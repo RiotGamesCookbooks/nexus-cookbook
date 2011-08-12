@@ -19,6 +19,12 @@
 #
 include_recipe "java"
 
+workDir = "#{node[:nexus][:work]}"
+
+rundeckPluginVersion = "#{node[:nexus][:plugins][:rundeck][:version]}"
+
+
+
 remote_file "/tmp/nexus-oss-webapp-1.9.2-bundle.tar.gz" do  
 source "http://nexus.sonatype.org/downloads/nexus-oss-webapp-1.9.2-bundle.tar.gz"  
 mode "0644"  
@@ -50,7 +56,41 @@ owner "root"
 mode "0755"
 end
 
-execute "startservice" do  
-command "service nexus start"   
+
+directory "#{workDir}/nexus/plugin-repository" do
+  owner "nexus"
+  group "nexus"
+  mode "0755"
+  action :create
 end
 
+cookbook_file "#{workDir}/nexus/plugin-repository/nexus-rundeck-plugin-#{rundeckPluginVersion}-bundle.zip" do
+  source "sonatype-work/nexus/plugin-repository/nexus-rundeck-plugin-#{rundeckPluginVersion}-bundle.zip"
+  mode 0644
+  owner "nexus"
+  group "nexus"
+  not_if do
+     File.exists?("#{workDir}/nexus/plugin-repository/nexus-rundeck-plugin-#{rundeckPluginVersion}")
+  end
+end
+
+#
+# NOTE:  this plugin has been reassembled, refer to:  http://kb.dtosolutions.com/wiki/Nexus-rundeck-plugin_options_service
+#
+script "installRundeckPlugin" do
+      interpreter "bash"
+      user "nexus"
+      group "nexus"
+      code <<-EOH
+         cd #{workDir}/nexus/plugin-repository &&
+         unzip nexus-rundeck-plugin-#{rundeckPluginVersion}-bundle.zip &&
+         rm nexus-rundeck-plugin-#{rundeckPluginVersion}-bundle.zip
+      EOH
+      not_if do
+         File.exists?("#{workDir}/nexus/plugin-repository/nexus-rundeck-plugin-#{rundeckPluginVersion}")
+      end
+end
+
+execute "startservice" do  
+   command "service nexus start"   
+end
