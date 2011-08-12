@@ -17,7 +17,7 @@
 # limitations under the License.
 #
 #
-include_recipe "java::sun"
+include_recipe "java"
 
 remote_file "/tmp/nexus-oss-webapp-1.9.2-bundle.tar.gz" do  
 source "http://nexus.sonatype.org/downloads/nexus-oss-webapp-1.9.2-bundle.tar.gz"  
