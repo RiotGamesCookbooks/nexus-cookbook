@@ -1,7 +1,8 @@
 #
-# Cookbook Name:: maven
+# Cookbook Name:: nexus
 # Recipe:: default
 #
+# Copyright 2011, DTO Solutions, Inc.
 # Copyright 2010, Opscode, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");

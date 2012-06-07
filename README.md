@@ -1,14 +1,14 @@
 Description
 ===========
 
-Installs and configures Apache Maven
+Installs and configures Sonatype Nexus
 
 Requirements
 ============
 
 Platform: 
 
-* Debian, Ubuntu, CentOS, Red Hat, Fedora
+* Ubuntu
 
 The following Opscode cookbooks are dependencies:
 
@@ -20,16 +20,17 @@ Attributes
 Usage
 =====
 
-Simply include the recipe where you want Apache Maven installed.
+Simply add the "nexus::default" recipe to the node where you want Sonatype Nexus installed.
 
-TODO
-====
 
 License and Author
 ==================
 
+Author:: Charles Scott (<connaryscott@gmail.com>)
+Author:: Greg Schueler (<greg.schueler@gmail.com>)
 Author:: Seth Chisamore (<schisamo@opscode.com>)
 
+Copyright 2011, DTO, Inc.
 Copyright 2010, Opscode, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
