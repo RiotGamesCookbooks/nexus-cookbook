@@ -39,7 +39,6 @@ code <<-EOH
 cd /usr/local
 tar -xzvf /tmp/nexus-oss-webapp-1.9.2-bundle.tar.gz
 ln -s /usr/local/nexus-oss-webapp-1.9.2 /usr/local/nexus
-rm /usr/local/nexus/conf/plexus.properties
 groupadd -g1230 nexus
 useradd -u1230 -g1230 -M nexus
 chown -R nexus:nexus /usr/local/nexus-oss-webapp-1.9.2/ /usr/local/sonatype-work/
@@ -47,14 +46,14 @@ EOH
 end
 
 template "/usr/local/nexus/conf/plexus.properties" do  
-source "plexus.properties.erb"  
-owner "nexus"
+  source "plexus.properties.erb"  
+  owner "nexus"
 end
 
 template "/etc/init.d/nexus" do  
-source "nexus.erb"  
-owner "root"
-mode "0755"
+  source "nexus.erb"  
+  owner "root"
+  mode "0755"
 end
 
 
@@ -79,17 +78,17 @@ end
 # NOTE:  this plugin has been reassembled, refer to:  http://kb.dtosolutions.com/wiki/Nexus-rundeck-plugin_options_service
 #
 script "installRundeckPlugin" do
-      interpreter "bash"
-      user "nexus"
-      group "nexus"
-      code <<-EOH
-         cd #{workDir}/nexus/plugin-repository &&
-         unzip nexus-rundeck-plugin-#{rundeckPluginVersion}-bundle.zip &&
-         rm nexus-rundeck-plugin-#{rundeckPluginVersion}-bundle.zip
-      EOH
-      not_if do
-         File.exists?("#{workDir}/nexus/plugin-repository/nexus-rundeck-plugin-#{rundeckPluginVersion}")
-      end
+  interpreter "bash"
+  user "nexus"
+  group "nexus"
+  code <<-EOH
+     cd #{workDir}/nexus/plugin-repository &&
+     unzip nexus-rundeck-plugin-#{rundeckPluginVersion}-bundle.zip &&
+     rm nexus-rundeck-plugin-#{rundeckPluginVersion}-bundle.zip
+  EOH
+  not_if do
+     File.exists?("#{workDir}/nexus/plugin-repository/nexus-rundeck-plugin-#{rundeckPluginVersion}")
+  end
 end
 
 execute "startservice" do  
