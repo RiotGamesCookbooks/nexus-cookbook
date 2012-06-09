@@ -8,4 +8,6 @@ version          "0.10.0"
 %w{ ubuntu }.each do |os|
   supports os
 end
+
+depends "ark"
 depends "java"
