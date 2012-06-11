@@ -23,13 +23,13 @@ include_recipe "java"
 
 app = {
   'name' => 'nexus',
-  'version' => '2.0.5',
-  'owner' => 'nexus',
-  'group' => 'nexus',
-  'url' => 'http://www.sonatype.org/downloads/nexus-2.0.5-bundle.tar.gz'
+  'version' => node['nexus']['version'],
+  'user' => node['nexus']['user'],
+  'group' => node['nexus']['group'],
+  'url' => node['nexus']['url']
 }
 
-user_home = "/var/lib/#{app['owner']}"
+user_home = "/var/lib/#{app['user']}"
 install_dir = "/usr/local/#{app['name']}"
 conf_dir = "#{install_dir}/conf"
 plugin_repo_path = "#{user_home}/plugin-repository"
@@ -38,7 +38,7 @@ group app['group'] do
   system true
 end
 
-user app['owner'] do
+user app['user'] do
   gid app['group']
   shell "/bin/bash"
   home user_home
@@ -46,7 +46,7 @@ user app['owner'] do
 end
 
 directory user_home do
-  owner app['owner']
+  owner app['user']
   group app['group']
   mode "0755"
   action :create
@@ -55,32 +55,31 @@ end
 ark app['name'] do
   url app['url']
   version app['version']
-  owner app['owner']
+  owner app['user']
   group app['group']
   action :install
 end
 
-template "#{conf_dir}/plexus.properties" do  
-  source "plexus.properties.erb"  
-  owner app['owner']
+template "#{conf_dir}/plexus.properties" do
+  source "plexus.properties.erb"
+  owner app['user']
   group app['group']
 end
 
-template "/etc/init.d/#{app['name']}" do  
-  source "nexus.erb"  
+template "/etc/init.d/#{app['name']}" do
+  source "nexus.erb"
   owner "root"
   group "root"
-  mode "0755"
+  mode "0775"
 end
 
 directory plugin_repo_path do
-  owner app['owner']
+  owner app['user']
   group app['group']
-  mode "0755"
+  mode "0775"
   action :create
 end
 
-service app['name'] do  
+service app['name'] do
    action [:enable, :start]
 end
-
