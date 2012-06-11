@@ -18,80 +18,69 @@
 # limitations under the License.
 #
 #
+include_recipe "ark"
 include_recipe "java"
 
-workDir = "#{node[:nexus][:work]}"
+app = {
+  'name' => 'nexus',
+  'version' => '2.0.5',
+  'owner' => 'nexus',
+  'group' => 'nexus',
+  'url' => 'http://www.sonatype.org/downloads/nexus-2.0.5-bundle.tar.gz'
+}
 
-rundeckPluginVersion = "#{node[:nexus][:plugins][:rundeck][:version]}"
+user_home = "/var/lib/#{app['owner']}"
+install_dir = "/usr/local/#{app['name']}"
+conf_dir = "#{install_dir}/conf"
+plugin_repo_path = "#{user_home}/plugin-repository"
 
-
-
-remote_file "/tmp/nexus-oss-webapp-1.9.2-bundle.tar.gz" do  
-source "http://nexus.sonatype.org/downloads/nexus-oss-webapp-1.9.2-bundle.tar.gz"  
-mode "0644"  
+group app['group'] do
+  system true
 end
 
-script "install_nexus" do  
-interpreter "bash"  
-user "root"  
-cwd "/tmp"  
-code <<-EOH  
-cd /usr/local
-tar -xzvf /tmp/nexus-oss-webapp-1.9.2-bundle.tar.gz
-ln -s /usr/local/nexus-oss-webapp-1.9.2 /usr/local/nexus
-rm /usr/local/nexus/conf/plexus.properties
-groupadd -g1230 nexus
-useradd -u1230 -g1230 -M nexus
-chown -R nexus:nexus /usr/local/nexus-oss-webapp-1.9.2/ /usr/local/sonatype-work/
-EOH
+user app['owner'] do
+  gid app['group']
+  shell "/bin/bash"
+  home user_home
+  system true
 end
 
-template "/usr/local/nexus/conf/plexus.properties" do  
-source "plexus.properties.erb"  
-owner "nexus"
-end
-
-template "/etc/init.d/nexus" do  
-source "nexus.erb"  
-owner "root"
-mode "0755"
-end
-
-
-directory "#{workDir}/nexus/plugin-repository" do
-  owner "nexus"
-  group "nexus"
+directory user_home do
+  owner app['owner']
+  group app['group']
   mode "0755"
   action :create
 end
 
-cookbook_file "#{workDir}/nexus/plugin-repository/nexus-rundeck-plugin-#{rundeckPluginVersion}-bundle.zip" do
-  source "sonatype-work/nexus/plugin-repository/nexus-rundeck-plugin-#{rundeckPluginVersion}-bundle.zip"
-  mode 0644
-  owner "nexus"
-  group "nexus"
-  not_if do
-     File.exists?("#{workDir}/nexus/plugin-repository/nexus-rundeck-plugin-#{rundeckPluginVersion}")
-  end
+ark app['name'] do
+  url app['url']
+  version app['version']
+  owner app['owner']
+  group app['group']
+  action :install
 end
 
-#
-# NOTE:  this plugin has been reassembled, refer to:  http://kb.dtosolutions.com/wiki/Nexus-rundeck-plugin_options_service
-#
-script "installRundeckPlugin" do
-      interpreter "bash"
-      user "nexus"
-      group "nexus"
-      code <<-EOH
-         cd #{workDir}/nexus/plugin-repository &&
-         unzip nexus-rundeck-plugin-#{rundeckPluginVersion}-bundle.zip &&
-         rm nexus-rundeck-plugin-#{rundeckPluginVersion}-bundle.zip
-      EOH
-      not_if do
-         File.exists?("#{workDir}/nexus/plugin-repository/nexus-rundeck-plugin-#{rundeckPluginVersion}")
-      end
+template "#{conf_dir}/plexus.properties" do  
+  source "plexus.properties.erb"  
+  owner app['owner']
+  group app['group']
 end
 
-execute "startservice" do  
-   command "service nexus start"   
+template "/etc/init.d/#{app['name']}" do  
+  source "nexus.erb"  
+  owner "root"
+  group "root"
+  mode "0755"
 end
+
+directory plugin_repo_path do
+  owner app['owner']
+  group app['group']
+  mode "0755"
+  action :create
+end
+
+service app['name'] do  
+   action [:enable, :start]
+end
+
