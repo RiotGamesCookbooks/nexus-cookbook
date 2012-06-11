@@ -26,7 +26,8 @@ app = {
   'version' => node['nexus']['version'],
   'user' => node['nexus']['user'],
   'group' => node['nexus']['group'],
-  'url' => node['nexus']['url']
+  'url' => node['nexus']['url'],
+  'binaries' => node['nexus']['binaries']
 }
 
 user_home = "/var/lib/#{app['user']}"
@@ -57,6 +58,7 @@ ark app['name'] do
   version app['version']
   owner app['user']
   group app['group']
+  has_binaries app['binaries']
   action :install
 end
 
