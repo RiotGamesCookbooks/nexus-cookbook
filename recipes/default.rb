@@ -62,8 +62,8 @@ ark app['name'] do
   action :install
 end
 
-template "#{conf_dir}/plexus.properties" do
-  source "plexus.properties.erb"
+template "#{conf_dir}/nexus.properties" do
+  source "nexus.properties.erb"
   owner app['user']
   group app['group']
 end
@@ -83,5 +83,5 @@ directory plugin_repo_path do
 end
 
 service app['name'] do
-   action [:enable, :start]
+  action [:enable, :start]
 end
