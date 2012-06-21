@@ -1,7 +1,8 @@
 Description
 ===========
 
-Installs and configures Sonatype Nexus
+Installs and configures Sonatype Nexus and Nginx. Nginx is installed from source with the http\_ssl\_module.
+Nginx is configured to run as a proxy for Nexus using HTTPS/SSL.
 
 Requirements
 ============
@@ -9,19 +10,44 @@ Requirements
 Platform: 
 
 * Ubuntu
+* CentOS
 
-The following Opscode cookbooks are dependencies:
+The following cookbooks are dependencies:
 
 * java
+* ark
+* nginx
 
 Attributes
 ==========
+
+The following attributes are set under the `nexus` namespace:
+
+* version - sets the version to install
+* user - sets the user to install nexus under
+* group - sets the group to install nexus under
+* url - sets the URL where the nexus package is located
+* port - the port to run nexus on
+* host - the hostname to use for nexus
+* path - the `user` home directory
+* home - the installation directory for nexus
+
+The following attributes are set under `nexus::nginx` namespace:
+
+* listen\_port - the port to listen on for nginx
+* server\_name - the name of the nginx server
+* options - used to generate options in the nginx conf file
+
+SSL
+===
+
+The files directory contains a self-signed certificate that is installed to `nginx::dir/shared/certificates/nexus-proxy.pem`
+Replace this file with your own certificates for a production environment.
 
 Usage
 =====
 
 Simply add the "nexus::default" recipe to the node where you want Sonatype Nexus installed.
-
 
 License and Author
 ==================

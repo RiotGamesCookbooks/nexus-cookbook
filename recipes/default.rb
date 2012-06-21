@@ -20,68 +20,86 @@
 #
 include_recipe "ark"
 include_recipe "java"
+include_recipe "nginx::source"
 
-app = {
-  'name' => 'nexus',
-  'version' => node['nexus']['version'],
-  'user' => node['nexus']['user'],
-  'group' => node['nexus']['group'],
-  'url' => node['nexus']['url'],
-  'binaries' => node['nexus']['binaries']
-}
+user_home = "/#{node[:nexus][:user]}"
+path_file_name = "#{user_home}/nexus-#{node[:nexus][:version]}-bundle.tar.gz"
 
-user_home = "/var/lib/#{app['user']}"
-install_dir = "/usr/local/#{app['name']}"
-conf_dir = "#{install_dir}/conf"
-plugin_repo_path = "#{user_home}/plugin-repository"
-
-group app['group'] do
-  system true
+platform = ""
+case node[:platform]
+when "centos", "redhat", "debian", "ubuntu", "amazon", "scientific"
+  platform = "linux-x86-64"
 end
 
-user app['user'] do
-  gid app['group']
+group node[:nexus][:group] do
+  system "true"
+end
+
+user node[:nexus][:group] do
+  gid node[:nexus][:group]
   shell "/bin/bash"
   home user_home
   system true
 end
 
 directory user_home do
-  owner app['user']
-  group app['group']
+  owner node[:nexus][:user]
+  group node[:nexus][:group]
   mode "0755"
   action :create
 end
 
-ark app['name'] do
-  url app['url']
-  version app['version']
-  owner app['user']
-  group app['group']
-  has_binaries app['binaries']
+ark node[:nexus][:name] do
+  url node[:nexus][:url]
+  version node[:nexus][:version]
+  owner node[:nexus][:user]
+  group node[:nexus][:group]
   action :install
 end
 
-template "#{conf_dir}/nexus.properties" do
+template "#{node[:nexus][:home]}/conf/nexus.properties" do
   source "nexus.properties.erb"
-  owner app['user']
-  group app['group']
+  owner node[:nexus][:user]
+  group node[:nexus][:group]
 end
 
-template "/etc/init.d/#{app['name']}" do
-  source "nexus.erb"
+template "/etc/init.d/#{node[:nexus][:name]}" do
+  source "nexus.init.d.erb"
   owner "root"
   group "root"
   mode "0775"
+  variables(
+    :platform => platform
+  )
 end
 
-directory plugin_repo_path do
-  owner app['user']
-  group app['group']
-  mode "0775"
-  action :create
+directory "#{node[:nginx][:dir]}/shared/certificates" do
+  owner "root"
+  group "root"
+  mode "700"
+  recursive true
 end
 
-service app['name'] do
+cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.pem" do
+  source "self_signed_cert.pem"
+  mode "077"
+  action :create_if_missing
+end
+
+template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
+  source "nexus_proxy.nginx.conf.erb"
+  owner "root"
+  group "root"
+  mode "0644"
+  variables(
+    :ssl_certificate => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.pem",
+    :options => node[:nexus][:nginx][:options]
+  )
+end
+
+nginx_site 'nexus_proxy.conf'
+
+service node[:nexus][:name] do
+  supports :status => true, :console => true, :start => true, :stop => true, :restart => true, :dump => true
   action [:enable, :start]
 end
