@@ -32,7 +32,7 @@ when "centos", "redhat", "debian", "ubuntu", "amazon", "scientific"
 end
 
 group node[:nexus][:group] do
-  system "true"
+  system true
 end
 
 user node[:nexus][:group] do
