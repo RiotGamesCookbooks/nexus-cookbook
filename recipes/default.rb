@@ -100,6 +100,7 @@ end
 available_plugins = Dir.entries("#{node[:nexus][:home]}/nexus/WEB-INF/optional-plugins")
 node[:nexus][:plugins].each do |plugin|
   matched_plugin = available_plugins.find{|plugin_dir| plugin_dir.match(plugin)}
+  
   link "#{node[:nexus][:home]}/nexus/WEB-INF/optional-plugins/#{matched_plugin}" do
     to "#{node[:nexus][:home]}/nexus/WEB-INF/plugin-repository/#{matched_plugin}"
   end
