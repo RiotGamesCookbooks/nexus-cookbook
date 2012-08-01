@@ -1,0 +1,2 @@
+actions :install_plugin
+
