@@ -97,7 +97,8 @@ template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
   )
 end
 
-install_plugin "foo"
+nexus_plugin "foo"
+log "After nexus_plugin"
 
 #available_plugins = Dir.entries("#{node[:nexus][:home]}/nexus/WEB-INF/optional-plugins")
 #node[:nexus][:plugins].each do |plugin|
