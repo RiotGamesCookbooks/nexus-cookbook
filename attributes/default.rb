@@ -13,6 +13,8 @@ default['nexus']['home']                                              = "/usr/lo
 default['nexus']['nginx_proxy']['listen_port']                        = 8443
 default['nexus']['nginx_proxy']['server_name']                        = 'localhost'
 
+default['nexus']['plugins']                                           = ['nexus-timeline-plugin']
+
 default['nginx']['configure_flags']                                   = 'with-http_ssl_module'
 
 default['nexus']['nginx']['options']['client_max_body_size']          = '200M'
