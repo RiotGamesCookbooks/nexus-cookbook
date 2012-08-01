@@ -43,3 +43,6 @@ features/*
 # Berkshelf
 Berksfile
 Berksfile.lock
+
+# Vagrant
+.vagrant
