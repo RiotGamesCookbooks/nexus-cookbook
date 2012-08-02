@@ -97,6 +97,10 @@ template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
   )
 end
 
+node[:nexus][:plugins].each do |plugin| 
+  nexus_plugin plugin
+end
+
 nginx_site 'nexus_proxy.conf'
 
 service node[:nexus][:name] do
