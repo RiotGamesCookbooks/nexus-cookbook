@@ -13,7 +13,7 @@ default['nexus']['home']                                              = "/usr/lo
 default['nexus']['nginx_proxy']['listen_port']                        = 8443
 default['nexus']['nginx_proxy']['server_name']                        = 'localhost'
 
-default['nexus']['plugins']                                           = ['nexus-timeline-plugin', 'nexus-maven-bridge-plugin']
+default['nexus']['plugins']                                           = ['nexus-groovy-console-plugin', 'nexus-maven-bridge-plugin']
 
 default['nginx']['configure_flags']                                   = 'with-http_ssl_module'
 
