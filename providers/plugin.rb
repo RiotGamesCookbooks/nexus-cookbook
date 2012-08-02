@@ -38,6 +38,7 @@ action :install do
   end
 end
 
+private
 def available_plugins
   Dir.entries("#{node[:nexus][:home]}/nexus/WEB-INF/optional-plugins")
 end
