@@ -97,9 +97,7 @@ template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
   )
 end
 
-nexus_plugin node['nexus']['plugins'] do
-  action :install
-end
+nexus_plugin "nexus-groovy-console-plugin"
 
 nginx_site 'nexus_proxy.conf'
 
