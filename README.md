@@ -18,6 +18,24 @@ The following cookbooks are dependencies:
 * ark
 * nginx
 
+Resources/Providers
+===================
+
+## nexus\_plugin
+
+Installs a Nexus plugin by creating a symlink of a named plugin from the Nexus' `optional-plugins` directory into the
+Nexus' `plugin-repositroy` directory.
+
+### Actions
+Action  | Description         | Default
+------- |-------------        |---------
+install | Installs the plugin | Yes
+
+### Attributes
+Attribute  | Description                   | Type    | Default
+---------  |-------------                  |-----    |--------
+name       | Name of the plugin to install | String  | name
+
 Attributes
 ==========
 
