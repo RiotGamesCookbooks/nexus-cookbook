@@ -25,8 +25,7 @@ end
 action :install do
   unless ::File.exists?("#{node[:nexus][:home]}/nexus/WEB-INF/plugin-repository/#{@current_resource.name}")
     plugin = new_resource.name
-    available_plugins = Dir.entries("#{node[:nexus][:home]}/nexus/WEB-INF/optional-plugins")
-    matched_plugin = available_plugins.find{|plugin_dir| plugin_dir.match(plugin)}
+    matched_plugin = get_plugin(plugin)
     if matched_plugin.nil? || matched_plugin.empty?
       log "Plugin #{plugin} did not match any optional-plugins for your Nexus installation."
     else
@@ -37,4 +36,12 @@ action :install do
     end
     new_resource.updated_by_last_action(true)
   end
+end
+
+def available_plugins
+  Dir.entries("#{node[:nexus][:home]}/nexus/WEB-INF/optional-plugins")
+end
+
+def get_plugin(plugin)
+  available_plugins.find{|plugin_dir| plugin_dir.match(plugin)}
 end
