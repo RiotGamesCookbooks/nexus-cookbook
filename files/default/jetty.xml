@@ -13,7 +13,7 @@
     Eclipse Foundation. All other trademarks are the property of their respective owners.
 
 -->
-<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
 
 <!-- ============================================================ -->
 <!--                                                              -->
@@ -23,6 +23,9 @@
 <!--                                                              -->
 <!-- ============================================================ -->
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
+    <Set name="threadPool">
+        <New class="org.sonatype.sisu.jetty.thread.InstrumentedQueuedThreadPool"/>
+    </Set>
     <Call name="addConnector">
         <Arg>
             <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
@@ -35,19 +38,11 @@
     
     <Set name="handler">
       <New id="Contexts" class="org.eclipse.jetty.server.handler.ContextHandlerCollection">
-          <!-- The following configuration is REQUIRED, and MUST BE FIRST. 
-               It makes the Plexus container available for use in the Nexus webapp. -->
-          <Call name="addLifeCycleListener">
-              <Arg>
-                <New class="org.sonatype.plexus.jetty.custom.InjectExistingPlexusListener" />
-              </Arg>
-          </Call>
-    
           <!-- The following configuration disables JSP taglib support, the validation of which
                slows down Jetty's startup significantly. -->
           <Call name="addLifeCycleListener">
               <Arg>
-                <New class="org.sonatype.plexus.jetty.custom.DisableTagLibsListener" />
+                <New class="org.sonatype.sisu.jetty.custom.DisableTagLibsListener" />
               </Arg>
           </Call>
       </New>
@@ -57,7 +52,14 @@
       <Arg><Ref id="Contexts"/></Arg>
       <Arg>${nexus-webapp}</Arg>
       <Arg>${nexus-webapp-context-path}</Arg>
+      <Set name="serverClasses">
+        <Array type="java.lang.String">
+          <Item>org.slf4j.</Item>
+          <Item>ch.qos.logback.</Item>
+        </Array>
+      </Set>
       <Set name="extractWAR">false</Set>
+      <Set name="throwUnavailableOnStartupException">true</Set>
     </New>
     
     <Set name="stopAtShutdown">true</Set>
