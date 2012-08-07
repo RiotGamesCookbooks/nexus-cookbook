@@ -21,6 +21,7 @@
 include_recipe "ark"
 include_recipe "java"
 include_recipe "nginx::source"
+include_recipe "bluepill"
 
 user_home = "/#{node[:nexus][:user]}"
 path_file_name = "#{user_home}/nexus-#{node[:nexus][:version]}-bundle.tar.gz"
@@ -103,7 +104,11 @@ end
 
 nginx_site 'nexus_proxy.conf'
 
-service node[:nexus][:name] do
-  supports :status => true, :console => true, :start => true, :stop => true, :restart => true, :dump => true
-  action [:enable, :start]
+template "#{node[:bluepill][:conf_dir]}/nexus.pill" do
+  source "nexus.pill.erb"
+  mode 0644
+end
+
+bluepill_service "nexus" do
+  action [:enable, :load, :start]
 end
