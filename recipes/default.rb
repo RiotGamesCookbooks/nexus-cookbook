@@ -87,6 +87,13 @@ cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.pem" do
   action :create_if_missing
 end
 
+cookbook_file "#{node[:nexus][:home]}/conf/jetty.xml" do
+  source "jetty.xml"
+  mode "0775"
+  owner node[:nexus][:user]
+  group node[:nexus][:group] 
+end
+
 template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
   source "nexus_proxy.nginx.conf.erb"
   owner "root"
