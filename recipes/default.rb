@@ -58,13 +58,13 @@ ark node[:nexus][:name] do
   action :install
 end
 
-template "#{node[:nexus][:home]}/conf/nexus.properties" do
+template "#{node[:nexus][:conf_dir]}/nexus.properties" do
   source "nexus.properties.erb"
   owner node[:nexus][:user]
   group node[:nexus][:group]
 end
 
-template "#{node[:nexus][:home]}/bin/#{node[:nexus][:name]}" do
+template "#{node[:nexus][:bin_dir]}/#{node[:nexus][:name]}" do
   source "nexus.erb"
   owner "root"
   group "root"
@@ -87,7 +87,7 @@ cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.pem" do
   action :create_if_missing
 end
 
-cookbook_file "#{node[:nexus][:home]}/conf/jetty.xml" do
+cookbook_file "#{node[:nexus][:conf_dir]}/jetty.xml" do
   source "jetty.xml"
   mode "0775"
   owner node[:nexus][:user]
@@ -108,7 +108,6 @@ end
 node[:nexus][:plugins].each do |plugin| 
   nexus_plugin plugin
 end
-
 nginx_site 'nexus_proxy.conf'
 
 template "#{node[:bluepill][:conf_dir]}/nexus.pill" do

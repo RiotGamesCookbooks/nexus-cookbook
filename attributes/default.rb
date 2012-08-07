@@ -8,7 +8,9 @@ default[:nexus][:host]                                         = '0.0.0.0'
 default[:nexus][:path]                                         = '/nexus'
 
 default[:nexus][:name]                                         = 'nexus'
-default[:nexus][:home]                                         = "/usr/local/#{default['nexus']['name']}"
+default[:nexus][:home]                                         = "/usr/local/#{node[:nexus][:name]}"
+default[:nexus][:conf_dir]                                     = "#{node[:nexus][:home]}/conf"
+default[:nexus][:bin_dir]                                      = "#{node[:nexus][:home]}/bin"
 
 default[:nexus][:nginx_proxy][:listen_port]                    = 8443
 default[:nexus][:nginx_proxy][:server_name]                    = 'localhost'
