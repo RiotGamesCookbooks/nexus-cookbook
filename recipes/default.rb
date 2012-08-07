@@ -64,8 +64,8 @@ template "#{node[:nexus][:home]}/conf/nexus.properties" do
   group node[:nexus][:group]
 end
 
-template "/etc/init.d/#{node[:nexus][:name]}" do
-  source "nexus.init.d.erb"
+template "#{node[:nexus][:home]}/bin/#{node[:nexus][:name]}" do
+  source "nexus.erb"
   owner "root"
   group "root"
   mode "0775"

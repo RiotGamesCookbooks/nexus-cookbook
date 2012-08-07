@@ -2,9 +2,8 @@ Bluepill.application("nexus") do |app|
 
   app.process("nexus") do |process|
     process.pid_file = "<%= node[:bluepill][:pid_dir] %>/nexus.pid"
-    process.working_dir = "/etc/init.d"
-    process.start_command = "nexus start"
-    process.stop_comman = "nexus stop"
+    process.start_command = "<%= node[:nexus][:home] %>/bin/<%= node[:nexus][:name] %> start"
+    process.stop_command = "<%= node[:nexus][:home] %>/bin/<%= node[:nexus][:name] %> stop"
     process.stdout = process.stderr = "<%= node[:nexus][:home] %>/logs/nexus.log"
     process.start_grace_time = 8.seconds
     process.stop_grace_time = 5.seconds
