@@ -110,7 +110,7 @@ template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
   variables(
     :ssl_certificate => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.pem",
     :listen_port => node[:nexus][:nginx_proxy][:listen_port],
-    :server_name => "#{node[:nexus][:nginx_proxy][:server_name]}",
+    :server_name => node[:nexus][:nginx_proxy][:server_name],
     :fqdn => node[:fqdn],
     :options => node[:nexus][:nginx][:options]
   )
@@ -125,10 +125,10 @@ template "#{node[:bluepill][:conf_dir]}/nexus.pill" do
   source "nexus.pill.erb"
   mode 0644
   variables(
-    :pid_dir => "#{node[:bluepill][:pid_dir]}",
-    :bin_dir => "#{node[:nexus][:bin_dir]}",
-    :home_dir => "#{node[:nexus][:home]}",
-    :name => "#{node[:nexus][:name]}"
+    :pid_dir => node[:bluepill][:pid_dir],
+    :bin_dir => node[:nexus][:bin_dir],
+    :home_dir => node[:nexus][:home],
+    :name => node[:nexus][:name]
   )
 end
 
