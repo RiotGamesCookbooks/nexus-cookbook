@@ -63,9 +63,9 @@ template "#{node[:nexus][:conf_dir]}/nexus.properties" do
   owner node[:nexus][:user]
   group node[:nexus][:group]
   variables(
-    :nexus_port => "#{node[:nexus][:port]}",
-    :nexus_host => "#{node[:nexus][:host]}",
-    :nexus_path => "#{node[:nexus][:path]}",
+    :nexus_port => node[:nexus][:port],
+    :nexus_host => node[:nexus][:host],
+    :work_dir => node[:nexus][:work_dir],
     :fqdn => node[:fqdn]
   )
 end
@@ -119,6 +119,7 @@ end
 node[:nexus][:plugins].each do |plugin| 
   nexus_plugin plugin
 end
+
 nginx_site 'nexus_proxy.conf'
 
 template "#{node[:bluepill][:conf_dir]}/nexus.pill" do
@@ -134,4 +135,12 @@ end
 
 bluepill_service "nexus" do
   action [:enable, :load, :start]
+end
+  
+node[:nexus][:packages].each do |pack|
+  package pack
+end
+
+nexus_config "hello" do
+  action :update_urls
 end
