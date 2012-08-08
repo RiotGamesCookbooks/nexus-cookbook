@@ -79,8 +79,9 @@ template "#{node[:nexus][:bin_dir]}/#{node[:nexus][:name]}" do
   mode "0775"
   variables(
     :platform => platform,
-    :nexus_home => "#{node[:nexus][:home]}",
-    :nexus_user => "#{node[:nexus][:user]}"
+    :nexus_port => node[:nexus][:port],
+    :nexus_home => node[:nexus][:home],
+    :nexus_user => node[:nexus][:user]
   )
 end
 

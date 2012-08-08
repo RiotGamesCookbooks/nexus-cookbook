@@ -408,7 +408,20 @@ console() {
         exit 1
     fi
 }
- 
+
+remove_log() {
+  # Delete the log on startup
+  rm -f <%= @nexus_home %>/logs/wrapper.log
+}
+
+run_until() {
+  OUTPUT=0;
+  while [ "$OUTPUT" = 0 ]; do
+    OUTPUT=`cat <%= @nexus_home %>/logs/wrapper.log | grep -c "org.eclipse.jetty.server.AbstractConnector - Started SelectChannelConnector@127.0.0.1:<%= @nexus_port %>"`;
+    # Waiting until org.eclipse.jetty.server.AbstractConnector - Started SelectChannelConnector@127.0.0.1:8081 appears in the log
+  done
+}
+
 start() {
     echo "Starting $APP_LONG_NAME..."
     getpid
@@ -416,7 +429,9 @@ start() {
     then
         # The string passed to eval must handles spaces in paths correctly.
         COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=$APP_NAME wrapper.pidfile=\"$PIDFILE\" wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $LOCKPROP"
+        remove_log
         eval $COMMAND_LINE
+        run_until
     else
         echo "$APP_LONG_NAME is already running."
         exit 1
@@ -427,7 +442,7 @@ start() {
         echo "Started $APP_LONG_NAME."
     else
         echo "Failed to start $APP_LONG_NAME."
-    fi    
+    fi   
 }
  
 stopit() {
