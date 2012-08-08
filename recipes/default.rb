@@ -21,6 +21,7 @@
 include_recipe "ark"
 include_recipe "java"
 include_recipe "nginx::source"
+include_recipe "bluepill"
 
 user_home = "/#{node[:nexus][:user]}"
 path_file_name = "#{user_home}/nexus-#{node[:nexus][:version]}-bundle.tar.gz"
@@ -57,19 +58,27 @@ ark node[:nexus][:name] do
   action :install
 end
 
-template "#{node[:nexus][:home]}/conf/nexus.properties" do
+template "#{node[:nexus][:conf_dir]}/nexus.properties" do
   source "nexus.properties.erb"
   owner node[:nexus][:user]
   group node[:nexus][:group]
+  variables(
+    :nexus_port => "#{node[:nexus][:port]}",
+    :nexus_host => "#{node[:nexus][:host]}",
+    :nexus_path => "#{node[:nexus][:path]}",
+    :fqdn => node[:fqdn]
+  )
 end
 
-template "/etc/init.d/#{node[:nexus][:name]}" do
-  source "nexus.init.d.erb"
+template "#{node[:nexus][:bin_dir]}/#{node[:nexus][:name]}" do
+  source "nexus.erb"
   owner "root"
   group "root"
   mode "0775"
   variables(
-    :platform => platform
+    :platform => platform,
+    :nexus_home => "#{node[:nexus][:home]}",
+    :nexus_user => "#{node[:nexus][:user]}"
   )
 end
 
@@ -86,6 +95,13 @@ cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.pem" do
   action :create_if_missing
 end
 
+cookbook_file "#{node[:nexus][:conf_dir]}/jetty.xml" do
+  source "jetty.xml"
+  mode "0775"
+  owner node[:nexus][:user]
+  group node[:nexus][:group] 
+end
+
 template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
   source "nexus_proxy.nginx.conf.erb"
   owner "root"
@@ -93,6 +109,9 @@ template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
   mode "0644"
   variables(
     :ssl_certificate => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.pem",
+    :listen_port => node[:nexus][:nginx_proxy][:listen_port],
+    :server_name => node[:nexus][:nginx_proxy][:server_name],
+    :fqdn => node[:fqdn],
     :options => node[:nexus][:nginx][:options]
   )
 end
@@ -100,10 +119,19 @@ end
 node[:nexus][:plugins].each do |plugin| 
   nexus_plugin plugin
 end
-
 nginx_site 'nexus_proxy.conf'
 
-service node[:nexus][:name] do
-  supports :status => true, :console => true, :start => true, :stop => true, :restart => true, :dump => true
-  action [:enable, :start]
+template "#{node[:bluepill][:conf_dir]}/nexus.pill" do
+  source "nexus.pill.erb"
+  mode 0644
+  variables(
+    :pid_dir => node[:bluepill][:pid_dir],
+    :bin_dir => node[:nexus][:bin_dir],
+    :home_dir => node[:nexus][:home],
+    :name => node[:nexus][:name]
+  )
+end
+
+bluepill_service "nexus" do
+  action [:enable, :load, :start]
 end

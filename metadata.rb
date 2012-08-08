@@ -12,3 +12,4 @@ end
 depends "ark"
 depends "java"
 depends "nginx"
+depends "bluepill"

@@ -1,14 +1,16 @@
-default[:nexus][:version]                                      = '2.0.5'
+default[:nexus][:version]                                      = '2.1.1'
 default[:nexus][:user]                                         = 'nexus'
 default[:nexus][:group]                                        = 'nexus'
-default[:nexus][:url]                                          = "http://www.sonatype.org/downloads/nexus-#{nexus['version']}-bundle.tar.gz"
+default[:nexus][:url]                                          = "http://www.sonatype.org/downloads/nexus-#{node[:nexus][:version]}-bundle.tar.gz"
 
 default[:nexus][:port]                                         = '8081'
 default[:nexus][:host]                                         = '0.0.0.0'
 default[:nexus][:path]                                         = '/nexus'
 
 default[:nexus][:name]                                         = 'nexus'
-default[:nexus][:home]                                         = "/usr/local/#{default['nexus']['name']}"
+default[:nexus][:home]                                         = "/usr/local/#{node[:nexus][:name]}"
+default[:nexus][:conf_dir]                                     = "#{node[:nexus][:home]}/conf"
+default[:nexus][:bin_dir]                                      = "#{node[:nexus][:home]}/bin"
 
 default[:nexus][:nginx_proxy][:listen_port]                    = 8443
 default[:nexus][:nginx_proxy][:server_name]                    = 'localhost'
