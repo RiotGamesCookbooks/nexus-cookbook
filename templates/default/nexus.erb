@@ -24,7 +24,7 @@
 # Application
 APP_NAME="nexus"
 APP_LONG_NAME="Nexus OSS"
-NEXUS_HOME="<%= node[:nexus][:home] %>"
+NEXUS_HOME="<%= @nexus_home %>"
 PLATFORM="<%= @platform %>"
 #JAVA_HOME="/usr/java/latest"
 #PATH=${PATH}:${JAVA_HOME}/bin
@@ -53,7 +53,7 @@ PRIORITY=
 # NOTE - This will set the user which is used to run the Wrapper as well as
 #  the JVM and is not useful in situations where a privileged resource or
 #  port needs to be allocated prior to the user being changed.
-RUN_AS_USER=<%= node['nexus']['user'] %>
+RUN_AS_USER=<%= @nexus_user %>
 
 # The following two lines are used by the chkconfig command. Change as is
 #  appropriate for your application.  They should remain commented.

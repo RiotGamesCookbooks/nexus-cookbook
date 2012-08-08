@@ -62,6 +62,12 @@ template "#{node[:nexus][:conf_dir]}/nexus.properties" do
   source "nexus.properties.erb"
   owner node[:nexus][:user]
   group node[:nexus][:group]
+  variables(
+    :nexus_port => "#{node[:nexus][:port]}",
+    :nexus_host => "#{node[:nexus][:host]}",
+    :nexus_path => "#{node[:nexus][:path]}",
+    :fqdn => node[:fqdn]
+  )
 end
 
 template "#{node[:nexus][:bin_dir]}/#{node[:nexus][:name]}" do
@@ -70,7 +76,9 @@ template "#{node[:nexus][:bin_dir]}/#{node[:nexus][:name]}" do
   group "root"
   mode "0775"
   variables(
-    :platform => platform
+    :platform => platform,
+    :nexus_home => "#{node[:nexus][:home]}",
+    :nexus_user => "#{node['nexus']['user']}"
   )
 end
 
@@ -101,6 +109,9 @@ template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
   mode "0644"
   variables(
     :ssl_certificate => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.pem",
+    :listen_port => node[:nexus][:nginx_proxy][:listen_port],
+    :server_name => "#{node[:nexus][:nginx_proxy][:server_name]}",
+    :fqdn => node[:fqdn],
     :options => node[:nexus][:nginx][:options]
   )
 end
@@ -113,6 +124,12 @@ nginx_site 'nexus_proxy.conf'
 template "#{node[:bluepill][:conf_dir]}/nexus.pill" do
   source "nexus.pill.erb"
   mode 0644
+  variables(
+    :pid_dir => "#{node[:bluepill][:pid_dir]}",
+    :bin_dir => "#{node[:nexus][:bin_dir]}",
+    :home_dir => "#{node[:nexus][:home]}",
+    :name => "#{node[:nexus][:name]}"
+  )
 end
 
 bluepill_service "nexus" do
