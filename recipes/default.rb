@@ -144,6 +144,4 @@ node[:nexus][:packages].each do |pack|
   package pack
 end
 
-nexus_config "hello" do
-  action :update_urls
-end
+nexus_server "https://localhost:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
