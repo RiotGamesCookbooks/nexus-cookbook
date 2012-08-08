@@ -62,9 +62,11 @@ template "#{node[:nexus][:conf_dir]}/nexus.properties" do
   source "nexus.properties.erb"
   owner node[:nexus][:user]
   group node[:nexus][:group]
+  mode "0775"
   variables(
     :nexus_port => node[:nexus][:port],
     :nexus_host => node[:nexus][:host],
+    :nexus_path => node[:nexus][:path],
     :work_dir => node[:nexus][:work_dir],
     :fqdn => node[:fqdn]
   )
