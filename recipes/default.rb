@@ -78,7 +78,7 @@ template "#{node[:nexus][:bin_dir]}/#{node[:nexus][:name]}" do
   variables(
     :platform => platform,
     :nexus_home => "#{node[:nexus][:home]}",
-    :nexus_user => "#{node['nexus']['user']}"
+    :nexus_user => "#{node[:nexus][:user]}"
   )
 end
 
