@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: nexus
-# Resource:: server
+# Provider:: settings
 #
 # Author:: Kyle Allan (<kallan@riotgames.com>)
 # Copyright 2012, Riot Games
@@ -18,11 +18,37 @@
 # limitations under the License.
 #
 
-def initialize(*args)
-  super
-  @action = :create
+def load_current_resource
+  @current_resource = Chef::Resource::NexusServer.new(new_resource.url)
 end
 
-actions :create
+action :create do
+  install_nokogiri
 
-attribute :url, :kind_of           => String, :required => true, :name_attribute => true
+  unless check_server_settings_exist
+    ruby_block "create xml and add it to nexus.xml" do
+      block do
+        nexus_xml
+      end
+    end
+    new_resource.updated_by_last_action(true)
+  end
+
+end
+
+private
+def install_nokogiri
+  chef_gem "nokogiri" do
+    action :install
+  end
+
+  require 'nokogiri'
+end
+
+def nexus_xml
+  Nokogiri::XML(::File.new("#{node[:nexus][:work_dir]}/conf/nexus.xml"))
+end
+
+def check_server_settings_exist
+  nexus_xml.xpath("nexusConfiguration/restApi").empty?
+end
