@@ -28,7 +28,8 @@ action :update do
   unless path_value_equals?(@current_resource.value)
     ruby_block "update the json and upload it" do
       block do
-        nexus_xml
+        update_nexus_settings_json
+        upload_nexus_settings_json
       end
     end
     new_resource.updated_by_last_action(true)
@@ -44,20 +45,56 @@ def install_nexus_cli
 end
 
 def path_value_equals?(value)
-  paths = @current_resource.path.split("/")
-  json = get_nexus_settings_json
-  paths.each do |path|
-    return false unless json.kind_of? Hash
-    json = json[path]
+  ruby_block "check whether the current settings are already equal to value" do
+    block do
+      paths = @current_resource.path.split("/")
+      json = get_nexus_settings_json
+      paths.each do |path|
+        return false unless json.kind_of? Hash
+        json = json[path]
+      end
+      json == value
+    end
   end
-  json == value
 end
 
 def get_nexus_settings_json
   ruby_block "get the json from nexus" do
     block do
       require 'nexus_cli'
-      NexusCli::Factory.create(nil)
+      nexus = NexusCli::Factory.create(nexus_cli_credentials)
+      nexus.get_global_settings
+      JSON.parse(File.read(File.join(File.expand_path("."), "global_settings.json")))
     end
   end
+end
+
+def update_nexus_settings_json
+  ruby_block "update the settings json" do
+    block do
+      json = JSON.parse(File.read(File.join(File.expand_path("."), "global_settings.json")))
+      paths = @current_resource.path.split("/")
+      json_edit = paths.inject("json") do |string, path|
+        string << "[\"#{path}\"]"
+      end
+      File.open(File.join(File.expand_path("."), "global_settings.json"), "w+") do |opened|
+        json_edit << " = @current_resource.value"
+        eval json_edit
+        opened.write(JSON.pretty_generate(json))
+      end
+    end
+  end
+end
+
+def upload_nexus_settings_json
+  ruby_block "upload the json to nexus" do
+    block do
+      nexus = NexusCli::Factory.create(nexus_cli_credentials)
+      nexus.upload_global_settings
+    end
+  end
+end
+
+def nexus_cli_credentials
+  {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository], "username" => node[:nexus][:cli][:username], "password" => node[:nexus][:cli][:password]}
 end
