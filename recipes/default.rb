@@ -139,9 +139,11 @@ end
 bluepill_service "nexus" do
   action [:enable, :load, :start]
 end
-  
-node[:nexus][:packages].each do |pack|
-  package pack
+
+nexus_settings "data/globalRestApiSettings/baseUrl" do
+  value "https://localhost:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
 end
 
-nexus_server "https://localhost:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
+nexus_settings "data/globalRestApiSettings/forceBaseUrl" do
+  value "true"
+end

@@ -22,5 +22,3 @@ default[:nginx][:configure_flags]                              = 'with-http_ssl_
 
 default[:nexus][:nginx][:options][:client_max_body_size]       = '200M'
 default[:nexus][:nginx][:options][:client_body_buffer_size]    = '512k'
-
-default[:nexus][:packages]                                     = ["libxml2", "libxml2-devel", "libxslt", "libxslt-devel"]

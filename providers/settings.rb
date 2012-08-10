@@ -19,14 +19,14 @@
 #
 
 def load_current_resource
-  @current_resource = Chef::Resource::NexusServer.new(new_resource.url)
+  @current_resource = Chef::Resource::NexusSettings.new(new_resource.path)
 end
 
-action :create do
-  install_nokogiri
+action :update do
+  install_nexus_cli
 
-  unless check_server_settings_exist
-    ruby_block "create xml and add it to nexus.xml" do
+  unless path_value_equals?(@current_resource.value)
+    ruby_block "update the json and upload it" do
       block do
         nexus_xml
       end
@@ -37,18 +37,27 @@ action :create do
 end
 
 private
-def install_nokogiri
-  chef_gem "nokogiri" do
-    action :install
+def install_nexus_cli
+  chef_gem "neuxs_cli" do
+    version "0.4.0"
   end
-
-  require 'nokogiri'
 end
 
-def nexus_xml
-  Nokogiri::XML(::File.new("#{node[:nexus][:work_dir]}/conf/nexus.xml"))
+def path_value_equals?(value)
+  paths = @current_resource.path.split("/")
+  json = get_nexus_settings_json
+  paths.each do |path|
+    return false unless json.kind_of? Hash
+    json = json[path]
+  end
+  json == value
 end
 
-def check_server_settings_exist
-  nexus_xml.xpath("nexusConfiguration/restApi").empty?
+def get_nexus_settings_json
+  ruby_block "get the json from nexus" do
+    block do
+      require 'nexus_cli'
+      NexusCli::Factory.create(nil)
+    end
+  end
 end

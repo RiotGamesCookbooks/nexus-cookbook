@@ -20,9 +20,10 @@
 
 def initialize(*args)
   super
-  @action = :create
+  @action = :update
 end
 
-actions :create, :update
+actions :update
 
-attribute :url, :kind_of           => String, :required => true, :name_attribute => true
+attribute :path, :kind_of           => String, :required => true, :name_attribute => true
+attribute :value, :kind_of          => String, :required => true
