@@ -20,6 +20,7 @@
 
 def load_current_resource
   @current_resource = Chef::Resource::NexusSettings.new(new_resource.path)
+  @current_resource.value new_resource.value
 end
 
 action :update do
@@ -39,62 +40,60 @@ end
 
 private
 def install_nexus_cli
-  chef_gem "neuxs_cli" do
+  package "libxml2-devel" do
+    action :install
+  end.run_action(:install)
+
+  package "libxslt-devel" do
+    action :install
+  end.run_action(:install)
+  
+  chef_gem "nexus_cli" do
     version "0.4.0"
   end
 end
 
 def path_value_equals?(value)
-  ruby_block "check whether the current settings are already equal to value" do
-    block do
-      paths = @current_resource.path.split("/")
-      json = get_nexus_settings_json
-      paths.each do |path|
-        return false unless json.kind_of? Hash
-        json = json[path]
-      end
-      json == value
-    end
+  paths = new_resource.path.split("/")
+  json = get_nexus_settings_json
+  paths.each do |path|
+    return false unless json.kind_of? Hash
+    json = json[path]
   end
+  json == value
 end
 
 def get_nexus_settings_json
-  ruby_block "get the json from nexus" do
-    block do
-      require 'nexus_cli'
-      nexus = NexusCli::Factory.create(nexus_cli_credentials)
-      nexus.get_global_settings
-      JSON.parse(File.read(File.join(File.expand_path("."), "global_settings.json")))
-    end
-  end
+  require 'nexus_cli'
+  nexus.get_global_settings
+  JSON.parse(::File.read(global_settings))
 end
 
 def update_nexus_settings_json
-  ruby_block "update the settings json" do
-    block do
-      json = JSON.parse(File.read(File.join(File.expand_path("."), "global_settings.json")))
-      paths = @current_resource.path.split("/")
-      json_edit = paths.inject("json") do |string, path|
-        string << "[\"#{path}\"]"
-      end
-      File.open(File.join(File.expand_path("."), "global_settings.json"), "w+") do |opened|
-        json_edit << " = @current_resource.value"
-        eval json_edit
-        opened.write(JSON.pretty_generate(json))
-      end
-    end
+  json = JSON.parse(::File.read(global_settings))
+  paths = new_resource.path.split("/")
+  json_edit = paths.inject("json") do |string, path|
+    string << "[\"#{path}\"]"
+  end
+  ::File.open(global_settings, "w+") do |opened|
+    json_edit << " = new_resource.value"
+    eval json_edit
+    opened.write(JSON.pretty_generate(json))
   end
 end
 
 def upload_nexus_settings_json
-  ruby_block "upload the json to nexus" do
-    block do
-      nexus = NexusCli::Factory.create(nexus_cli_credentials)
-      nexus.upload_global_settings
-    end
-  end
+  nexus.upload_global_settings
 end
 
 def nexus_cli_credentials
   {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository], "username" => node[:nexus][:cli][:username], "password" => node[:nexus][:cli][:password]}
+end
+
+def global_settings
+  ::File.join(::File.expand_path("."), "global_settings.json")
+end
+
+def nexus
+  @nexus ||= NexusCli::Factory.create(nexus_cli_credentials)
 end

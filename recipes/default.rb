@@ -123,7 +123,7 @@ node[:nexus][:plugins].each do |plugin|
   nexus_plugin plugin
 end
 
-nginx_site 'nexus_proxy.conf'
+nginx_site "nexus_proxy.conf"
 
 template "#{node[:bluepill][:conf_dir]}/nexus.pill" do
   source "nexus.pill.erb"
@@ -140,10 +140,13 @@ bluepill_service "nexus" do
   action [:enable, :load, :start]
 end
 
+package "libxml2-devel"
+package "libxslt-devel"
+
 nexus_settings "data/globalRestApiSettings/baseUrl" do
   value "https://localhost:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
 end
 
 nexus_settings "data/globalRestApiSettings/forceBaseUrl" do
-  value "true"
+  value true
 end

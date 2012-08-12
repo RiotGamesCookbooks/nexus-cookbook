@@ -25,5 +25,5 @@ end
 
 actions :update
 
-attribute :path, :kind_of           => String, :required => true, :name_attribute => true
-attribute :value, :kind_of          => String, :required => true
+attribute :path, :kind_of           => String, :name_attribute => true
+attribute :value, :kind_of          => [String, TrueClass, FalseClass], :required => true
