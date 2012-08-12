@@ -140,9 +140,6 @@ bluepill_service "nexus" do
   action [:enable, :load, :start]
 end
 
-package "libxml2-devel"
-package "libxslt-devel"
-
 nexus_settings "data/globalRestApiSettings/baseUrl" do
   value "https://localhost:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
 end
