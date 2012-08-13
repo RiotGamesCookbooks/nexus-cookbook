@@ -140,10 +140,10 @@ bluepill_service "nexus" do
   action [:enable, :load, :start]
 end
 
-nexus_settings "data/globalRestApiSettings/baseUrl" do
+nexus_settings "baseUrl" do
   value "https://localhost:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
 end
 
-nexus_settings "data/globalRestApiSettings/forceBaseUrl" do
+nexus_settings "forceBaseUrl" do
   value true
 end

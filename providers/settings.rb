@@ -25,12 +25,15 @@ end
 
 action :update do
   install_nexus_cli
+  install_jsonpath
 
   unless path_value_equals?(@current_resource.value)
     ruby_block "update the json and upload it" do
       block do
+        require 'nexus_cli'
+        require 'json'
+        require 'jsonpath'
         update_nexus_settings_json
-        upload_nexus_settings_json
       end
     end
     new_resource.updated_by_last_action(true)
@@ -54,37 +57,24 @@ private
     end
   end
 
+  def install_jsonpath
+    chef_gem "jsonpath"
+  end
+
   def path_value_equals?(value)
-    paths = new_resource.path.split("/")
-    json = get_nexus_settings_json
-    paths.each do |path|
-      return false unless json.kind_of? Hash
-      json = json[path]
-    end
-    json == value
+    json = JSON.parse(get_nexus_settings_json)
+    path_value = JsonPath.new("$..#{new_resource.path}").on(json).first
+    path_value == value
   end
 
   def get_nexus_settings_json
-    require 'nexus_cli'
-    nexus.get_global_settings
-    JSON.parse(::File.read(global_settings))
+    nexus.get_global_settings_json
   end
 
   def update_nexus_settings_json
-    json = JSON.parse(::File.read(global_settings))
-    paths = new_resource.path.split("/")
-    json_edit = paths.inject("json") do |string, path|
-      string << "[\"#{path}\"]"
-    end
-    ::File.open(global_settings, "w+") do |opened|
-      json_edit << " = new_resource.value"
-      eval json_edit
-      opened.write(JSON.pretty_generate(json))
-    end
-  end
-
-  def upload_nexus_settings_json
-    nexus.upload_global_settings
+    json = JSON.parse(get_nexus_settings_json)
+    edited_json = JsonPath.for(json).gsub("$..#{new_resource.path}") {|value| new_resource.value}.to_hash
+    nexus.upload_global_settings(JSON.dump(edited_json))
   end
 
   def nexus_cli_credentials
