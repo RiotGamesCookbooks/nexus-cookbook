@@ -39,61 +39,62 @@ action :update do
 end
 
 private
-def install_nexus_cli
-  package "libxml2-devel" do
-    action :install
-  end.run_action(:install)
 
-  package "libxslt-devel" do
-    action :install
-  end.run_action(:install)
-  
-  chef_gem "nexus_cli" do
-    version "0.4.0"
+  def install_nexus_cli
+    package "libxml2-devel" do
+      action :install
+    end.run_action(:install)
+
+    package "libxslt-devel" do
+      action :install
+    end.run_action(:install)
+    
+    chef_gem "nexus_cli" do
+      version "0.4.0"
+    end
   end
-end
 
-def path_value_equals?(value)
-  paths = new_resource.path.split("/")
-  json = get_nexus_settings_json
-  paths.each do |path|
-    return false unless json.kind_of? Hash
-    json = json[path]
+  def path_value_equals?(value)
+    paths = new_resource.path.split("/")
+    json = get_nexus_settings_json
+    paths.each do |path|
+      return false unless json.kind_of? Hash
+      json = json[path]
+    end
+    json == value
   end
-  json == value
-end
 
-def get_nexus_settings_json
-  require 'nexus_cli'
-  nexus.get_global_settings
-  JSON.parse(::File.read(global_settings))
-end
-
-def update_nexus_settings_json
-  json = JSON.parse(::File.read(global_settings))
-  paths = new_resource.path.split("/")
-  json_edit = paths.inject("json") do |string, path|
-    string << "[\"#{path}\"]"
+  def get_nexus_settings_json
+    require 'nexus_cli'
+    nexus.get_global_settings
+    JSON.parse(::File.read(global_settings))
   end
-  ::File.open(global_settings, "w+") do |opened|
-    json_edit << " = new_resource.value"
-    eval json_edit
-    opened.write(JSON.pretty_generate(json))
+
+  def update_nexus_settings_json
+    json = JSON.parse(::File.read(global_settings))
+    paths = new_resource.path.split("/")
+    json_edit = paths.inject("json") do |string, path|
+      string << "[\"#{path}\"]"
+    end
+    ::File.open(global_settings, "w+") do |opened|
+      json_edit << " = new_resource.value"
+      eval json_edit
+      opened.write(JSON.pretty_generate(json))
+    end
   end
-end
 
-def upload_nexus_settings_json
-  nexus.upload_global_settings
-end
+  def upload_nexus_settings_json
+    nexus.upload_global_settings
+  end
 
-def nexus_cli_credentials
-  {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository], "username" => node[:nexus][:cli][:username], "password" => node[:nexus][:cli][:password]}
-end
+  def nexus_cli_credentials
+    {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository], "username" => node[:nexus][:cli][:username], "password" => node[:nexus][:cli][:password]}
+  end
 
-def global_settings
-  ::File.join(::File.expand_path("."), "global_settings.json")
-end
+  def global_settings
+    ::File.join(::File.expand_path("."), "global_settings.json")
+  end
 
-def nexus
-  @nexus ||= NexusCli::Factory.create(nexus_cli_credentials)
-end
+  def nexus
+    @nexus ||= NexusCli::Factory.create(nexus_cli_credentials)
+  end
