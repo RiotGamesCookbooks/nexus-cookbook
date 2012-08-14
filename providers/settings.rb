@@ -28,14 +28,7 @@ action :update do
   install_jsonpath
 
   unless path_value_equals?(@current_resource.value)
-    ruby_block "update the json and upload it" do
-      block do
-        require 'nexus_cli'
-        require 'json'
-        require 'jsonpath'
-        update_nexus_settings_json
-      end
-    end
+    update_nexus_settings_json
     new_resource.updated_by_last_action(true)
   end
 
@@ -53,7 +46,7 @@ private
     end.run_action(:install)
     
     chef_gem "nexus_cli" do
-      version "0.4.0"
+      version "0.5.0"
     end
   end
 
@@ -62,6 +55,7 @@ private
   end
 
   def path_value_equals?(value)
+    require 'jsonpath'
     json = JSON.parse(get_nexus_settings_json)
     path_value = JsonPath.new("$..#{new_resource.path}").on(json).first
     path_value == value
@@ -72,6 +66,7 @@ private
   end
 
   def update_nexus_settings_json
+    require 'json'
     json = JSON.parse(get_nexus_settings_json)
     edited_json = JsonPath.for(json).gsub("$..#{new_resource.path}") {|value| new_resource.value}.to_hash
     nexus.upload_global_settings(JSON.dump(edited_json))
@@ -86,5 +81,6 @@ private
   end
 
   def nexus
+    require 'nexus_cli'
     @nexus ||= NexusCli::Factory.create(nexus_cli_credentials)
   end
