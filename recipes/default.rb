@@ -123,8 +123,6 @@ node[:nexus][:plugins].each do |plugin|
   nexus_plugin plugin
 end
 
-nginx_site "nexus_proxy.conf"
-
 template "#{node[:bluepill][:conf_dir]}/nexus.pill" do
   source "nexus.pill.erb"
   mode 0644
@@ -136,8 +134,11 @@ template "#{node[:bluepill][:conf_dir]}/nexus.pill" do
   )
 end
 
+nginx_site 'nexus_proxy.conf'
+
 bluepill_service "nexus" do
   action [:enable, :load, :start]
+  notifies :restart, "service[nginx]", :immediately
 end
 
 nexus_settings "baseUrl" do
