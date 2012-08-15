@@ -62,10 +62,12 @@ template "#{node[:nexus][:conf_dir]}/nexus.properties" do
   source "nexus.properties.erb"
   owner node[:nexus][:user]
   group node[:nexus][:group]
+  mode "0775"
   variables(
-    :nexus_port => "#{node[:nexus][:port]}",
-    :nexus_host => "#{node[:nexus][:host]}",
-    :nexus_path => "#{node[:nexus][:path]}",
+    :nexus_port => node[:nexus][:port],
+    :nexus_host => node[:nexus][:host],
+    :nexus_path => node[:nexus][:path],
+    :work_dir => node[:nexus][:work_dir],
     :fqdn => node[:fqdn]
   )
 end
@@ -77,8 +79,9 @@ template "#{node[:nexus][:bin_dir]}/#{node[:nexus][:name]}" do
   mode "0775"
   variables(
     :platform => platform,
-    :nexus_home => "#{node[:nexus][:home]}",
-    :nexus_user => "#{node[:nexus][:user]}"
+    :nexus_port => node[:nexus][:port],
+    :nexus_home => node[:nexus][:home],
+    :nexus_user => node[:nexus][:user]
   )
 end
 
@@ -119,7 +122,6 @@ end
 node[:nexus][:plugins].each do |plugin| 
   nexus_plugin plugin
 end
-nginx_site 'nexus_proxy.conf'
 
 template "#{node[:bluepill][:conf_dir]}/nexus.pill" do
   source "nexus.pill.erb"
@@ -132,6 +134,17 @@ template "#{node[:bluepill][:conf_dir]}/nexus.pill" do
   )
 end
 
+nginx_site 'nexus_proxy.conf'
+
 bluepill_service "nexus" do
   action [:enable, :load, :start]
+  notifies :restart, "service[nginx]", :immediately
+end
+
+nexus_settings "baseUrl" do
+  value "https://localhost:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
+end
+
+nexus_settings "forceBaseUrl" do
+  value true
 end

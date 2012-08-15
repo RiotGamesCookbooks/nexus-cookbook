@@ -3,6 +3,6 @@ application-port=<%= @nexus_port %>
 application-host=<%= @nexus_host %>
 nexus-webapp=${bundleBasedir}/nexus
 nexus-webapp-context-path=<%= @nexus_path %>
-nexus-work=<%= @nexus_path %>/sonatype-work/nexus
+nexus-work=<%= @work_dir %>
 runtime=${bundleBasedir}/nexus/WEB-INF
 pr.encryptor.publicKeyPath=/apr/public-key.txt

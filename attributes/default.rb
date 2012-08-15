@@ -11,6 +11,7 @@ default[:nexus][:name]                                         = 'nexus'
 default[:nexus][:home]                                         = "/usr/local/#{node[:nexus][:name]}"
 default[:nexus][:conf_dir]                                     = "#{node[:nexus][:home]}/conf"
 default[:nexus][:bin_dir]                                      = "#{node[:nexus][:home]}/bin"
+default[:nexus][:work_dir]                                     = "#{node[:nexus][:path]}/sonatype-work/nexus"
 
 default[:nexus][:nginx_proxy][:listen_port]                    = 8443
 default[:nexus][:nginx_proxy][:server_name]                    = 'localhost'
@@ -21,3 +22,8 @@ default[:nginx][:configure_flags]                              = 'with-http_ssl_
 
 default[:nexus][:nginx][:options][:client_max_body_size]       = '200M'
 default[:nexus][:nginx][:options][:client_body_buffer_size]    = '512k'
+
+default[:nexus][:cli][:url]                                    = "https://#{node[:nexus][:nginx_proxy][:server_name]}:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
+default[:nexus][:cli][:repository]                             = "releases"
+default[:nexus][:cli][:username]                               = "admin"
+default[:nexus][:cli][:password]                               = "admin123"
