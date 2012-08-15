@@ -76,10 +76,6 @@ private
     {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository], "username" => node[:nexus][:cli][:username], "password" => node[:nexus][:cli][:password]}
   end
 
-  def global_settings
-    ::File.join(::File.expand_path("."), "global_settings.json")
-  end
-
   def nexus
     require 'nexus_cli'
     @nexus ||= NexusCli::Factory.create(nexus_cli_credentials)
