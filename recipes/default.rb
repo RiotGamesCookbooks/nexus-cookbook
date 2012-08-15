@@ -148,3 +148,5 @@ end
 nexus_settings "forceBaseUrl" do
   value true
 end
+
+nexus_repository "Artifacts"
