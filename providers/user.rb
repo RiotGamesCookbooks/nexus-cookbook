@@ -38,6 +38,28 @@ action :create do
   end
 end
 
+action :update do
+  install_nexus_cli
+
+  if user_exists?(@current_resource.username)
+    update_user
+    new_resource.updated_by_last_action(true)
+  end
+end
+
+action :delete do
+  install_nexus_cli
+
+  if user_exists?(@current_resource.username)
+    delete_user
+    new_resource.updated_by_last_action(true)
+  end
+end
+
+action :change_password do
+  install_nexus_cli
+end
+
 private
   
   def install_nexus_cli
@@ -65,21 +87,36 @@ private
 
   def create_user
     validate_create_user
-    params = {:userId => new_resource.username}
-    params[:firstName] = new_resource.first_name
-    params[:lastName] = new_resource.last_name
-    params[:email] = new_resource.email
-    params[:status] = new_resource.enabled == true ? "active" : "disabled"
-    params[:password] = new_resource.password
-    params[:roles] = new_resource.roles
+    nexus.create_user(get_params)
+  end
 
-    nexus.create_user(params)
+  def update_user
+    nexus.update_user(get_params(true))
+  end
+
+  def delete_user
+    nexus.delete_user(new_resource.username)
   end
 
   def validate_create_user
     Chef::Log.fatal("Yo you need to give an email address.") if new_resource.email.nil?
     Chef::Log.fatal("Yo you need to give a status.") if new_resource.enabled.nil?
     Chef::Log.fatal("Yo you need to have at least one role.") if new_resource.roles.nil? || new_resource.roles.empty?
+  end
+
+  def get_params(update=false)
+    params = {:userId => new_resource.username}
+    params[:firstName] = new_resource.first_name
+    params[:lastName] = new_resource.last_name
+    params[:email] = new_resource.email
+    if new_resource.enabled.nil? && update
+      params[:status] = nil
+    else
+      params[:status] = new_resource.enabled == true ? "active" : "disabled"
+    end
+    params[:password] = new_resource.password
+    params[:roles] = new_resource.roles
+    params
   end
 
   def nexus

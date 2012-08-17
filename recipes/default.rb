@@ -149,6 +149,15 @@ nexus_settings "forceBaseUrl" do
   value true
 end
 
+nexus_user "mike" do
+  action :create
+  first_name "Mike"
+  last_name "Ditka"
+  email "mditka@riotgames.com"
+  enabled true
+  roles ["nx-admin"]
+end
+
 nexus_user "kyle" do
   action :create
   first_name "Kyle"
@@ -156,4 +165,13 @@ nexus_user "kyle" do
   email "kallan@riotgames.com"
   enabled true
   roles ["nx-admin"]
+end
+
+nexus_user "mike" do
+  action :update
+  first_name "JoeBob"
+end
+
+nexus_user "mike" do
+  action :delete
 end

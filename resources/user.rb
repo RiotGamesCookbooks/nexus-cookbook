@@ -33,4 +33,4 @@ attribute :enabled, :kind_of        => [TrueClass, FalseClass]
 attribute :password, :kind_of       => String
 attribute :old_password, :kind_of   => String
 #attribute :new_password, :kind_of   => String
-attribute :roles, :kind_of          => Array
+attribute :roles, :kind_of          => Array, :default => []
