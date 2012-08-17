@@ -148,3 +148,12 @@ end
 nexus_settings "forceBaseUrl" do
   value true
 end
+
+nexus_user "kyle" do
+  action :create
+  first_name "Kyle"
+  last_name "Allan"
+  email "kallan@riotgames.com"
+  enabled true
+  roles ["nx-admin"]
+end

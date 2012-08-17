@@ -19,7 +19,7 @@
 #
 
 def load_current_resource
-  @current_resource = Chef::Resource::NexusSettings.new(new_resource.username)
+  @current_resource = Chef::Resource::NexusUser.new(new_resource.username)
   @current_resource.first_name new_resource.first_name
   @current_resource.last_name new_resource.last_name
   @current_resource.email new_resource.email
@@ -33,6 +33,8 @@ action :create do
   install_nexus_cli
 
   unless user_exists?(@current_resource.username)
+    create_user
+    new_resource.updated_by_last_action(true)
   end
 end
 
@@ -52,11 +54,41 @@ private
     end
   end
 
-  def user_exists?
+  def user_exists?(username)
+    begin
+      nexus.get_user(username)
+      true
+    rescue NexusCli::UserNotFoundException => e
+      return false
+    end
+  end
 
+  def create_user
+    validate_create_user
+    params = {:userId => new_resource.username}
+    params[:firstName] = new_resource.first_name
+    params[:lastName] = new_resource.last_name
+    params[:email] = new_resource.email
+    params[:status] = new_resource.enabled == true ? "active" : "disabled"
+    params[:password] = new_resource.password
+    params[:roles] = new_resource.roles
+
+    nexus.create_user(params)
+  end
+
+  def validate_create_user
+    Chef::Log.fatal("Yo you need to give an email address.") if new_resource.email.nil?
+    Chef::Log.fatal("Yo you need to give a status.") if new_resource.enabled.nil?
+    Chef::Log.fatal("Yo you need to have at least one role.") if new_resource.roles.nil? || new_resource.roles.empty?
   end
 
   def nexus
     require 'nexus_cli'
     @nexus ||= NexusCli::Factory.create(nexus_cli_credentials)
+  end
+
+  def nexus_cli_credentials
+    data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'credentials')
+    credentials = data_bag_item["default_admin"]
+    {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository]}.merge credentials
   end

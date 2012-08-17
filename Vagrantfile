@@ -39,6 +39,8 @@ Vagrant::Config.run do |config|
 
   config.vm.provision :chef_solo do |chef|
     chef.cookbooks_path = ["cookbooks"]
+    chef.data_bags_path = "data_bags"
+    chef.encrypted_data_bag_secret_key_path = "/Users/kallan/chef-repo2/encrypted_data_bag_key"
     
     chef.json = {
       :mysql => {
