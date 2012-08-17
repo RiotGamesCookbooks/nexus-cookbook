@@ -163,15 +163,22 @@ nexus_user "kyle" do
   first_name "Kyle"
   last_name "Allan"
   email "kallan@riotgames.com"
+  password "foo"
   enabled true
   roles ["nx-admin"]
 end
 
 nexus_user "mike" do
   action :update
-  first_name "JoeBob"
+  first_name "Michael"
 end
 
 nexus_user "mike" do
   action :delete
+end
+
+nexus_user "kyle" do
+  action :change_password
+  old_password "foo"
+  password "bar"
 end

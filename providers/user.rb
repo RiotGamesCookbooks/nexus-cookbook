@@ -58,6 +58,11 @@ end
 
 action :change_password do
   install_nexus_cli
+
+  if user_exists?(@current_resource.username)
+    change_password
+    new_resource.updated_by_last_action(true)
+  end
 end
 
 private
@@ -98,10 +103,20 @@ private
     nexus.delete_user(new_resource.username)
   end
 
+  def change_password
+    validate_change_password
+    nexus.change_password(get_password_params)
+  end
+
   def validate_create_user
-    Chef::Log.fatal("Yo you need to give an email address.") if new_resource.email.nil?
-    Chef::Log.fatal("Yo you need to give a status.") if new_resource.enabled.nil?
-    Chef::Log.fatal("Yo you need to have at least one role.") if new_resource.roles.nil? || new_resource.roles.empty?
+    Chef::Application.fatal!("nexus_user create requires an email address.", 1) if new_resource.email.nil?
+    Chef::Application.fatal!("nexus_user create requires a enabled.", 1) if new_resource.enabled.nil?
+    Chef::Application.fatal!("nexus_user create requires at least one role.", 1) if new_resource.roles.nil? || new_resource.roles.empty?
+  end
+
+  def validate_change_password
+    Chef::Application.fatal!("nexus_user change_password requires your old password") if new_resource.old_password.nil?
+    Chef::Application.fatal!("nexus_user change_password requires a new password") if new_resource.password.nil?
   end
 
   def get_params(update=false)
@@ -116,6 +131,13 @@ private
     end
     params[:password] = new_resource.password
     params[:roles] = new_resource.roles
+    params
+  end
+
+  def get_password_params
+    params = {:userId => new_resource.username}
+    params[:oldPassword] = new_resource.old_password
+    params[:newPassword] = new_resource.password
     params
   end
 
