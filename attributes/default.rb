@@ -27,3 +27,5 @@ default[:nexus][:cli][:url]                                    = "https://#{node
 default[:nexus][:cli][:repository]                             = "releases"
 default[:nexus][:cli][:username]                               = "admin"
 default[:nexus][:cli][:password]                               = "admin123"
+
+default[:nexus][:create_repositories]                          = ["Artifacts"]

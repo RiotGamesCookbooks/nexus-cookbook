@@ -148,6 +148,10 @@ end
 nexus_settings "forceBaseUrl" do
   value true
 end
+
+node[:nexus][:create_repositories].each do |repository|
+  nexus_repository repository
+end
     
 data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'credentials')
 credentials = data_bag_item["default_admin"]
