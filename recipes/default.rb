@@ -177,8 +177,8 @@ nexus_user "mike" do
   action :delete
 end
 
-nexus_user "kyle" do
+nexus_user "admin" do
   action :change_password
-  old_password "foo"
-  password "bar"
+  old_password "admin123"
+  password "what"
 end

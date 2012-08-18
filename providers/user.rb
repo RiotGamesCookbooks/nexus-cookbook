@@ -105,7 +105,9 @@ private
 
   def change_password
     validate_change_password
-    nexus.change_password(get_password_params)
+    if nexus.change_password(get_password_params) && nexus_cli_credentials["username"] == new_resource.username
+      update_nexus_cli_credentials
+    end
   end
 
   def validate_create_user
@@ -143,11 +145,27 @@ private
 
   def nexus
     require 'nexus_cli'
-    @nexus ||= NexusCli::Factory.create(nexus_cli_credentials)
+    @nexus = NexusCli::Factory.create(nexus_cli_credentials)
   end
 
   def nexus_cli_credentials
     data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'credentials')
     credentials = data_bag_item["default_admin"]
     {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository]}.merge credentials
+  end
+
+  def update_nexus_cli_credentials
+    data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'credentials')
+    data_bag_hash = data_bag_item.to_hash
+    data_bag_hash["default_admin"]["password"] = new_resource.password
+    data_bag_item = Chef::EncryptedDataBagItem.encrypt_data_bag_item(data_bag_hash, Chef::EncryptedDataBagItem.load_secret)
+  
+    if Chef::Config[:solo]
+      Chef::Log.info data_bag_item.to_json
+      ::File.open(::File.join(Chef::Config[:data_bag_path], "nexus/credentials.json"), "w") do |opened|
+        opened.write(data_bag_item.to_json)
+      end
+    else
+      Chef::DataBagItem.from_hash(data_bag_item).save
+    end
   end

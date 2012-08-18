@@ -57,7 +57,9 @@ private
   end
 
   def nexus_cli_credentials
-    {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository], "username" => node[:nexus][:cli][:username], "password" => node[:nexus][:cli][:password]}
+    data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'credentials')
+    credentials = data_bag_item["default_admin"]
+    {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository]}.merge credentials
   end
 
   def nexus
