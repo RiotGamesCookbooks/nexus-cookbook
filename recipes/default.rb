@@ -148,37 +148,12 @@ end
 nexus_settings "forceBaseUrl" do
   value true
 end
-
-nexus_user "mike" do
-  action :create
-  first_name "Mike"
-  last_name "Ditka"
-  email "mditka@riotgames.com"
-  enabled true
-  roles ["nx-admin"]
-end
-
-nexus_user "kyle" do
-  action :create
-  first_name "Kyle"
-  last_name "Allan"
-  email "kallan@riotgames.com"
-  password "foo"
-  enabled true
-  roles ["nx-admin"]
-end
-
-nexus_user "mike" do
-  action :update
-  first_name "Michael"
-end
-
-nexus_user "mike" do
-  action :delete
-end
+    
+data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'credentials')
+credentials = data_bag_item["default_admin"]
 
 nexus_user "admin" do
   action :change_password
-  old_password "admin123"
+  old_password credentials["password"]
   password "what"
 end
