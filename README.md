@@ -102,7 +102,13 @@ The following attributes are set under the `nexus` namespace:
 * port - the port to run nexus on
 * host - the hostname to use for nexus
 * path - the `user` home directory
-* home - the installation directory for nexus
+* name - the name of the Nexus
+* home - the installation directory for nexus. Uses name.
+* conf_dir - the above home/conf
+* bin_dir - the above home/bin
+* work_dir - the above path/sonatype-work/nexus
+* plugins - an Array of Nexus plugins that will be installed by the default recipe.
+* create_repositories - an Array of repositories that will be created by the default recipe.
 
 The following attributes are set under `nexus::nginx` namespace:
 
@@ -110,11 +116,43 @@ The following attributes are set under `nexus::nginx` namespace:
 * server\_name - the name of the nginx server
 * options - used to generate options in the nginx conf file
 
+The following attributes are set under the `nexus::cli` namespace:
+
+* url - The url that the nexus_cli gem will connect to. The default recipe uses this to configure itself, so localhost.
+* repository - The repository that nexus_cli gem will use for push / pull operations. A requirement of nexus_cli, not used by this cookbook.
+
 SSL
 ===
 
 The files directory contains a self-signed certificate that is installed to `nginx::dir/shared/certificates/nexus-proxy.pem`
 Replace this file with your own certificates for a production environment.
+
+Nexus Usage
+===========
+
+Many of the LWRPs utilize the Nexus CLI gem to interact with the Nexus server. In order to use them, you must first
+create an [encrypted data bag](http://wiki.opscode.com/display/chef/Encrypted+Data+Bags) that contains the credentials
+for your Nexus server.
+
+	knife data bag create nexus credentials -c <your chef config> --secret-file=<your secret file>
+
+Your databag should look like the following:
+
+	{
+	  "id": "credentials",
+	  "default_admin": {
+	    "username": "admin",
+	    "password": "admin123"
+	  },
+	  "updated_admin": {
+	    "username": "admin",
+	    "password": "customize_me"
+	  }
+	}
+
+Out-of-the-box, Nexus comes configured with a specific administrative username/password combo. The default recipe
+change the password for that account to the password configured in the `updated_admin` element.
+
 
 Usage
 =====
@@ -124,6 +162,7 @@ Simply add the "nexus::default" recipe to the node where you want Sonatype Nexus
 License and Author
 ==================
 
+Author:: Kyle Allan (<kallan@riotgames.com>)
 Author:: Charles Scott (<connaryscott@gmail.com>)
 Author:: Greg Schueler (<greg.schueler@gmail.com>)
 Author:: Seth Chisamore (<schisamo@opscode.com>)
