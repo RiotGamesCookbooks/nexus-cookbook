@@ -36,6 +36,60 @@ Attribute  | Description                   | Type    | Default
 ---------  |-------------                  |-----    |--------
 name       | Name of the plugin to install | String  | name
 
+## nexus\_repository
+
+Resource provider for creating and deleting Neuxs repositories.
+
+### Actions
+Action  | Description              | Default
+------- |-------------             |---------
+create  | Creates a new repository | Yes
+delete  | Deletes a repository     | No
+
+### Attributes
+Attribute  | Description                   			 | Type    | Default
+---------  |-------------                  			 |-----    |--------
+name       | Name of the repository to create/delete | String  | name
+
+## nexus\_settings
+
+Resource provider for modifying the global Nexus settings.
+
+### Actions
+Action  | Description              						 | Default
+------- |-------------             						 |---------
+update  | Updates a global Nexus setting to a new value. | Yes
+
+### Attributes
+Attribute  | Description                   			 				  | Type                          | Default
+---------  |-------------                  			 				  |-----                          |--------
+path       | The element of the settings that is going to be changed. | String                        | name
+value      | The new value to update the path to.                     | String, TrueClass, FalseClass |
+
+## nexus\_user
+
+Resource provider for creating, deleting, and modifying Nexus user accounts.
+
+### Actions
+Action  		| Description              						 | Default
+------- 		|-------------             						 |---------
+create  		| Creates a new Nexus user.                      | Yes
+delete          | Deletes a Nexus user.                          | 
+update          | Updates a Nexus user with updated information  |
+change_password | Changes a Nexus user's password                |
+
+### Attributes
+Attribute    | Description                   			 				| Type                  | Default
+---------    |-------------                  			 				|-----                  |--------
+username     | The element of the settings that is going to be changed. | String                | name
+first_name   | The first name of the user.                              | String                |
+last_name    | The last name of the user.                               | String                |
+email        | The email address of the user.                           | String                |
+enabled      | Whether or not this user is enabled or disabled.         | TrueClass, FalseClass |
+password     | The current (or new) password of the user.               | String                |
+old_password | The old password of the user, used in change_password.   | String                |
+roles        | A list of roles (permissions) to apply to the user.      | Array                 |
+
 Attributes
 ==========
 
