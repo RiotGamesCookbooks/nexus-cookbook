@@ -3,3 +3,4 @@ Berksfile.lock
 Gemfile.lock
 .vagrant
 cookbooks/
+data_bags/
