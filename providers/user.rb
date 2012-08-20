@@ -166,7 +166,6 @@ private
     data_bag_item = Chef::EncryptedDataBagItem.encrypt_data_bag_item(data_bag_hash, Chef::EncryptedDataBagItem.load_secret)
   
     if Chef::Config[:solo]
-      Chef::Log.info data_bag_item.to_json
       ::File.open(::File.join(Chef::Config[:data_bag_path], "nexus/credentials.json"), "w") do |opened|
         opened.write(data_bag_item.to_json)
       end

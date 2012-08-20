@@ -154,10 +154,11 @@ node[:nexus][:create_repositories].each do |repository|
 end
     
 data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'credentials')
-credentials = data_bag_item["default_admin"]
+default_credentials = data_bag_item["default_admin"]
+updated_credentials = data_bag_item["updated_admin"]
 
 nexus_user "admin" do
   action :change_password
-  old_password credentials["password"]
-  password "what"
+  old_password default_credentials["password"]
+  password updated_credentials["password"]
 end
