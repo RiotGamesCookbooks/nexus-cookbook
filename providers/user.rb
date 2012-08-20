@@ -59,7 +59,7 @@ end
 action :change_password do
   install_nexus_cli
 
-  if user_exists?(@current_resource.username)
+  unless password_equals?(@current_resource.password)
     change_password
     new_resource.updated_by_last_action(true)
   end
@@ -88,6 +88,11 @@ private
     rescue NexusCli::UserNotFoundException => e
       return false
     end
+  end
+
+  def password_equals?(password)
+    data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'credentials')
+    data_bag_item["default_admin"]["password"] == password
   end
 
   def create_user

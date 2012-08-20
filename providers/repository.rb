@@ -52,7 +52,7 @@ private
     end.run_action(:install)
     
     chef_gem "nexus_cli" do
-      version "0.5.0"
+      version "0.6.0"
     end
   end
 

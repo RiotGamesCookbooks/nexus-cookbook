@@ -25,7 +25,6 @@ end
 
 action :update do
   install_nexus_cli
-  install_jsonpath
 
   unless path_value_equals?(@current_resource.value)
     update_nexus_settings_json
@@ -45,12 +44,8 @@ private
     end.run_action(:install)
     
     chef_gem "nexus_cli" do
-      version "0.5.0"
+      version "0.6.0"
     end
-  end
-
-  def install_jsonpath
-    chef_gem "jsonpath"
   end
 
   def path_value_equals?(value)
