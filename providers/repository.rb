@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: nexus
-# Provider:: settings
+# Provider:: repository
 #
 # Author:: Kyle Allan (<kallan@riotgames.com>)
 # Copyright 2012, Riot Games
@@ -19,21 +19,29 @@
 #
 
 def load_current_resource
-  @current_resource = Chef::Resource::NexusSettings.new(new_resource.path)
-  @current_resource.value new_resource.value
+  @current_resource = Chef::Resource::NexusRepository.new(new_resource.name)
 end
 
-action :update do
+action :create do
   install_nexus_cli
 
-  unless path_value_equals?(@current_resource.value)
-    update_nexus_settings_json
+  unless repository_exists?(@current_resource.name)
+    nexus.create_repository(new_resource.name)
+    new_resource.updated_by_last_action(true)
+  end
+end
+
+action :delete do
+  install_nexus_cli
+
+  if repository_exists?(@current_resource.name)
+    nexus.delete_repository(new_resource.name)
     new_resource.updated_by_last_action(true)
   end
 end
 
 private
-
+  
   def install_nexus_cli
     package "libxml2-devel" do
       action :install
@@ -48,24 +56,6 @@ private
     end
   end
 
-  def path_value_equals?(value)
-    require 'jsonpath'
-    json = JSON.parse(get_nexus_settings_json)
-    path_value = JsonPath.new("$..#{new_resource.path}").on(json).first
-    path_value == value
-  end
-
-  def get_nexus_settings_json
-    nexus.get_global_settings_json
-  end
-
-  def update_nexus_settings_json
-    require 'json'
-    json = JSON.parse(get_nexus_settings_json)
-    edited_json = JsonPath.for(json).gsub("$..#{new_resource.path}") {|value| new_resource.value}.to_hash
-    nexus.upload_global_settings(JSON.dump(edited_json))
-  end
-
   def nexus_cli_credentials
     data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'credentials')
     credentials = data_bag_item["default_admin"]
@@ -75,4 +65,13 @@ private
   def nexus
     require 'nexus_cli'
     @nexus ||= NexusCli::Factory.create(nexus_cli_credentials)
+  end
+
+  def repository_exists?(name)
+    begin
+      nexus.get_repository_info(name)
+      true
+    rescue NexusCli::RepositoryNotFoundException => e
+      return false
+    end
   end
