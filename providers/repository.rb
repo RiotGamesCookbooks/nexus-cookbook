@@ -30,8 +30,13 @@ end
 
 action :create do
   unless repository_exists?(@current_resource.name)
-    validate_proxy
-    nexus.create_repository(new_resource.name, new_resource.proxy, new_resource.url)
+    nexus.create_repository(new_resource.name, new_resource.type == "proxy" ? true : false, new_resource.url)
+    if new_resource.publisher
+      set_publisher
+    end
+    if new_resource.subscriber
+      set_subscriber
+    end
     new_resource.updated_by_last_action(true)
   end
 end
@@ -43,8 +48,33 @@ action :delete do
   end
 end
 
+action :update do
+  install_nexus_cli
+
+  if repository_exists?(@current_resource.name)
+    if new_resource.publisher
+      set_publisher
+    else
+      set_publisher(true)
+    end
+    if new_resource.subscriber
+      set_subscriber
+    else
+      set_subscriber(true)
+    end
+  end
+end
+
 private
   
+  def set_publisher(disable=false)
+    nexus.enable_artifact_publish(new_resource.name.downcase, disable)
+  end
+
+  def set_subscriber
+    nexus.enable_artifact_subscribe(new_resource.name.downcase, disable)
+  end
+
   def nexus_cli_credentials
     data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'credentials')
     credentials = data_bag_item["default_admin"]
