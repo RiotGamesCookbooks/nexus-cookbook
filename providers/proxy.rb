@@ -19,7 +19,12 @@
 #
 
 def load_current_resource
-  @current_resource = Chef::Resource::NexusProsy.new(new_resource.name)
+  @current_resource = Chef::Resource::NexusProxy.new(new_resource.name)
+  @current_resource.id new_resource.id
+  @current_resource.host new_resource.host
+  @current_resource.port new_resource.port
+  @current_resource.certificate new_resource.certificate
+  @@current_resource.description new_resource.description
 end
 
 action :enable do

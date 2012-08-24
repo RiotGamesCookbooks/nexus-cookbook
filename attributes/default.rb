@@ -28,3 +28,8 @@ default[:nexus][:cli][:repository]                             = "releases"
 default[:nexus][:cli][:packages]                               = ["libxml2-devel", "libxslt-devel"]
 
 default[:nexus][:create_repositories]                          = ["Artifacts"]
+
+default[:nexus][:smart_proxy][:enable]                         = true
+default[:nexus][:smart_proxy][:trusted_servers]                = []
+default[:nexus][:smart_proxy][:host]                           = ""
+default[:nexus][:smart_proxy][:port]                           = 1234

@@ -144,7 +144,7 @@ end
 nexus_license "install a license"
 
 nexus_settings "baseUrl" do
-  value "https://localhost:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
+  value "https://#{node[:nexus][:nginx_proxy][:server_name]}:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
 end
 
 nexus_settings "forceBaseUrl" do
@@ -163,4 +163,26 @@ nexus_user "admin" do
   action :change_password
   old_password default_credentials["password"]
   password updated_credentials["password"]
+end
+
+nexus_proxy "enable smart proxy" do
+  action :enable
+  host node[:nexus][:smart_proxy][:host]
+  port node[:nexus][:smart_proxy][:port]
+  only_if {node[:nexus][:smart_proxy][:enable]}
+end
+
+nexus_repository "Artifacts" do
+  action :update
+  publisher true
+  only_if {node[:nexus][:smart_proxy][:enable]}
+end
+
+data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'nexus_certificates')
+node[:nexus_cli][:smart_proxy][:trusted_servers].each do |server|
+  nexus_proxy "install a trusted key with description #{server["description"]}" do
+    action :add_trusted_key
+    description server["description"]
+    certificate server["certificate"]
+  end
 end
