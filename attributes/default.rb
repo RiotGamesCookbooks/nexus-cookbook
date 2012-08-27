@@ -28,3 +28,5 @@ default[:nexus][:cli][:repository]                             = "releases"
 default[:nexus][:cli][:packages]                               = ["libxml2-devel", "libxslt-devel"]
 
 default[:nexus][:create_repositories]                          = ["Artifacts"]
+
+default[:nexus][:pro][:requires_license]                       = false
