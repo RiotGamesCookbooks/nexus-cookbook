@@ -25,5 +25,6 @@ default[:nexus][:nginx][:options][:client_body_buffer_size]    = '512k'
 
 default[:nexus][:cli][:url]                                    = "https://#{node[:nexus][:nginx_proxy][:server_name]}:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
 default[:nexus][:cli][:repository]                             = "releases"
+default[:nexus][:cli][:packages]                               = ["libxml2-devel", "libxslt-devel"]
 
 default[:nexus][:create_repositories]                          = ["Artifacts"]
