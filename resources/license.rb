@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: nexus
-# Resource:: repository
+# Resource:: license
 #
 # Author:: Kyle Allan (<kallan@riotgames.com>)
 # Copyright 2012, Riot Games
@@ -20,11 +20,9 @@
 
 def initialize(*args)
   super
-  @action = :create
+  @action = :install
 end
 
-actions :create, :delete
+actions :install
 
-attribute :name, :kind_of           => String, :name_attribute => true
-attribute :proxy, :kind_of          => [TrueClass, FalseClass]
-attribute :url, :kind_of            => String
+attribute :name, :kind_of           => String, :required => true, :name_attribute => true

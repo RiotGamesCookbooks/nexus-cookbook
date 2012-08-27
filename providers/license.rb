@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: nexus
-# Provider:: repository
+# Provider:: license
 #
 # Author:: Kyle Allan (<kallan@riotgames.com>)
 # Copyright 2012, Riot Games
@@ -19,27 +19,21 @@
 #
 
 def load_current_resource
-  @current_resource = Chef::Resource::NexusRepository.new(new_resource.name)
-  @current_resource.proxy new_resource.proxy
-  @current_resource.url new_resource.url
+  @current_resource = Chef::Resource::NexusLicense.new(new_resource.name)
 
   run_context.include_recipe "nexus::cli"
 
   @current_resource
 end
 
-action :create do
-  unless repository_exists?(@current_resource.name)
-    validate_proxy
-    nexus.create_repository(new_resource.name, new_resource.proxy, new_resource.url)
-    new_resource.updated_by_last_action(true)
-  end
-end
+action :install do
 
-action :delete do
-  if repository_exists?(@current_resource.name)
-    nexus.delete_repository(new_resource.name)
-    new_resource.updated_by_last_action(true)
+  unless licensed? && running_nexus_pro?
+
+    require 'base64'
+    data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'license')
+    license_data = Base64.decode64(data_bag_item["file"])
+    nexus.install_license_bytes(license_data)
   end
 end
 
@@ -56,16 +50,12 @@ private
     @nexus ||= NexusCli::Factory.create(nexus_cli_credentials)
   end
 
-  def repository_exists?(name)
-    begin
-      nexus.get_repository_info(name)
-      true
-    rescue NexusCli::RepositoryNotFoundException => e
-      return false
-    end
+  def licensed?
+    require 'json'
+    json = JSON.parse(nexus.get_license_info)
+    json["data"]["licenseType"] != "Not licensed"
   end
 
-  def validate_proxy
-    Chef::Application.fatal!("If this repository is a Proxy repository, you also need to provide a url.") if new_resource.proxy && new_resource.url.nil?
-    Chef::Application.fatal!("You need to provide a valid url.") if new_resource.proxy && (new_resource.url =~ URI::ABS_URI).nil?
+  def running_nexus_pro?
+    nexus.running_nexus_pro?
   end
