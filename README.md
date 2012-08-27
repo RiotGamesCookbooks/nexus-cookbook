@@ -90,6 +90,35 @@ password     | The current (or new) password of the user.               | String
 old_password | The old password of the user, used in change_password.   | String                |
 roles        | A list of roles (permissions) to apply to the user.      | Array                 |
 
+## nexus\_license
+
+Resource provider for installing a license file into Nexus. This LWRP uses an encrypted data bag namespaced
+under nexus license.
+
+	knife data bag create nexus license -c <your chef config> --secret-file<your secret file>
+
+Your databag should look like the following:
+
+	{
+	  "id": "license"
+	  "file": "<base64 encoded string of your .lic file>"
+	}
+
+It is *very important* that you base64 encode your Nexus license before storage inside the data bag.
+	require 'base64'
+	Base64.encode(File.read("/path/to/license/file.lic"))
+
+### Actions
+Action   | Description              						 | Default
+-------  |-------------             						 |---------
+install  | Installs a license file into the server.          | Yes
+
+### Attributes
+Attribute  | Description                   			 				          | Type                          | Default
+---------  |-------------                  			 				          |-----                          |--------
+name       | Some useful information about the license. Similar to ruby_block | String                        | name
+
+
 Attributes
 ==========
 
