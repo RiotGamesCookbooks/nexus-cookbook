@@ -55,6 +55,7 @@ ark node[:nexus][:name] do
   version node[:nexus][:version]
   owner node[:nexus][:user]
   group node[:nexus][:group]
+  checksum node[:nexus][:checksum]
   action :install
 end
 
