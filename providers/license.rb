@@ -23,7 +23,11 @@ def load_current_resource
 end
 
 action :install do
-  unless license_installed?
+  install_nexus_cli
+
+  if licensed?
+
+    require 'base64'
     data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'license')
     license_data = Base64.decode64(data_bag_item["file"])
     nexus.install_license_bytes(license_data)
@@ -57,8 +61,10 @@ private
     @nexus ||= NexusCli::Factory.create(nexus_cli_credentials)
   end
 
-  def license_installed?
+  def licensed?
     require 'json'
     json = JSON.parse(nexus.get_license_info)
-    json["data"]["licenseType"] == "Not licensed"
+    log(json) { level :debug }
+    log(json["data"]["licenseType"] == "Not licensed")
+    json["data"]["licenseType"] != "Not licensed"
   end
