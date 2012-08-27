@@ -141,9 +141,7 @@ bluepill_service "nexus" do
   notifies :restart, "service[nginx]", :immediately
 end
 
-nexus_license "install a license" do
-  only_if { node[:nexus][:pro][:requires_license] }
-end
+nexus_license "install a license"
 
 nexus_settings "baseUrl" do
   value "https://localhost:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"

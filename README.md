@@ -105,8 +105,8 @@ Your databag should look like the following:
 	}
 
 It is *very important* that you base64 encode your Nexus license before storage inside the data bag.
-	require 'base64'
-	Base64.encode(File.read("/path/to/license/file.lic"))
+	
+	openssl base64 -in /path/to/your/license.lic
 
 ### Actions
 Action   | Description              						 | Default
