@@ -20,10 +20,13 @@
 
 def load_current_resource
   @current_resource = Chef::Resource::NexusLicense.new(new_resource.name)
+
+  run_context.include_recipe "nexus::cli"
+
+  @current_resource
 end
 
 action :install do
-  install_nexus_cli
 
   if licensed?
 
@@ -36,20 +39,6 @@ end
 
 private
   
-  def install_nexus_cli
-    package "libxml2-devel" do
-      action :install
-    end.run_action(:install)
-
-    package "libxslt-devel" do
-      action :install
-    end.run_action(:install)
-    
-    chef_gem "nexus_cli" do
-      version "0.7.0"
-    end
-  end
-
   def nexus_cli_credentials
     data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'credentials')
     credentials = data_bag_item["default_admin"]
