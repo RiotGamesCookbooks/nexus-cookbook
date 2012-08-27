@@ -55,24 +55,33 @@ action :update do
     if new_resource.publisher
       set_publisher
     else
-      set_publisher(true)
+      unset_publisher
     end
+
     if new_resource.subscriber
       set_subscriber
     else
-      set_subscriber(true)
+      unset_subscriber
     end
   end
 end
 
 private
   
-  def set_publisher(disable=false)
-    nexus.enable_artifact_publish(new_resource.name.downcase, disable)
+  def set_publisher
+    nexus.enable_artifact_publish(new_resource.name.downcase)
+  end
+
+  def unset_publisher
+    nexus.disable_artifact_publish(new_resource.name.downcase)
   end
 
   def set_subscriber
-    nexus.enable_artifact_subscribe(new_resource.name.downcase, disable)
+    nexus.enable_artifact_subscribe(new_resource.name.downcase)
+  end
+
+  def unset_subscriber
+    nexus.disable_artifact_subscribe(new_resource.name.downcase)
   end
 
   def nexus_cli_credentials
