@@ -27,11 +27,13 @@ def load_current_resource
   @current_resource.password new_resource.password
   @current_resource.old_password new_resource.old_password
   @current_resource.roles new_resource.roles
+
+  run_context.include_recipe "nexus::cli"
+
+  @current_resource
 end
 
 action :create do
-  install_nexus_cli
-
   unless user_exists?(@current_resource.username)
     create_user
     new_resource.updated_by_last_action(true)
@@ -39,8 +41,6 @@ action :create do
 end
 
 action :update do
-  install_nexus_cli
-
   if user_exists?(@current_resource.username)
     update_user
     new_resource.updated_by_last_action(true)
@@ -48,8 +48,6 @@ action :update do
 end
 
 action :delete do
-  install_nexus_cli
-
   if user_exists?(@current_resource.username)
     delete_user
     new_resource.updated_by_last_action(true)
@@ -57,8 +55,6 @@ action :delete do
 end
 
 action :change_password do
-  install_nexus_cli
-
   unless password_equals?(@current_resource.password)
     change_password
     new_resource.updated_by_last_action(true)
@@ -66,20 +62,6 @@ action :change_password do
 end
 
 private
-  
-  def install_nexus_cli
-    package "libxml2-devel" do
-      action :install
-    end.run_action(:install)
-
-    package "libxslt-devel" do
-      action :install
-    end.run_action(:install)
-    
-    chef_gem "nexus_cli" do
-      version "0.6.0"
-    end
-  end
 
   def user_exists?(username)
     begin
