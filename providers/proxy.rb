@@ -24,12 +24,15 @@ def load_current_resource
   @current_resource.host new_resource.host
   @current_resource.port new_resource.port
   @current_resource.certificate new_resource.certificate
-  @@current_resource.description new_resource.description
+  @current_resource.description new_resource.description
+
+  run_context.include_recipe "nexus::cli"
+
+  @current_resource
 end
 
 action :enable do
-  install_nexus_cli
-
+  
   unless smart_proxy_enabled?
     enable_smart_proxy
     new_resource.updated_by_last_action(true)
@@ -37,7 +40,6 @@ action :enable do
 end
 
 action :disable do
-  install_nexus_cli
 
   if smart_proxy_enabled?
     disable_smart_proxy
@@ -63,24 +65,10 @@ end
 
 private
   
-  def install_nexus_cli
-    package "libxml2-devel" do
-      action :install
-    end.run_action(:install)
-
-    package "libxslt-devel" do
-      action :install
-    end.run_action(:install)
-    
-    chef_gem "nexus_cli" do
-      version "0.7.0"
-    end
-  end
-
   def smart_proxy_enabled?
     require 'json'
     json = JSON.parse(nexus.get_smart_proxy_settings)
-    json["data"]["enabled"]
+    json["data"]["enabled"] == true
   end
 
   def certificate_exists?
@@ -108,11 +96,11 @@ private
   end
 
   def enable_smart_proxy
-    nexus.enable_smart_proxy(false, new_resource.host, new_resource.port)
+    nexus.enable_smart_proxy(new_resource.host, new_resource.port)
   end
 
   def disable_smart_proxy
-    nexus.enable_smart_proxy(true)
+    nexus.disable_smart_proxy
   end
 
   def nexus_cli_credentials

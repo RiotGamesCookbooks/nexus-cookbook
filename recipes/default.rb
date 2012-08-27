@@ -176,10 +176,10 @@ end
 nexus_repository "Artifacts" do
   action :update
   publisher true
-  only_if {node[:nexus][:smart_proxy][:enable]}
+  only_if { node[:nexus][:smart_proxy][:enable] }
 end
 
-data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'nexus_certificates')
+data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'certificates')
 node[:nexus_cli][:smart_proxy][:trusted_servers].each do |server|
   nexus_proxy "install a trusted key with description #{server["description"]}" do
     action :add_trusted_key
