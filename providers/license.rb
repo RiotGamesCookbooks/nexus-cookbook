@@ -28,7 +28,7 @@ end
 
 action :install do
 
-  unless licensed?
+  unless licensed? && running_nexus_pro?
 
     require 'base64'
     data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'license')
@@ -54,4 +54,8 @@ private
     require 'json'
     json = JSON.parse(nexus.get_license_info)
     json["data"]["licenseType"] != "Not licensed"
+  end
+
+  def running_nexus_pro?
+    nexus.running_nexus_pro?
   end
