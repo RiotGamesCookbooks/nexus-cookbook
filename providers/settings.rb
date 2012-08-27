@@ -21,11 +21,13 @@
 def load_current_resource
   @current_resource = Chef::Resource::NexusSettings.new(new_resource.path)
   @current_resource.value new_resource.value
+
+  run_context.include_recipe "nexus::cli"
+
+  @current_resource
 end
 
 action :update do
-  install_nexus_cli
-
   unless path_value_equals?(@current_resource.value)
     update_nexus_settings_json
     new_resource.updated_by_last_action(true)
@@ -33,20 +35,6 @@ action :update do
 end
 
 private
-
-  def install_nexus_cli
-    package "libxml2-devel" do
-      action :install
-    end.run_action(:install)
-
-    package "libxslt-devel" do
-      action :install
-    end.run_action(:install)
-    
-    chef_gem "nexus_cli" do
-      version "0.6.0"
-    end
-  end
 
   def path_value_equals?(value)
     require 'jsonpath'
