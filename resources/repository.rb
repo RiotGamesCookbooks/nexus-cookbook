@@ -26,7 +26,7 @@ end
 actions :create, :delete, :update
 
 attribute :name, :kind_of           => String, :name_attribute => true
-attribute :type, :kind_of           => String, :equal_to => ["hosted", "proxy"]
+attribute :type, :kind_of           => String, :equal_to => ["hosted", "proxy"], :default => "hosted"
 attribute :url, :kind_of            => String
-attribute :publisher, :kind_of      => [TrueClass, FalseClass], :default => false
-attribute :subscriber, :kind_of     => [TrueClass, FalseClass], :default => false
+attribute :publisher, :kind_of      => [TrueClass, FalseClass], :default => nil
+attribute :subscriber, :kind_of     => [TrueClass, FalseClass], :default => nil

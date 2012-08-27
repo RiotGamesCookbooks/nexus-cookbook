@@ -20,8 +20,10 @@
 
 def load_current_resource
   @current_resource = Chef::Resource::NexusRepository.new(new_resource.name)
-  @current_resource.proxy new_resource.proxy
+  @current_resource.type new_resource.type
   @current_resource.url new_resource.url
+  @current_resource.publisher new_resource.publisher
+  @current_resource.subscriber new_resource.subscriber
 
   run_context.include_recipe "nexus::cli"
 
@@ -30,6 +32,7 @@ end
 
 action :create do
   unless repository_exists?(@current_resource.name)
+    validate_proxy
     nexus.create_repository(new_resource.name, new_resource.type == "proxy" ? true : false, new_resource.url)
     if new_resource.publisher
       set_publisher
@@ -49,18 +52,16 @@ action :delete do
 end
 
 action :update do
-  install_nexus_cli
-
   if repository_exists?(@current_resource.name)
     if new_resource.publisher
       set_publisher
-    else
+    elsif new_resource.publisher == false
       unset_publisher
     end
 
     if new_resource.subscriber
       set_subscriber
-    else
+    elsif new_resource.subscriber == false
       unset_subscriber
     end
   end
@@ -105,6 +106,6 @@ private
   end
 
   def validate_proxy
-    Chef::Application.fatal!("If this repository is a Proxy repository, you also need to provide a url.") if new_resource.proxy && new_resource.url.nil?
-    Chef::Application.fatal!("You need to provide a valid url.") if new_resource.proxy && (new_resource.url =~ URI::ABS_URI).nil?
+    Chef::Application.fatal!("If this repository is a Proxy repository, you also need to provide a url.") if new_resource.type == "proxy" && new_resource.url.nil?
+    Chef::Application.fatal!("You need to provide a valid url.") if new_resource.type == "proxy" && (new_resource.url =~ URI::ABS_URI).nil?
   end
