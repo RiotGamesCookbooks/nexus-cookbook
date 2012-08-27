@@ -67,5 +67,5 @@ private
 
   def validate_proxy
     Chef::Application.fatal!("If this repository is a Proxy repository, you also need to provide a url.") if new_resource.proxy && new_resource.url.nil?
-    Chef::Application.fatal!("You need to provide a valid url.") if (new_resource.url =~ URI::ABS_URI).nil?
+    Chef::Application.fatal!("You need to provide a valid url.") if new_resource.proxy && (new_resource.url =~ URI::ABS_URI).nil?
   end

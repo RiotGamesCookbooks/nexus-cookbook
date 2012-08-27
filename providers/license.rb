@@ -28,7 +28,7 @@ end
 
 action :install do
 
-  if licensed?
+  unless licensed?
 
     require 'base64'
     data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'license')
@@ -53,7 +53,5 @@ private
   def licensed?
     require 'json'
     json = JSON.parse(nexus.get_license_info)
-    log(json) { level :debug }
-    log(json["data"]["licenseType"] == "Not licensed")
     json["data"]["licenseType"] != "Not licensed"
   end
