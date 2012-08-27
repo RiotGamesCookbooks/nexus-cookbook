@@ -180,10 +180,12 @@ nexus_repository "Artifacts" do
 end
 
 data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'certificates')
-node[:nexus_cli][:smart_proxy][:trusted_servers].each do |server|
-  nexus_proxy "install a trusted key with description #{server["description"]}" do
+node[:nexus][:smart_proxy][:trusted_servers].each do |server|
+  server_info = data_bag_item[server]
+
+  nexus_proxy "install a trusted key with description #{server_info["description"]}" do
     action :add_trusted_key
-    description server["description"]
-    certificate server["certificate"]
+    description server_info["description"]
+    certificate server_info["certificate"]
   end
 end

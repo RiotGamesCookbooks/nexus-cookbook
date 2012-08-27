@@ -75,6 +75,7 @@ private
     require 'json'
     json = JSON.parse(nexus.get_trusted_keys)
     trusted_keys = json["data"]
+    return false if trusted_keys.nil?
     trusted_keys.each do |trusted_key|
       if new_resource.certificate == trusted_key["certificate"]["pem"]
         return true

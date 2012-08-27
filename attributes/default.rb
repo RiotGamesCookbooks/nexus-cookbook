@@ -31,6 +31,6 @@ default[:nexus][:cli][:packages]                               = ["libxml2-devel
 default[:nexus][:create_repositories]                          = ["Artifacts"]
 
 default[:nexus][:smart_proxy][:enable]                         = true
-default[:nexus][:smart_proxy][:trusted_servers]                = []
+default[:nexus][:smart_proxy][:trusted_servers]                = ["some_identifier"]
 default[:nexus][:smart_proxy][:host]                           = ""
 default[:nexus][:smart_proxy][:port]                           = 1234
