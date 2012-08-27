@@ -26,3 +26,5 @@ end
 actions :create, :delete
 
 attribute :name, :kind_of           => String, :name_attribute => true
+attribute :proxy, :kind_of          => [TrueClass, FalseClass]
+attribute :url, :kind_of            => String

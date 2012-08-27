@@ -20,6 +20,8 @@
 
 def load_current_resource
   @current_resource = Chef::Resource::NexusRepository.new(new_resource.name)
+  @current_resource.proxy new_resource.proxy
+  @current_resource.url new_resource.url
 
   run_context.include_recipe "nexus::cli"
 
@@ -28,7 +30,8 @@ end
 
 action :create do
   unless repository_exists?(@current_resource.name)
-    nexus.create_repository(new_resource.name)
+    validate_proxy
+    nexus.create_repository(new_resource.name, new_resource.proxy, new_resource.url)
     new_resource.updated_by_last_action(true)
   end
 end
@@ -60,4 +63,9 @@ private
     rescue NexusCli::RepositoryNotFoundException => e
       return false
     end
+  end
+
+  def validate_proxy
+    Chef::Application.fatal!("If this repository is a Proxy repository, you also need to provide a url.") if new_resource.proxy && new_resource.url.nil?
+    Chef::Application.fatal!("You need to provide a valid url.") if (new_resource.url =~ URI::ABS_URI).nil?
   end
