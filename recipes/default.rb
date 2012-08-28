@@ -142,8 +142,6 @@ bluepill_service "nexus" do
   notifies :restart, "service[nginx]", :immediately
 end
 
-nexus_license "install a license"
-
 nexus_settings "baseUrl" do
   value "https://#{node[:nexus][:nginx_proxy][:server_name]}:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
 end
@@ -152,8 +150,16 @@ nexus_settings "forceBaseUrl" do
   value true
 end
 
-node[:nexus][:create_repositories].each do |repository|
+node[:nexus][:repository][:create_hosted].each do |repository|
   nexus_repository repository
+end
+
+node[:nexus][:repository][:create_proxy].each do |repository, url|
+  nexus_repository repository do
+    action   :create
+    type     "proxy"
+    url      url
+  end
 end
     
 data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'credentials')
@@ -164,28 +170,4 @@ nexus_user "admin" do
   action :change_password
   old_password default_credentials["password"]
   password updated_credentials["password"]
-end
-
-nexus_proxy "enable smart proxy" do
-  action :enable
-  host node[:nexus][:smart_proxy][:host]
-  port node[:nexus][:smart_proxy][:port]
-  only_if {node[:nexus][:smart_proxy][:enable]}
-end
-
-nexus_repository "Artifacts" do
-  action :update
-  publisher true
-  only_if { node[:nexus][:smart_proxy][:enable] }
-end
-
-data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'certificates')
-node[:nexus][:smart_proxy][:trusted_servers].each do |server|
-  server_info = data_bag_item[server]
-
-  nexus_proxy "install a trusted key with description #{server_info["description"]}" do
-    action :add_trusted_key
-    description server_info["description"]
-    certificate server_info["certificate"]
-  end
 end
