@@ -45,6 +45,7 @@ end
 action :add_trusted_key do
 
   unless certificate_exists?
+    verify_add_trusted_key
     nexus.add_trusted_key(new_resource.certificate, new_resource.description, false)
     new_resource.updated_by_last_action(true)
   end
@@ -53,6 +54,7 @@ end
 action :delete_trusted_key do
 
   if trusted_key_exists?
+    verify_delete_trusted_key
     nexus.delete_trusted_key(new_resource.id)
     new_resource.updated_by_last_action(true)
   end
@@ -79,6 +81,15 @@ private
     json = JSON.parse(nexus.get_trusted_keys)
     trusted_keys = json["data"]
     return trusted_keys.any?{|trusted_key| new_resource.id == trusted_key["id"]}
+  end
+
+  def verify_add_trusted_key
+    Chef::Application.fatal!("The add_trusted_key action requires the certificate attribute!") if new_resource.certificate.nil?
+    Chef::Application.fatal!("The add_trusted_key action requires the description attribute!") if new_resource.description.nil?
+  end
+
+  def verify_delete_trusted_key
+    Chef::Application.fatal!("The delete_trusted_key action requires the id attribute!") if new_resource.id.nil?
   end
 
   def enable_smart_proxy
