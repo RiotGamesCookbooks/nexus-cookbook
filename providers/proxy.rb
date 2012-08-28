@@ -20,11 +20,6 @@
 
 def load_current_resource
   @current_resource = Chef::Resource::NexusProxy.new(new_resource.name)
-  @current_resource.id new_resource.id
-  @current_resource.host new_resource.host
-  @current_resource.port new_resource.port
-  @current_resource.certificate new_resource.certificate
-  @current_resource.description new_resource.description
 
   run_context.include_recipe "nexus::cli"
 
@@ -76,24 +71,14 @@ private
     json = JSON.parse(nexus.get_trusted_keys)
     trusted_keys = json["data"]
     return false if trusted_keys.nil?
-    trusted_keys.each do |trusted_key|
-      if new_resource.certificate == trusted_key["certificate"]["pem"]
-        return true
-      end
-    end
-    false    
+    return trusted_keys.any?{|trusted_key| new_resource.certificate == trusted_key["certificate"]["pem"]}
   end
 
   def trusted_key_exists?
     require 'json'
     json = JSON.parse(nexus.get_trusted_keys)
     trusted_keys = json["data"]
-    trusted_keys.each do |trusted_key|
-      if new_resource.id == trusted_key["id"]
-        return true
-      end
-    end
-    false
+    return trusted_keys.any?{|trusted_key| new_resource.id == trusted_key["id"]}
   end
 
   def enable_smart_proxy

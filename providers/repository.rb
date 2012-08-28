@@ -18,22 +18,21 @@
 # limitations under the License.
 #
 
+attr_reader :parsed_id
+
 def load_current_resource
   @current_resource = Chef::Resource::NexusRepository.new(new_resource.name)
-  @current_resource.type new_resource.type
-  @current_resource.url new_resource.url
-  @current_resource.publisher new_resource.publisher
-  @current_resource.subscriber new_resource.subscriber
 
   run_context.include_recipe "nexus::cli"
 
+  @parsed_id = new_resource.name.gsub(" ", "_").downcase
   @current_resource
 end
 
 action :create do
   unless repository_exists?(@current_resource.name)
     validate_proxy
-    nexus.create_repository(new_resource.name, new_resource.type == "proxy" ? true : false, new_resource.url)
+    nexus.create_repository(new_resource.name, new_resource.type == "proxy", new_resource.url)
     if new_resource.publisher
       set_publisher
     end
@@ -70,19 +69,19 @@ end
 private
   
   def set_publisher
-    nexus.enable_artifact_publish(new_resource.name.downcase)
+    nexus.enable_artifact_publish(@parsed_id)
   end
 
   def unset_publisher
-    nexus.disable_artifact_publish(new_resource.name.downcase)
+    nexus.disable_artifact_publish(@parsed_id)
   end
 
   def set_subscriber
-    nexus.enable_artifact_subscribe(new_resource.name.downcase)
+    nexus.enable_artifact_subscribe(@parsed_id)
   end
 
   def unset_subscriber
-    nexus.disable_artifact_subscribe(new_resource.name.downcase)
+    nexus.disable_artifact_subscribe(@parsed_id)
   end
 
   def nexus_cli_credentials
