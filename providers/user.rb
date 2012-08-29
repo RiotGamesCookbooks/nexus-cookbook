@@ -20,14 +20,8 @@
 
 def load_current_resource
   @current_resource = Chef::Resource::NexusUser.new(new_resource.username)
-  @current_resource.first_name new_resource.first_name
-  @current_resource.last_name new_resource.last_name
-  @current_resource.email new_resource.email
-  @current_resource.enabled new_resource.enabled
-  @current_resource.password new_resource.password
   @current_resource.old_password new_resource.old_password
-  @current_resource.roles new_resource.roles
-
+  
   run_context.include_recipe "nexus::cli"
 
   @current_resource
@@ -55,7 +49,7 @@ action :delete do
 end
 
 action :change_password do
-  unless password_equals?(@current_resource.password)
+  if old_credentials_equals?(@current_resource.username, @current_resource.old_password)
     change_password
     new_resource.updated_by_last_action(true)
   end
@@ -65,36 +59,33 @@ private
 
   def user_exists?(username)
     begin
-      nexus.get_user(username)
+      Chef::Nexus.nexus(node).get_user(username)
       true
     rescue NexusCli::UserNotFoundException => e
       return false
     end
   end
 
-  def password_equals?(password)
-    data_bag_item = Chef::Nexus.get_credentials_data_bag
-    data_bag_item["default_admin"]["password"] == password
+  def old_credentials_equals?(username, password)
+    Chef::Nexus.check_old_credentials(username, password, node)
   end
 
   def create_user
     validate_create_user
-    nexus.create_user(get_params)
+    Chef::Nexus.nexus(node).create_user(get_params)
   end
 
   def update_user
-    nexus.update_user(get_params(true))
+    Chef::Nexus.nexus(node).update_user(get_params(true))
   end
 
   def delete_user
-    nexus.delete_user(new_resource.username)
+    Chef::Nexus.nexus(node).delete_user(new_resource.username)
   end
 
   def change_password
     validate_change_password
-    if nexus.change_password(get_password_params) && nexus_cli_credentials["username"] == new_resource.username
-      update_nexus_cli_credentials
-    end
+    Chef::Nexus.nexus(node).change_password(get_password_params)
   end
 
   def validate_create_user
@@ -128,30 +119,4 @@ private
     params[:oldPassword] = new_resource.old_password
     params[:newPassword] = new_resource.password
     params
-  end
-
-  def nexus
-    require 'nexus_cli'
-    @nexus = NexusCli::Factory.create(nexus_cli_credentials)
-  end
-
-  def nexus_cli_credentials
-    data_bag_item = Chef::Nexus.get_credentials_data_bag
-    credentials = data_bag_item["default_admin"]
-    {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository]}.merge credentials
-  end
-
-  def update_nexus_cli_credentials
-    data_bag_item = Chef::Nexus.get_credentials_data_bag
-    data_bag_hash = data_bag_item.to_hash
-    data_bag_hash["default_admin"]["password"] = new_resource.password
-    data_bag_item = Chef::EncryptedDataBagItem.encrypt_data_bag_item(data_bag_hash, Chef::EncryptedDataBagItem.load_secret)
-  
-    if Chef::Config[:solo]
-      ::File.open(::File.join(Chef::Config[:data_bag_path], "nexus/credentials.json"), "w") do |opened|
-        opened.write(data_bag_item.to_json)
-      end
-    else
-      Chef::DataBagItem.from_hash(data_bag_item).save
-    end
   end

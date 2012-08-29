@@ -44,23 +44,12 @@ private
   end
 
   def get_nexus_settings_json
-    nexus.get_global_settings_json
+    Chef::Nexus.nexus(node).get_global_settings_json
   end
 
   def update_nexus_settings_json
     require 'json'
     json = JSON.parse(get_nexus_settings_json)
     edited_json = JsonPath.for(json).gsub("$..#{new_resource.path}") {|value| new_resource.value}.to_hash
-    nexus.upload_global_settings(JSON.dump(edited_json))
-  end
-
-  def nexus_cli_credentials
-    data_bag_item = Chef::Nexus.get_credentials_data_bag
-    credentials = data_bag_item["default_admin"]
-    {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository]}.merge credentials
-  end
-
-  def nexus
-    require 'nexus_cli'
-    @nexus ||= NexusCli::Factory.create(nexus_cli_credentials)
+    Chef::Nexus.nexus(node).upload_global_settings(JSON.dump(edited_json))
   end
