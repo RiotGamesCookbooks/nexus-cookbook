@@ -32,7 +32,7 @@ end
 action :create do
   unless repository_exists?(@current_resource.name)
     validate_proxy
-    nexus.create_repository(new_resource.name, new_resource.type == "proxy", new_resource.url)
+    Chef::Nexus.nexus(node).create_repository(new_resource.name, new_resource.type == "proxy", new_resource.url)
     if new_resource.publisher
       set_publisher
     end
@@ -45,7 +45,7 @@ end
 
 action :delete do
   if repository_exists?(@current_resource.name)
-    nexus.delete_repository(new_resource.name)
+    Chef::Nexus.nexus(node).delete_repository(new_resource.name)
     new_resource.updated_by_last_action(true)
   end
 end
@@ -69,35 +69,24 @@ end
 private
   
   def set_publisher
-    nexus.enable_artifact_publish(@parsed_id)
+    Chef::Nexus.nexus(node).enable_artifact_publish(@parsed_id)
   end
 
   def unset_publisher
-    nexus.disable_artifact_publish(@parsed_id)
+    Chef::Nexus.nexus(node).disable_artifact_publish(@parsed_id)
   end
 
   def set_subscriber
-    nexus.enable_artifact_subscribe(@parsed_id)
+    Chef::Nexus.nexus(node).enable_artifact_subscribe(@parsed_id)
   end
 
   def unset_subscriber
-    nexus.disable_artifact_subscribe(@parsed_id)
-  end
-
-  def nexus_cli_credentials
-    data_bag_item = Chef::Nexus.get_credentials_data_bag
-    credentials = data_bag_item["default_admin"]
-    {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository]}.merge credentials
-  end
-
-  def nexus
-    require 'nexus_cli'
-    @nexus ||= NexusCli::Factory.create(nexus_cli_credentials)
+    Chef::Nexus.nexus(node).disable_artifact_subscribe(@parsed_id)
   end
 
   def repository_exists?(name)
     begin
-      nexus.get_repository_info(name)
+      Chef::Nexus.nexus(node).get_repository_info(name)
       true
     rescue NexusCli::RepositoryNotFoundException => e
       return false

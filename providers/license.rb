@@ -33,29 +33,18 @@ action :install do
     require 'base64'
     data_bag_item = Chef::Nexus.get_license_data_bag
     license_data = Base64.decode64(data_bag_item["file"])
-    nexus.install_license_bytes(license_data)
+    Chef::Nexus.nexus(node).install_license_bytes(license_data)
   end
 end
 
 private
   
-  def nexus_cli_credentials
-    data_bag_item = Chef::Nexus.get_credentials_data_bag
-    credentials = data_bag_item["default_admin"]
-    {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository]}.merge credentials
-  end
-
-  def nexus
-    require 'nexus_cli'
-    @nexus ||= NexusCli::Factory.create(nexus_cli_credentials)
-  end
-
   def licensed?
     require 'json'
-    json = JSON.parse(nexus.get_license_info)
+    json = JSON.parse(Chef::Nexus.nexus(node).get_license_info)
     json["data"]["licenseType"] != "Not licensed"
   end
 
   def running_nexus_pro?
-    nexus.running_nexus_pro?
+    Chef::Nexus.nexus(node).running_nexus_pro?
   end

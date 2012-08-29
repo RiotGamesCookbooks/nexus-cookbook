@@ -46,7 +46,7 @@ action :add_trusted_key do
 
   unless certificate_exists?
     verify_add_trusted_key
-    nexus.add_trusted_key(new_resource.certificate, new_resource.description, false)
+    Chef::Nexus.nexus(node).add_trusted_key(new_resource.certificate, new_resource.description, false)
     new_resource.updated_by_last_action(true)
   end
 end
@@ -55,7 +55,7 @@ action :delete_trusted_key do
 
   if trusted_key_exists?
     verify_delete_trusted_key
-    nexus.delete_trusted_key(new_resource.id)
+    Chef::Nexus.nexus(node).delete_trusted_key(new_resource.id)
     new_resource.updated_by_last_action(true)
   end
 end
@@ -64,13 +64,13 @@ private
   
   def smart_proxy_enabled?
     require 'json'
-    json = JSON.parse(nexus.get_smart_proxy_settings)
+    json = JSON.parse(Chef::Nexus.nexus(node).get_smart_proxy_settings)
     json["data"]["enabled"] == true
   end
 
   def certificate_exists?
     require 'json'
-    json = JSON.parse(nexus.get_trusted_keys)
+    json = JSON.parse(Chef::Nexus.nexus(node).get_trusted_keys)
     trusted_keys = json["data"]
     return false if trusted_keys.nil?
     return trusted_keys.any?{|trusted_key| new_resource.certificate == trusted_key["certificate"]["pem"]}
@@ -78,7 +78,7 @@ private
 
   def trusted_key_exists?
     require 'json'
-    json = JSON.parse(nexus.get_trusted_keys)
+    json = JSON.parse(Chef::Nexus.nexus(node).get_trusted_keys)
     trusted_keys = json["data"]
     return trusted_keys.any?{|trusted_key| new_resource.id == trusted_key["id"]}
   end
@@ -93,20 +93,9 @@ private
   end
 
   def enable_smart_proxy
-    nexus.enable_smart_proxy(new_resource.host, new_resource.port)
+    Chef::Nexus.nexus(node).enable_smart_proxy(new_resource.host, new_resource.port)
   end
 
   def disable_smart_proxy
-    nexus.disable_smart_proxy
-  end
-
-  def nexus_cli_credentials
-    data_bag_item = Chef::Nexus.get_credentials_data_bag
-    credentials = data_bag_item["default_admin"]
-    {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository]}.merge credentials
-  end
-
-  def nexus
-    require 'nexus_cli'
-    @nexus ||= NexusCli::Factory.create(nexus_cli_credentials)
+    Chef::Nexus.nexus(node).disable_smart_proxy
   end

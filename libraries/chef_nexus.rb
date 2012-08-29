@@ -56,6 +56,30 @@ class Chef
         data_bag_item
       end
 
+      def nexus(node)
+        require 'nexus_cli'
+        data_bag_item = get_credentials_data_bag
+        default_credentials = data_bag_item["default_admin"]
+        updated_credentials = data_bag_item["updated_admin"]
+        overrides = {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository]}
+        begin
+          NexusCli::Factory.create(overrides.merge default_credentials)
+        rescue NexusCli::PermissionsException, RestClient::Unauthorized => e
+          NexusCli::Factory.create(overrides.merge updated_credentials)
+        end
+      end
+
+      def check_old_credentials(username, password, node)
+        require 'nexus_cli'
+        overrides = {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository], "username" => username, "password" => password}
+        begin
+          nexus = NexusCli::Factory.create(overrides)
+          true
+        rescue NexusCli::PermissionsException, RestClient::Unauthorized => e
+          false
+        end
+      end
+
       private
 
         def validate_credentials_data_bag(data_bag_item)
