@@ -84,8 +84,8 @@ private
   end
 
   def verify_add_trusted_key
-    Chef::Application.fatal!("The add_trusted_key action requires the certificate attribute!") if new_resource.certificate.nil?
-    Chef::Application.fatal!("The add_trusted_key action requires the description attribute!") if new_resource.description.nil?
+    Chef::Application.fatal!("The add_trusted_key action requires the certificate attribute!") unless new_resource.certificate
+    Chef::Application.fatal!("The add_trusted_key action requires the description attribute!") unless new_resource.description
   end
 
   def verify_delete_trusted_key
@@ -101,7 +101,7 @@ private
   end
 
   def nexus_cli_credentials
-    data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'credentials')
+    data_bag_item = Chef::Nexus.get_credentials_data_bag
     credentials = data_bag_item["default_admin"]
     {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository]}.merge credentials
   end

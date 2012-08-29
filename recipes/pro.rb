@@ -45,24 +45,9 @@ node[:nexus][:repository][:subscribers].each do |repository|
   end
 end
 
-data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'certificates')
+data_bag_item = Chef::Nexus.get_certificates_data_bag(node)
 node[:nexus][:smart_proxy][:trusted_servers].each do |server|
   server_info = data_bag_item[server]
-
-  log "The server #{server} was not found in the data bag." do
-    level :fatal
-    only_if { server_info.nil? }
-  end
-
-  log "The data bag entry for #{server} requires a \"certificate\" element." do
-    level :fatal
-    only_if { server_info["certificate"].nil? }
-  end
-
-  log "The data bag entry for #{server} requires a \"description\" element." do
-    level :fatal
-    only_if { server_info["description"].nil? }
-  end
 
   nexus_proxy "install a trusted key with description #{server_info["description"]}" do
     action      :add_trusted_key

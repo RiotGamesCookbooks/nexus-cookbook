@@ -162,7 +162,7 @@ node[:nexus][:repository][:create_proxy].each do |repository, url|
   end
 end
 
-data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'credentials')
+data_bag_item = Chef::Nexus.get_credentials_data_bag
 default_credentials = data_bag_item["default_admin"]
 updated_credentials = data_bag_item["updated_admin"]
 
