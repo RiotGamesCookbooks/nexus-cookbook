@@ -44,12 +44,17 @@ Resource provider for creating and deleting Neuxs repositories.
 Action  | Description              | Default
 ------- |-------------             |---------
 create  | Creates a new repository | Yes
-delete  | Deletes a repository     | No
+delete  | Deletes a repository     |
+update  | Updates a repository     | 
 
 ### Attributes
-Attribute  | Description                   			 | Type    | Default
----------  |-------------                  			 |-----    |--------
-name       | Name of the repository to create/delete | String  | name
+Attribute  | Description                   			               | Type                  | Default
+---------  |-------------                  			               |-----                  |--------
+name       | Name of the repository to create/delete               | String                | name
+type       | The type of repository - either "hosted" or "proxy".  | String                |
+url        | The url used for a proxy repository.                  | String                |
+publisher  | Whether this repository is a publisher of artifacts.  | TrueClass, FalseClass |
+subscriber | Whether this repository is a subscriber to artifacts. | TrueClass, FalseClass |
 
 ## nexus\_settings
 
@@ -97,7 +102,7 @@ under nexus license.
 
 	knife data bag create nexus license -c <your chef config> --secret-file<your secret file>
 
-Your databag should look like the following:
+Your data bag should look like the following:
 
 	{
 	  "id": "license"
@@ -114,9 +119,32 @@ Action   | Description              						 | Default
 install  | Installs a license file into the server.          | Yes
 
 ### Attributes
-Attribute  | Description                   			 				          | Type                          | Default
----------  |-------------                  			 				          |-----                          |--------
-name       | Some useful information about the license. Similar to ruby_block | String                        | name
+Attribute  | Description                   			 				           | Type                          | Default
+---------  |-------------                  			 				           |-----                          |--------
+name       | Some useful information about the license. Similar to ruby_block. | String                        | name
+
+## nexus\_proxy
+
+Resource provider for manipulating the Nexus' settings for Smart Proxy.
+
+### Actions
+Action  		        | Description              						 | Default
+------- 		        |-------------             						 |---------
+enable  		        | Enables the Smart Proxy functionality.         | Yes
+disable  		        | Disables the Smart Proxy functionality.        | 
+add_trusted_key  		| Adds a trusted key to the server.              | 
+delete_trusted_key  	| Removes a trusted key from the server.         | 
+
+
+### Attributes
+Attribute    | Description                   			 				                      | Type                  | Default
+---------    |-------------                  			 				                      |-----                  |--------
+name         | Some useful information about the proxy. Similar to ruby_block.                | String                | name
+id           | Used for delete_trusted_key. The id of the key to delete.                      | String                |
+host         | The host to use for Smart Proxy. Used for enable.                              | String                |
+port         | The port to use for Smart Proxy. Used for enable.                              | Fixnum                |
+certificate  | The certificate of another Nexus to add. Used for add_trusted_key.             | String                |
+description  | The description of the other Nexus. Used for add_trusted_key.                  | String                |
 
 
 Attributes
@@ -149,6 +177,21 @@ The following attributes are set under the `nexus::cli` namespace:
 
 * url - The url that the nexus_cli gem will connect to. The default recipe uses this to configure itself, so localhost.
 * repository - The repository that nexus_cli gem will use for push / pull operations. A requirement of nexus_cli, not used by this cookbook.
+* packages - required packages to install for using the `chef_gem "nexus_cli"`
+
+The following attributes are set under the `nexus::repository` namespace:
+
+* create_hosted - An Array of repository names that will be used to create Hosted Repositories.
+* create_proxy - A Hash of repository names to urls that will be used to create Proxy Repositories.
+* publishers - An Array of repository names that will be set to publish artifacts (Smart Proxy).
+* subscribers - An Array of repository names that will be set to subscribe to artifacts (Smart Proxy).
+
+The following attributes are set under the `nexus::smart_proxy` namespace:
+
+* enable - true if we want to enable Smart Proxy, false if not.
+* trusted_servers - An Array of IP addresses of other Nexus servers that have a key we should trust. Used in conjunction with the `certificates` data bag.
+* host - The host to use for Smart Proxy configuration.
+* port - The port to use for Smart Proxy configuration.
 
 SSL
 ===
@@ -165,7 +208,7 @@ for your Nexus server.
 
 	knife data bag create nexus credentials -c <your chef config> --secret-file=<your secret file>
 
-Your databag should look like the following:
+Your data bag should look like the following:
 
 	{
 	  "id": "credentials",
@@ -182,11 +225,43 @@ Your databag should look like the following:
 Out-of-the-box, Nexus comes configured with a specific administrative username/password combo. The default recipe
 change the password for that account to the password configured in the `updated_admin` element.
 
+Smart Proxy Usage
+=================
+
+When Smart Proxy is enabled (`nexus::pro` recipe), repositories need to be set to become publishers or subscribers. In
+addition, we need to store the certificates of other Nexus servers on the server that Smart Proxy is being enabled on.
+
+	knife data bag create nexus certificates -c <your chef config> --secret-file=<your secret file>
+
+Your data bag will store a certificate and description based on the IP address of other Nexus servers and should look like the following:
+
+	{
+	  "id": "certificates",
+	  "192.168.0.1": {
+	    "certificate": "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----\n",
+	    "description": "192.168.0.1 Trusted Key"
+	  },
+      "192.168.0.2": {
+        "certificate": "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----\n",
+        "description": "192.168.0.2 Trusted Key"
+      }
+	}
+
+Override the `nexus::repository` attributes to set these appropriately for your Nexus.
 
 Usage
 =====
 
 Simply add the "nexus::default" recipe to the node where you want Sonatype Nexus installed.
+
+To install Nexus Pro and perform some extra steps, use the "nexus::pro" recipe. Most likely, all you'll need is
+to override the following attributes like so:
+
+    :nexus => {
+      :version => '2.1.2',
+      :checksum => 'new checksum',
+      :url => 'some/url/to/nexus-professional-2.1.2-bundle.tar.gz',
+    }
 
 License and Author
 ==================

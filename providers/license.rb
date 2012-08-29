@@ -31,7 +31,7 @@ action :install do
   unless licensed? && running_nexus_pro?
 
     require 'base64'
-    data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'license')
+    data_bag_item = Chef::Nexus.get_license_data_bag
     license_data = Base64.decode64(data_bag_item["file"])
     nexus.install_license_bytes(license_data)
   end
@@ -40,7 +40,7 @@ end
 private
   
   def nexus_cli_credentials
-    data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'credentials')
+    data_bag_item = Chef::Nexus.get_credentials_data_bag
     credentials = data_bag_item["default_admin"]
     {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository]}.merge credentials
   end

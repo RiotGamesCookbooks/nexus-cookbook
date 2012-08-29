@@ -1,7 +1,8 @@
-default[:nexus][:version]                                      = '2.1.1'
+default[:nexus][:version]                                      = '2.1.2'
 default[:nexus][:user]                                         = 'nexus'
 default[:nexus][:group]                                        = 'nexus'
 default[:nexus][:url]                                          = "http://www.sonatype.org/downloads/nexus-#{node[:nexus][:version]}-bundle.tar.gz"
+default[:nexus][:checksum]                                     = '32fcf0fcfb45e4ee8bc53149131d34257da62758515e7b9d24c92d6ad083dbc9'
 
 default[:nexus][:port]                                         = '8081'
 default[:nexus][:host]                                         = '0.0.0.0'
@@ -27,4 +28,12 @@ default[:nexus][:cli][:url]                                    = "https://#{node
 default[:nexus][:cli][:repository]                             = "releases"
 default[:nexus][:cli][:packages]                               = ["libxml2-devel", "libxslt-devel"]
 
-default[:nexus][:create_repositories]                          = ["Artifacts"]
+default[:nexus][:repository][:create_hosted]                   = []
+default[:nexus][:repository][:create_proxy]                    = {}
+default[:nexus][:repository][:publishers]                      = []
+default[:nexus][:repository][:subscribers]                     = []
+
+default[:nexus][:smart_proxy][:enable]                         = true
+default[:nexus][:smart_proxy][:trusted_servers]                = []
+default[:nexus][:smart_proxy][:host]                           = nil
+default[:nexus][:smart_proxy][:port]                           = nil

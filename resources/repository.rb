@@ -23,8 +23,10 @@ def initialize(*args)
   @action = :create
 end
 
-actions :create, :delete
+actions :create, :delete, :update
 
 attribute :name, :kind_of           => String, :name_attribute => true
-attribute :proxy, :kind_of          => [TrueClass, FalseClass]
+attribute :type, :kind_of           => String, :equal_to => ["hosted", "proxy"], :default => "hosted"
 attribute :url, :kind_of            => String
+attribute :publisher, :kind_of      => [TrueClass, FalseClass], :default => nil
+attribute :subscriber, :kind_of     => [TrueClass, FalseClass], :default => nil

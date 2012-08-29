@@ -73,7 +73,7 @@ private
   end
 
   def password_equals?(password)
-    data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'credentials')
+    data_bag_item = Chef::Nexus.get_credentials_data_bag
     data_bag_item["default_admin"]["password"] == password
   end
 
@@ -136,13 +136,13 @@ private
   end
 
   def nexus_cli_credentials
-    data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'credentials')
+    data_bag_item = Chef::Nexus.get_credentials_data_bag
     credentials = data_bag_item["default_admin"]
     {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository]}.merge credentials
   end
 
   def update_nexus_cli_credentials
-    data_bag_item = Chef::EncryptedDataBagItem.load('nexus', 'credentials')
+    data_bag_item = Chef::Nexus.get_credentials_data_bag
     data_bag_hash = data_bag_item.to_hash
     data_bag_hash["default_admin"]["password"] = new_resource.password
     data_bag_item = Chef::EncryptedDataBagItem.encrypt_data_bag_item(data_bag_hash, Chef::EncryptedDataBagItem.load_secret)
