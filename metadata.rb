@@ -9,7 +9,7 @@ version          "0.11.2"
   supports os
 end
 
-depends "ark"
-depends "java"
-depends "nginx"
-depends "bluepill"
+depends "ark", "~> 0.0.11"
+depends "java", "~> 1.5.2"
+depends "nginx", "~> 0.101.6"
+depends "bluepill", "~> 1.0.6"
