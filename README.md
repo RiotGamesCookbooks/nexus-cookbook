@@ -267,12 +267,10 @@ License and Author
 ==================
 
 Author:: Kyle Allan (<kallan@riotgames.com>)
-Author:: Charles Scott (<connaryscott@gmail.com>)
-Author:: Greg Schueler (<greg.schueler@gmail.com>)
-Author:: Seth Chisamore (<schisamo@opscode.com>)
+Based on work by Joseph Holsten (<joseph@josephholsten.com>), Charles Scott (<connaryscott@gmail.com>),
+Greg Schueler (<greg.schueler@gmail.com>), and Seth Chisamore (<schisamo@opscode.com>)
 
-Copyright 2011, DTO, Inc.
-Copyright 2010, Opscode, Inc.
+Copyright 2012, Riot Games
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

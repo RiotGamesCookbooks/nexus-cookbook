@@ -2,8 +2,8 @@
 # Cookbook Name:: nexus
 # Recipe:: default
 #
-# Copyright 2011, DTO Solutions, Inc.
-# Copyright 2010, Opscode, Inc.
+# Author:: Kyle Allan (<kallan@riotgames.com>)
+# Copyright 2012, Riot Games
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
