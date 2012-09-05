@@ -101,9 +101,7 @@ if data_bag_item["pem"]
     mode "077"
     action :create_if_missing
   end
-end
-
-unless data_bag_item["pem"]
+else
   log "Could not find ssl_certificate data bag, using default certificate." do
     level :warn
   end
