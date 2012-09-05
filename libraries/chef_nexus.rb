@@ -24,8 +24,18 @@ class Chef
     CREDENTIALS_DATABAG_ITEM = "credentials"
     LICENSE_DATABAG_ITEM = "license"
     CERTIFICATES_DATABAG_ITEM = "certificates"
+    SSL_CERTIFICATE_DATABAG_ITEM = "ssl_certificate"
     
     class << self
+      def get_ssl_certificate_data_bag
+        begin
+          data_bag_item = Chef::EncryptedDataBagItem.load(DATABAG, SSL_CERTIFICATE_DATABAG_ITEM)
+        rescue Net::HTTPServerException => e
+          raise Nexus::EncryptedDataBagNotFound.new(CREDENTIALS_DATABAG_ITEM)
+        end
+        data_bag_item
+      end
+
       def get_credentials_data_bag
         begin
           data_bag_item = Chef::EncryptedDataBagItem.load(DATABAG, CREDENTIALS_DATABAG_ITEM)
