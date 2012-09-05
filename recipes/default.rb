@@ -93,10 +93,26 @@ directory "#{node[:nginx][:dir]}/shared/certificates" do
   recursive true
 end
 
-cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.pem" do
-  source "self_signed_cert.pem"
-  mode "077"
-  action :create_if_missing
+data_bag_item = Chef::Nexus.get_ssl_certificate_data_bag
+
+if data_bag_item["pem"]
+  file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.pem" do
+    content data_bag_item["pem"]
+    mode "077"
+    action :create_if_missing
+  end
+end
+
+unless data_bag_item["pem"]
+  log "Could not find ssl_certificate data bag, using default certificate." do
+    level :warn
+  end
+
+  cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.pem" do
+    source "self_signed_cert.pem"
+    mode "077"
+    action :create_if_missing
+  end
 end
 
 cookbook_file "#{node[:nexus][:conf_dir]}/jetty.xml" do
