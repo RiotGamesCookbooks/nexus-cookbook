@@ -29,29 +29,15 @@ nexus_proxy "enable smart proxy" do
   only_if { node[:nexus][:smart_proxy][:enable] }
 end
 
-node[:nexus][:repository][:publishers].each do |repository|
-
-  nexus_repository repository do
-    action      :update
-    publisher   true
-  end
-end
-
-node[:nexus][:repository][:subscribers].each do |repository|
-
-  nexus_repository repository do
-    action      :update
-    subscriber  true
-  end
-end
-
 data_bag_item = Chef::Nexus.get_certificates_data_bag(node)
-node[:nexus][:smart_proxy][:trusted_servers].each do |server|
-  server_info = data_bag_item[server]
+data_bag_item.to_hash.each do |key, value|
 
-  nexus_proxy "install a trusted key with description #{server_info["description"]}" do
-    action      :add_trusted_key
-    description server_info["description"]
-    certificate server_info["certificate"]
+  unless key == "id"
+    log "Trusting #{key}"
+    nexus_proxy "install a trusted key with description #{value["description"]}" do
+      action      :add_trusted_key
+      description value["description"]
+      certificate value["certificate"]
+    end
   end
 end
