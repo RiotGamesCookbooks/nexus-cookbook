@@ -15,7 +15,7 @@ default[:nexus][:bin_dir]                                      = "#{node[:nexus]
 default[:nexus][:work_dir]                                     = "#{node[:nexus][:path]}/sonatype-work/nexus"
 
 default[:nexus][:nginx_proxy][:listen_port]                    = 8443
-default[:nexus][:nginx_proxy][:server_name]                    = 'localhost'
+default[:nexus][:nginx_proxy][:server_name]                    = node[:fqdn]
 
 default[:nexus][:plugins]                                      = ['nexus-custom-metadata-plugin']
 
@@ -34,6 +34,5 @@ default[:nexus][:repository][:publishers]                      = []
 default[:nexus][:repository][:subscribers]                     = []
 
 default[:nexus][:smart_proxy][:enable]                         = true
-default[:nexus][:smart_proxy][:trusted_servers]                = []
 default[:nexus][:smart_proxy][:host]                           = nil
 default[:nexus][:smart_proxy][:port]                           = nil

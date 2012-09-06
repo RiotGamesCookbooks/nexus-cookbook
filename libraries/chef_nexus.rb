@@ -102,10 +102,11 @@ class Chef
         end
 
         def validate_certificates_data_bag(data_bag_item, node)
-          node[:nexus][:smart_proxy][:trusted_servers].each do |server|
-            raise Nexus::InvalidDataBagItem.new(CERTIFICATES_DATABAG_ITEM, server) unless data_bag_item[server]
-            raise Nexus::InvalidDataBagItem.new(CERTIFICATES_DATABAG_ITEM, "#{server}::certificate") unless data_bag_item[server]["certificate"]
-            raise Nexus::InvalidDataBagItem.new(CERTIFICATES_DATABAG_ITEM, "#{server}::description") unless data_bag_item[server]["description"]
+          data_bag_item.to_hash.each do |key, value|
+            unless key == "id"
+              raise Nexus::InvalidDataBagItem.new(CERTIFICATES_DATABAG_ITEM, "#{value}::certificate") unless value["certificate"]
+              raise Nexus::InvalidDataBagItem.new(CERTIFICATES_DATABAG_ITEM, "#{value}::description") unless value["description"]
+            end
           end
         end
     end
