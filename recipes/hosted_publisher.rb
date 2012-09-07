@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: nexus
-# Recipe:: hosted
+# Recipe:: hosted_publisher
 #
 # Copyright 2012, Riot Games
 #
