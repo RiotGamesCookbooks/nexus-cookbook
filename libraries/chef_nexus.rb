@@ -66,7 +66,7 @@ class Chef
         data_bag_item
       end
 
-      def get_hosted_publishers(node)
+      def get_hosted_publishers
         search(:node, 'run_list:recipe\[nexus\:\:hosted_publisher\]') do |matching_node|
           hosted_repositories = matching_node[:nexus][:repository][:create_hosted]
           publishers = matching_node[:nexus][:repository][:publishers]

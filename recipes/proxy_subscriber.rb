@@ -17,22 +17,18 @@
 # limitations under the License.
 #
 #
-search(:node, 'run_list:recipe\[nexus\:\:hosted_publisher\]') do |matching_node|
-  hosted_repositories = matching_node[:nexus][:repository][:create_hosted]
-  publishers = matching_node[:nexus][:repository][:publishers]
-  hosted_publishers = hosted_repositories & publishers
+hosted_publishers = Chef::Nexus.get_hosted_publishers
 
-  hosted_publishers.each do |repository|
-    url = "#{matching_node[:fqdn]}:#{matching_node[:nexus][:nginx_proxy][:listen_port]}/nexus/content/content/repositories/#{repository.downcase}"
-    nexus_repository repository do
-      action   :create
-      type     "proxy"
-      url      url
-    end
+hosted_publishers.each do |repository|
+  url = "#{matching_node[:fqdn]}:#{matching_node[:nexus][:nginx_proxy][:listen_port]}/nexus/content/content/repositories/#{repository.downcase}"
+  nexus_repository repository do
+    action   :create
+    type     "proxy"
+    url      url
+  end
 
-    nexus_repository repository do
-      action      :update
-      subscriber  true
-    end
+  nexus_repository repository do
+    action      :update
+    subscriber  true
   end
 end
