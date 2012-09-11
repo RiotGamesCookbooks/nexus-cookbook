@@ -117,8 +117,14 @@ else
     level :warn
   end
 
-  cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.pem" do
-    source "self_signed_cert.pem"
+  cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt" do
+    source "self_signed_cert.crt"
+    mode "077"
+    action :create_if_missing
+  end
+
+  cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key" do
+    source "self_signed_key.key"
     mode "077"
     action :create_if_missing
   end
