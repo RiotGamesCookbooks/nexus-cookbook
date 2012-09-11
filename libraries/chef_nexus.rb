@@ -25,6 +25,8 @@ class Chef
     LICENSE_DATABAG_ITEM = "license"
     CERTIFICATES_DATABAG_ITEM = "certificates"
     SSL_CERTIFICATE_DATABAG_ITEM = "ssl_certificate"
+    SSL_CERTIFICATE_CRT = "crt"
+    SSL_CERTIFICATE_KEY = "key"
     
     class << self
       def get_ssl_certificate_data_bag
@@ -34,6 +36,16 @@ class Chef
           raise Nexus::EncryptedDataBagNotFound.new(CREDENTIALS_DATABAG_ITEM)
         end
         data_bag_item
+      end
+
+      def get_ssl_certificate_crt(data_bag_item)
+        require 'base64'
+        Base64.decode64(data_bag_item[SSL_CERTIFICATE_CRT])
+      end
+
+      def get_ssl_certificate_key(data_bag_item)
+        require 'base64'
+        Base64.decode64(data_bag_item[SSL_CERTIFICATE_KEY])
       end
 
       def get_credentials_data_bag
