@@ -196,8 +196,27 @@ The following attributes are set under the `nexus::smart_proxy` namespace:
 SSL
 ===
 
-The files directory contains a self-signed certificate that is installed to `nginx::dir/shared/certificates/nexus-proxy.pem`
-Replace this file with your own certificates for a production environment.
+The files directory contains a self-signed certificate and key that are installed to `nginx::dir/shared/certificates/nexus-proxy.crt` 
+and `nginx::dir/shared/certificates/nexus-proxy.key`.
+
+By default, the cookbook will look for a ssl_certificate encrypted data bag:
+
+	knife data bag create nexus ssl_certificate -c <your chef config> --secret-file=<your secret file>
+
+Your data bag should look like the following:
+
+	{
+      "id": "ssl_certificate",
+      "fully-qualified-domain-name": {
+        "crt": "base64-encoded-ssl-certificate",
+        "key": "base64-encoded-private-key"
+      },
+      ...
+    }
+
+The cookbook will look for an entry for your node[:fqdn] in the data bag, and if found, will get the certificate and key,
+base64 decode them, and write them using the `file` resource. If there is no entry in the data bag, the default action will
+use the `cookbook_file` resource to copy the self-signed certificate and key and install them.
 
 Nexus Usage
 ===========
