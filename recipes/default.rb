@@ -95,9 +95,20 @@ end
 
 data_bag_item = Chef::Nexus.get_ssl_certificate_data_bag
 
-if data_bag_item["pem"]
-  file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.pem" do
-    content data_bag_item["pem"]
+if data_bag_item[node[:fqdn]]
+  
+  data_bag_item = data_bag_item[node[:fqdn]]
+  certificate = Chef::Nexus.get_ssl_certificate_crt(data_bag_item)
+  key = Chef::Nexus.get_ssl_certificate_key(data_bag_item)
+
+  file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt" do
+    content certificate
+    mode "077"
+    action :create_if_missing
+  end
+
+  file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key" do
+    content key
     mode "077"
     action :create_if_missing
   end
@@ -106,8 +117,14 @@ else
     level :warn
   end
 
-  cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.pem" do
-    source "self_signed_cert.pem"
+  cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt" do
+    source "self_signed_cert.crt"
+    mode "077"
+    action :create_if_missing
+  end
+
+  cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key" do
+    source "self_signed_key.key"
     mode "077"
     action :create_if_missing
   end
@@ -126,7 +143,8 @@ template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
   group "root"
   mode "0644"
   variables(
-    :ssl_certificate => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.pem",
+    :ssl_certificate => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt",
+    :ssl_key => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key",
     :listen_port => node[:nexus][:nginx_proxy][:listen_port],
     :server_name => node[:nexus][:nginx_proxy][:server_name],
     :fqdn => node[:fqdn],
