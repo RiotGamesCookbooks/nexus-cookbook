@@ -17,7 +17,7 @@ default[:nexus][:work_dir]                                     = "#{node[:nexus]
 default[:nexus][:ssl_certificate][:key]                        = node[:fqdn]
 
 default[:nexus][:nginx_proxy][:listen_port]                    = 8443
-default[:nexus][:nginx_proxy][:server_name]                    = 'localhost'
+default[:nexus][:nginx_proxy][:server_name]                    = node[:fqdn]
 
 default[:nexus][:plugins]                                      = ['nexus-custom-metadata-plugin']
 
@@ -30,12 +30,9 @@ default[:nexus][:cli][:url]                                    = "https://#{node
 default[:nexus][:cli][:repository]                             = "releases"
 default[:nexus][:cli][:packages]                               = ["libxml2-devel", "libxslt-devel"]
 
-default[:nexus][:repository][:create_hosted]                   = []
-default[:nexus][:repository][:create_proxy]                    = {}
-default[:nexus][:repository][:publishers]                      = []
-default[:nexus][:repository][:subscribers]                     = []
+default[:nexus][:repository][:create_hosted]                   = ['Artifacts']
+default[:nexus][:repository][:publishers]                      = ['Artifacts']
 
 default[:nexus][:smart_proxy][:enable]                         = true
-default[:nexus][:smart_proxy][:trusted_servers]                = []
 default[:nexus][:smart_proxy][:host]                           = nil
 default[:nexus][:smart_proxy][:port]                           = nil
