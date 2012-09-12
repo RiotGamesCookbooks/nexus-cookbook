@@ -98,6 +98,11 @@ class Chef
         end
       end
 
+      def decode(value)
+        require 'base64'
+        Base64.decode64(value)
+      end
+
       private
 
         def validate_credentials_data_bag(data_bag_item)
