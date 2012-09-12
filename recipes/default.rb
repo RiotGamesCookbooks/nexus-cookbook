@@ -182,18 +182,6 @@ nexus_settings "forceBaseUrl" do
   value true
 end
 
-node[:nexus][:repository][:create_hosted].each do |repository|
-  nexus_repository repository
-end
-
-node[:nexus][:repository][:create_proxy].each do |repository, url|
-  nexus_repository repository do
-    action   :create
-    type     "proxy"
-    url      url
-  end
-end
-
 data_bag_item = Chef::Nexus.get_credentials_data_bag
 default_credentials = data_bag_item["default_admin"]
 updated_credentials = data_bag_item["updated_admin"]

@@ -189,7 +189,6 @@ The following attributes are set under the `nexus::repository` namespace:
 The following attributes are set under the `nexus::smart_proxy` namespace:
 
 * enable - true if we want to enable Smart Proxy, false if not.
-* trusted_servers - An Array of IP addresses of other Nexus servers that have a key we should trust. Used in conjunction with the `certificates` data bag.
 * host - The host to use for Smart Proxy configuration.
 * port - The port to use for Smart Proxy configuration.
 
