@@ -14,6 +14,8 @@ default[:nexus][:conf_dir]                                     = "#{node[:nexus]
 default[:nexus][:bin_dir]                                      = "#{node[:nexus][:home]}/bin"
 default[:nexus][:work_dir]                                     = "#{node[:nexus][:path]}/sonatype-work/nexus"
 
+default[:nexus][:ssl_certificate][:key]                        = node[:fqdn]
+
 default[:nexus][:nginx_proxy][:listen_port]                    = 8443
 default[:nexus][:nginx_proxy][:server_name]                    = 'localhost'
 

@@ -95,9 +95,9 @@ end
 
 data_bag_item = Chef::Nexus.get_ssl_certificate_data_bag
 
-if data_bag_item[node[:fqdn]]
+if data_bag_item[node[:nexus][:ssl_certificate][:key]]
   
-  data_bag_item = data_bag_item[node[:fqdn]]
+  data_bag_item = data_bag_item[node[:nexus][:ssl_certificate][:key]]
   certificate = Chef::Nexus.get_ssl_certificate_crt(data_bag_item)
   key = Chef::Nexus.get_ssl_certificate_key(data_bag_item)
 
