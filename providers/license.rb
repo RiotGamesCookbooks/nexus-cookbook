@@ -34,6 +34,7 @@ action :install do
     data_bag_item = Chef::Nexus.get_license_data_bag
     license_data = Base64.decode64(data_bag_item["file"])
     Chef::Nexus.nexus(node).install_license_bytes(license_data)
+    new_resource.updated_by_last_action(true)
   end
 end
 
