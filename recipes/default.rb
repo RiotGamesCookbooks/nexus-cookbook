@@ -156,6 +156,23 @@ node[:nexus][:plugins].each do |plugin|
   nexus_plugin plugin
 end
 
+mount "#{node[:nexus][:mount][:nfs][:dir]}" do
+  device node[:nexus][:mount][:nfs][:device]
+  fstype "nfs"
+  options "rw"
+  only_if {node[:nexus][:mount][:nfs][:enable]}
+end
+
+link "#{node[:nexus][:work_dir]}/indexer" do
+  to node[:nexus][:mount][:nfs][:non_mount_dir][:indexer]
+  only_if {node[:nexus][:mount][:nfs][:enable]}
+end
+
+link "#{node[:nexus][:work_dir]}/timeline" do
+  to node[:nexus][:mount][:nfs][:non_mount_dir][:timeline]
+  only_if {node[:nexus][:mount][:nfs][:enable]}
+end
+
 template "#{node[:bluepill][:conf_dir]}/nexus.pill" do
   source "nexus.pill.erb"
   mode 0644

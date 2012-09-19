@@ -56,3 +56,9 @@ default[:nexus][:repository][:publishers]                      = ['Artifacts']
 default[:nexus][:smart_proxy][:enable]                         = true
 default[:nexus][:smart_proxy][:host]                           = nil
 default[:nexus][:smart_proxy][:port]                           = nil
+
+default[:nexus][:mount][:nfs][:enable]                         = false
+default[:nexus][:mount][:nfs][:dir]                            = "/mnt/nexus"
+default[:nexus][:mount][:nfs][:device]                         = nil
+default[:nexus][:mount][:nfs][:non_mount_dir][:indexer]        = "/nexus/indexer"
+default[:nexus][:mount][:nfs][:non_mount_dir][:timeline]       = "/nexus/timeline"
