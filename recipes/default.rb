@@ -173,6 +173,10 @@ mount "#{node[:nexus][:mount][:nfs][:mount_point]}" do
   only_if {node[:nexus][:mount][:nfs][:enable]}
 end
 
+# Sonatype recommends not using NFS at all, and if you have to use it
+# you should symlink the indexer and timeline directories to a non-NFS
+# drive. Commenting this out for now until we run into a problem with NFS.
+
 #link "#{node[:nexus][:work_dir]}/indexer" do
 #  to node[:nexus][:mount][:nfs][:non_mount_dir][:indexer]
 #  only_if {node[:nexus][:mount][:nfs][:enable]}
