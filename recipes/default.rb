@@ -156,22 +156,32 @@ node[:nexus][:plugins].each do |plugin|
   nexus_plugin plugin
 end
 
-mount "#{node[:nexus][:mount][:nfs][:dir]}" do
-  device node[:nexus][:mount][:nfs][:device]
+directory node[:nexus][:mount][:nfs][:mount_point] do
+  owner node[:nexus][:user]
+  group node[:nexus][:group]
+  mode "0755"
+  action :create
+  recursive true
+  only_if {node[:nexus][:mount][:nfs][:enable]}
+end
+
+mount "#{node[:nexus][:mount][:nfs][:mount_point]}" do
+  action [:mount, :enable]
+  device node[:nexus][:mount][:nfs][:device_path]
   fstype "nfs"
   options "rw"
   only_if {node[:nexus][:mount][:nfs][:enable]}
 end
 
-link "#{node[:nexus][:work_dir]}/indexer" do
-  to node[:nexus][:mount][:nfs][:non_mount_dir][:indexer]
-  only_if {node[:nexus][:mount][:nfs][:enable]}
-end
+#link "#{node[:nexus][:work_dir]}/indexer" do
+#  to node[:nexus][:mount][:nfs][:non_mount_dir][:indexer]
+#  only_if {node[:nexus][:mount][:nfs][:enable]}
+#end
 
-link "#{node[:nexus][:work_dir]}/timeline" do
-  to node[:nexus][:mount][:nfs][:non_mount_dir][:timeline]
-  only_if {node[:nexus][:mount][:nfs][:enable]}
-end
+#link "#{node[:nexus][:work_dir]}/timeline" do
+#  to node[:nexus][:mount][:nfs][:non_mount_dir][:timeline]
+#  only_if {node[:nexus][:mount][:nfs][:enable]}
+#end
 
 template "#{node[:bluepill][:conf_dir]}/nexus.pill" do
   source "nexus.pill.erb"
