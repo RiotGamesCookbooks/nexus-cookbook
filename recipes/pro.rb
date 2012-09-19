@@ -35,12 +35,11 @@ data_bag_item.to_hash.each do |key, value|
   unless key == "id"
     log "Trusting #{key}"
 
-    description = Chef::Nexus.decode(value["description"])
     certificate = Chef::Nexus.decode(value["certificate"])
 
     nexus_proxy "install a trusted key with description #{value["description"]}" do
       action      :add_trusted_key
-      description description
+      description value["description"]
       certificate certificate
     end
   end
