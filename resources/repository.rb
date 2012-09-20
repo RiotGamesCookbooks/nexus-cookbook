@@ -18,15 +18,11 @@
 # limitations under the License.
 #
 
-def initialize(*args)
-  super
-  @action = :create
-end
-
 actions :create, :delete, :update
+default_action :create
 
-attribute :name, :kind_of           => String, :name_attribute => true
-attribute :type, :kind_of           => String, :equal_to => ["hosted", "proxy"], :default => "hosted"
-attribute :url, :kind_of            => String
-attribute :publisher, :kind_of      => [TrueClass, FalseClass], :default => nil
-attribute :subscriber, :kind_of     => [TrueClass, FalseClass], :default => nil
+attribute :name, :kind_of       => String, :name_attribute => true
+attribute :type, :kind_of       => String, :equal_to => ["hosted", "proxy"], :default => "hosted"
+attribute :url, :kind_of        => String
+attribute :publisher, :kind_of  => [TrueClass, FalseClass], :default => nil
+attribute :subscriber, :kind_of => [TrueClass, FalseClass], :default => nil
