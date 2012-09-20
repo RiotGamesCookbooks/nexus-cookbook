@@ -26,13 +26,13 @@ default[:nexus][:checksum]                                     = '32fcf0fcfb45e4
 
 default[:nexus][:port]                                         = '8081'
 default[:nexus][:host]                                         = '0.0.0.0'
-default[:nexus][:path]                                         = '/nexus'
+default[:nexus][:context_path]                                 = '/nexus'
 
 default[:nexus][:name]                                         = 'nexus'
 default[:nexus][:home]                                         = "/usr/local/#{node[:nexus][:name]}"
 default[:nexus][:conf_dir]                                     = "#{node[:nexus][:home]}/conf"
 default[:nexus][:bin_dir]                                      = "#{node[:nexus][:home]}/bin"
-default[:nexus][:work_dir]                                     = "#{node[:nexus][:path]}/sonatype-work/nexus"
+default[:nexus][:work_dir]                                     = "/nexus/sonatype-work/nexus"
 
 default[:nexus][:ssl_certificate][:key]                        = node[:fqdn]
 

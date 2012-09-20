@@ -67,7 +67,7 @@ template "#{node[:nexus][:conf_dir]}/nexus.properties" do
   variables(
     :nexus_port => node[:nexus][:port],
     :nexus_host => node[:nexus][:host],
-    :nexus_path => node[:nexus][:path],
+    :nexus_context_path => node[:nexus][:context_path],
     :work_dir => node[:nexus][:work_dir],
     :fqdn => node[:fqdn]
   )
