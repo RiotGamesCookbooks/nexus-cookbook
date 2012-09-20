@@ -79,7 +79,8 @@ class Chef
       end
 
       def get_hosted_publishers
-        search(:node, 'run_list:recipe\[nexus\:\:hosted_publisher\]') do |matching_node|
+        chef_search = Chef::Search::Query.new
+        chef_search.search(:node, 'run_list:recipe\[nexus\:\:hosted_publisher\]') do |matching_node|
           hosted_repositories = matching_node[:nexus][:repository][:create_hosted]
           publishers = matching_node[:nexus][:repository][:publishers]
           hosted_publishers = hosted_repositories & publishers
