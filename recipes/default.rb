@@ -104,13 +104,13 @@ if data_bag_item[node[:nexus][:ssl_certificate][:key]]
   file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt" do
     content certificate
     mode "077"
-    action :create_if_missing
+    action :create
   end
 
   file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key" do
     content key
     mode "077"
-    action :create_if_missing
+    action :create
   end
 else
   log "Could not find ssl_certificate data bag, using default certificate." do
@@ -120,13 +120,13 @@ else
   cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt" do
     source "self_signed_cert.crt"
     mode "077"
-    action :create_if_missing
+    action :create
   end
 
   cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key" do
     source "self_signed_key.key"
     mode "077"
-    action :create_if_missing
+    action :create
   end
 end
 

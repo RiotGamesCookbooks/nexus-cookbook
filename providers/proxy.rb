@@ -28,7 +28,7 @@ end
 
 action :enable do
   
-  unless smart_proxy_enabled?
+  unless smart_proxy_enabled_same_settings?
     enable_smart_proxy
     new_resource.updated_by_last_action(true)
   end
@@ -66,6 +66,15 @@ private
     require 'json'
     json = JSON.parse(Chef::Nexus.nexus(node).get_smart_proxy_settings)
     json["data"]["enabled"] == true
+  end
+
+  def smart_proxy_enabled_same_settings?
+    require 'json'
+    json = JSON.parse(Chef::Nexus.nexus(node).get_smart_proxy_settings)
+    enabled = json["data"]["enabled"]
+    host = json["data"]["host"]
+    port = json["data"]["port"]
+    enabled == true && host == new_resource.host && port == new_resource.port
   end
 
   def certificate_exists?
