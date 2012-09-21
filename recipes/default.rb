@@ -20,7 +20,7 @@
 #
 include_recipe "ark"
 include_recipe "java"
-include_recipe "nginx::source"
+include_recipe "nginx"
 include_recipe "bluepill"
 
 user_home = "/#{node[:nexus][:user]}"

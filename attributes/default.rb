@@ -41,8 +41,6 @@ default[:nexus][:nginx_proxy][:server_name]                    = node[:fqdn]
 
 default[:nexus][:plugins]                                      = ['nexus-custom-metadata-plugin']
 
-default[:nginx][:configure_flags]                              = 'with-http_ssl_module'
-
 default[:nexus][:nginx][:options][:client_max_body_size]       = '200M'
 default[:nexus][:nginx][:options][:client_body_buffer_size]    = '512k'
 
