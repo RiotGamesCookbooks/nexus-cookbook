@@ -40,5 +40,5 @@ private
   def same_logging_level?
     require 'json'
     logging_info = JSON.parse(Chef::Nexus.nexus(node).get_logging_info)
-    json["data"]["rootLoggerLevel"] == new_resource.level
+    logging_info["data"]["rootLoggerLevel"] == new_resource.level
   end
