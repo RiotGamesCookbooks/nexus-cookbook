@@ -19,9 +19,4 @@
 #
 #
 
-default[:nexus][:repository][:hosted] = [ 
-  { 
-    :name => "",
-    :publisher => false
-  }
-]
+default[:nexus][:repository][:hosted] = Array.new

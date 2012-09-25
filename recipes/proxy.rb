@@ -17,21 +17,21 @@
 # limitations under the License.
 #
 #
-node[:nexus][:repository][:proxy].each do |repository_object|
+node[:nexus][:repository][:proxy].each do |repository|
   
-  nexus_repository repository_object[:name] do
+  nexus_repository repository[:name] do
     action   :create
     type     "proxy"
-    url      repository_object[:url]
+    url      repository[:url]
   end
 
-  nexus_repository repository_object[:name] do
+  nexus_repository repository[:name] do
     action      :update
-    subscriber  repository_object[:subscriber]
+    subscriber  repository[:subscriber]
   end
 
-  nexus_repository repository_object[:name] do
+  nexus_repository repository[:name] do
     action      :update
-    publisher  repository_object[:publisher]
+    publisher  repository[:publisher]
   end
 end

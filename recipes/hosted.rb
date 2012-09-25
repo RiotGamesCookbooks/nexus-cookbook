@@ -17,12 +17,12 @@
 # limitations under the License.
 #
 #
-node[:nexus][:repository][:hosted].each do |repository_object|
+node[:nexus][:repository][:hosted].each do |repository|
   
-  nexus_repository repository_object[:name]
+  nexus_repository repository[:name]
 
-  nexus_repository repository_object[:name] do
+  nexus_repository repository[:name] do
     action      :update
-    publisher   repository_object[:publisher]
+    publisher   repository[:publisher]
   end
 end

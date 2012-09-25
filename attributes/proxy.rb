@@ -19,11 +19,4 @@
 #
 #
 
-default[:nexus][:repository][:proxy] = [ 
-  { 
-    :name => "",
-    :url => "",
-    :publisher => false,
-    :subscriber => false
-  }
-]
+default[:nexus][:repository][:proxy] = Array.new
