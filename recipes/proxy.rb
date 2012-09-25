@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: nexus
-# Recipe:: proxy_subscriber
+# Recipe:: proxy
 #
 # Copyright 2012, Riot Games
 #
@@ -17,18 +17,21 @@
 # limitations under the License.
 #
 #
-hosted_publishers = Chef::Nexus.get_hosted_publishers
-
-hosted_publishers.each do |repository|
-  url = "#{matching_node[:fqdn]}:#{matching_node[:nexus][:nginx_proxy][:listen_port]}/nexus/content/content/repositories/#{repository.downcase}"
-  nexus_repository repository do
+node[:nexus][:repository][:proxy].each do |repository|
+  
+  nexus_repository repository[:name] do
     action   :create
     type     "proxy"
-    url      url
+    url      repository[:url]
   end
 
-  nexus_repository repository do
+  nexus_repository repository[:name] do
     action      :update
-    subscriber  true
+    subscriber  repository[:subscriber]
+  end
+
+  nexus_repository repository[:name] do
+    action      :update
+    publisher  repository[:publisher]
   end
 end
