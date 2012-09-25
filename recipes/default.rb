@@ -130,11 +130,14 @@ else
   end
 end
 
-cookbook_file "#{node[:nexus][:conf_dir]}/jetty.xml" do
-  source "jetty.xml"
-  mode "0775"
+template "#{node[:nexus][:conf_dir]}/jetty.xml" do
+  source "jetty.xml.erb"
   owner node[:nexus][:user]
   group node[:nexus][:group] 
+  mode "0775"  
+  variables(
+    :loopback => node[:nexus][:jetty][:loopback]
+  )
 end
 
 template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do

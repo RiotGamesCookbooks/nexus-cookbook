@@ -34,6 +34,8 @@ default[:nexus][:conf_dir]                                     = "#{node[:nexus]
 default[:nexus][:bin_dir]                                      = "#{node[:nexus][:home]}/bin"
 default[:nexus][:work_dir]                                     = "/nexus/sonatype-work/nexus"
 
+default[:nexus][:jetty][:loopback]                             = true
+
 default[:nexus][:ssl][:verify]                                 = true
 default[:nexus][:ssl_certificate][:key]                        = node[:fqdn]
 
