@@ -34,6 +34,9 @@ default[:nexus][:conf_dir]                                     = "#{node[:nexus]
 default[:nexus][:bin_dir]                                      = "#{node[:nexus][:home]}/bin"
 default[:nexus][:work_dir]                                     = "/nexus/sonatype-work/nexus"
 
+default[:nexus][:jetty][:loopback]                             = true
+
+default[:nexus][:ssl][:verify]                                 = true
 default[:nexus][:ssl_certificate][:key]                        = node[:fqdn]
 
 default[:nexus][:nginx_proxy][:listen_port]                    = 8443
@@ -47,9 +50,6 @@ default[:nexus][:nginx][:options][:client_body_buffer_size]    = '512k'
 default[:nexus][:cli][:url]                                    = "https://#{node[:nexus][:nginx_proxy][:server_name]}:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
 default[:nexus][:cli][:repository]                             = "releases"
 default[:nexus][:cli][:packages]                               = ["libxml2-devel", "libxslt-devel"]
-
-default[:nexus][:repository][:create_hosted]                   = ['Artifacts']
-default[:nexus][:repository][:publishers]                      = ['Artifacts']
 
 default[:nexus][:smart_proxy][:enable]                         = true
 default[:nexus][:smart_proxy][:host]                           = nil

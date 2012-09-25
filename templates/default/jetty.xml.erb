@@ -31,7 +31,9 @@
             <New class="org.eclipse.jetty.server.nio.SelectChannelConnector">
               <Set name="host">${application-host}</Set>
               <Set name="port">${application-port}</Set>
-              <Set name="Host">127.0.0.1</Set>
+              <% if @loopback %>
+                <Set name="Host">127.0.0.1</Set>
+              <% end %>
             </New>
         </Arg>
     </Call>

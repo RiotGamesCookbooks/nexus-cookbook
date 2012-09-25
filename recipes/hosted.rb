@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: nexus
-# Recipe:: hosted_publisher
+# Recipe:: hosted
 #
 # Copyright 2012, Riot Games
 #
@@ -17,14 +17,12 @@
 # limitations under the License.
 #
 #
-node[:nexus][:repository][:create_hosted].each do |repository|
-  nexus_repository repository
-end
+node[:nexus][:repository][:hosted].each do |repository|
+  
+  nexus_repository repository[:name]
 
-node[:nexus][:repository][:publishers].each do |repository|
-
-  nexus_repository repository do
+  nexus_repository repository[:name] do
     action      :update
-    publisher   true
+    publisher   repository[:publisher]
   end
 end

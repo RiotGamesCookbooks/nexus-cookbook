@@ -78,15 +78,6 @@ class Chef
         data_bag_item
       end
 
-      def get_hosted_publishers
-        chef_search = Chef::Search::Query.new
-        chef_search.search(:node, 'run_list:recipe\[nexus\:\:hosted_publisher\]') do |matching_node|
-          hosted_repositories = matching_node[:nexus][:repository][:create_hosted]
-          publishers = matching_node[:nexus][:repository][:publishers]
-          hosted_publishers = hosted_repositories & publishers
-        end
-      end
-
       def nexus(node)
         require 'nexus_cli'
         data_bag_item = get_credentials_data_bag
@@ -94,9 +85,11 @@ class Chef
         updated_credentials = data_bag_item["updated_admin"]
         overrides = {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository]}
         begin
-          NexusCli::Factory.create(overrides.merge default_credentials)
-        rescue NexusCli::PermissionsException, RestClient::Unauthorized => e
-          NexusCli::Factory.create(overrides.merge updated_credentials)
+          merged_credentials = overrides.merge(default_credentials)
+          NexusCli::Factory.create(merged_credentials, node[:nexus][:ssl][:verify])
+        rescue NexusCli::PermissionsException, NexusCli::CouldNotConnectToNexusException, NexusCli::UnexpectedStatusCodeException => e
+          merged_credentials = overrides.merge(updated_credentials)
+          NexusCli::Factory.create(merged_credentials, node[:nexus][:ssl][:verify])
         end
       end
 
@@ -104,9 +97,9 @@ class Chef
         require 'nexus_cli'
         overrides = {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository], "username" => username, "password" => password}
         begin
-          nexus = NexusCli::Factory.create(overrides)
+          nexus = NexusCli::Factory.create(overrides, node[:nexus][:ssl][:verify])
           true
-        rescue NexusCli::PermissionsException, RestClient::Unauthorized => e
+        rescue NexusCli::PermissionsException, NexusCli::CouldNotConnectToNexusException, NexusCli::UnexpectedStatusCodeException => e
           false
         end
       end
