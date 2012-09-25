@@ -1,7 +1,8 @@
 #
 # Cookbook Name:: nexus
-# Recipe:: proxy_subscriber
+# Attributes:: hosted
 #
+# Author:: Kyle Allan (<kallan@riotgames.com>)
 # Copyright 2012, Riot Games
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,18 +18,10 @@
 # limitations under the License.
 #
 #
-hosted_publishers = Chef::Nexus.get_hosted_publishers
 
-hosted_publishers.each do |repository|
-  url = "#{matching_node[:fqdn]}:#{matching_node[:nexus][:nginx_proxy][:listen_port]}/nexus/content/content/repositories/#{repository.downcase}"
-  nexus_repository repository do
-    action   :create
-    type     "proxy"
-    url      url
-  end
-
-  nexus_repository repository do
-    action      :update
-    subscriber  true
-  end
-end
+default[:nexus][:repository][:hosted] = [ 
+  { 
+    :name => "",
+    :publisher => false
+  }
+]

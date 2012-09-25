@@ -1,7 +1,8 @@
 #
 # Cookbook Name:: nexus
-# Recipe:: hosted_publisher
+# Attributes:: proxy
 #
+# Author:: Kyle Allan (<kallan@riotgames.com>)
 # Copyright 2012, Riot Games
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,14 +18,12 @@
 # limitations under the License.
 #
 #
-node[:nexus][:repository][:create_hosted].each do |repository|
-  nexus_repository repository
-end
 
-node[:nexus][:repository][:publishers].each do |repository|
-
-  nexus_repository repository do
-    action      :update
-    publisher   true
-  end
-end
+default[:nexus][:repository][:proxy] = [ 
+  { 
+    :name => "",
+    :url => "",
+    :publisher => false,
+    :subscriber => false
+  }
+]

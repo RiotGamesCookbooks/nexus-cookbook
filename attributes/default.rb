@@ -51,9 +51,6 @@ default[:nexus][:cli][:url]                                    = "https://#{node
 default[:nexus][:cli][:repository]                             = "releases"
 default[:nexus][:cli][:packages]                               = ["libxml2-devel", "libxslt-devel"]
 
-default[:nexus][:repository][:create_hosted]                   = ['Artifacts']
-default[:nexus][:repository][:publishers]                      = ['Artifacts']
-
 default[:nexus][:smart_proxy][:enable]                         = true
 default[:nexus][:smart_proxy][:host]                           = nil
 default[:nexus][:smart_proxy][:port]                           = nil

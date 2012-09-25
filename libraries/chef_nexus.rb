@@ -78,15 +78,6 @@ class Chef
         data_bag_item
       end
 
-      def get_hosted_publishers
-        chef_search = Chef::Search::Query.new
-        chef_search.search(:node, 'run_list:recipe\[nexus\:\:hosted_publisher\]') do |matching_node|
-          hosted_repositories = matching_node[:nexus][:repository][:create_hosted]
-          publishers = matching_node[:nexus][:repository][:publishers]
-          hosted_publishers = hosted_repositories & publishers
-        end
-      end
-
       def nexus(node)
         require 'nexus_cli'
         data_bag_item = get_credentials_data_bag
