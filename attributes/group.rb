@@ -21,7 +21,7 @@
 
 # Example Value
 # [
-#  { :name => "Name", :includes => ["Releases", "Snapshots"] }
+#  { :name => "Name", :add => ["Releases", "Snapshots"], :remove => ["Releases"] }
 # ]
 #
 
