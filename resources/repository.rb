@@ -18,11 +18,13 @@
 # limitations under the License.
 #
 
-actions :create, :delete, :update
+actions :create, :delete, :update, :add_to, :remove_from
 default_action :create
 
-attribute :name, :kind_of       => String, :name_attribute => true
-attribute :type, :kind_of       => String, :equal_to => ["hosted", "proxy"], :default => "hosted"
-attribute :url, :kind_of        => String
-attribute :publisher, :kind_of  => [TrueClass, FalseClass], :default => nil
-attribute :subscriber, :kind_of => [TrueClass, FalseClass], :default => nil
+attribute :name, :kind_of                 => String, :name_attribute => true
+attribute :type, :kind_of                 => String, :equal_to => ["hosted", "proxy", "group"], :default => "hosted"
+attribute :url, :kind_of                  => String
+attribute :publisher, :kind_of            => [TrueClass, FalseClass], :default => nil
+attribute :subscriber, :kind_of           => [TrueClass, FalseClass], :default => nil
+attribute :repository_to_add, :kind_of    => String
+attribute :repository_to_remove, :kind_of => String
