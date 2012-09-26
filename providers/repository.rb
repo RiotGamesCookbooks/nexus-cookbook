@@ -31,24 +31,27 @@ def load_current_resource
   @parsed_repository_to_add_id    = new_resource.repository_to_add.gsub(" ", "_").downcase unless new_resource.repository_to_add.nil?
   @parsed_repository_to_remove_id = new_resource.repository_to_remove.gsub(" ", "_").downcase unless new_resource.repository_to_remove.nil?
 
+  @current_resource.repository_to_add    @parsed_repository_to_add_id
+  @current_resource.repository_to_remove @parsed_repository_to_remove_id
+
   @current_resource
 end
 
 action :create do
-  unless repository_exists?(@current_resource.name) || (new_resource.type == "group" && group_repository_exists?(@current_resource.name))
-    case new_resource.type
-    when "proxy"
+  case new_resource.type
+  when "proxy", "hosted"
+    unless repository_exists?(@current_resource.name)
       validate_create_proxy
       Chef::Nexus.nexus(node).create_repository(new_resource.name, true, new_resource.url)
       set_publisher if new_resource.publisher
       set_subscriber if new_resource.subscriber
-    when "hosted"
-      Chef::Nexus.nexus(node).create_repository(new_resource.name, false, new_resource.url)
-      set_publisher if new_resource.publisher
-    when "group"
-      Chef::Nexus.nexus(node).create_group_repository(new_resource.name)
+      new_resource.updated_by_last_action(true)
     end
-    new_resource.updated_by_last_action(true)
+  when "group"
+    unless group_repository_exists?(@current_resource.name)
+      Chef::Nexus.nexus(node).create_group_repository(new_resource.name)
+      new_resource.updated_by_last_action(true)
+    end
   end
 end
 
@@ -84,16 +87,16 @@ end
 
 action :add_to do
   validate_add_to
-  unless already_added_to_group?(@current_resource.repository_to_add)
-    Chef::Nexus.node(node).add_to_group_repository(@parsed_id, @parsed_repository_to_add_id)
+  unless repository_in_group?(@current_resource.name, @current_resource.repository_to_add)
+    Chef::Nexus.nexus(node).add_to_group_repository(@parsed_id, @parsed_repository_to_add_id)
     new_resource.updated_by_last_action(true)
   end
 end
 
 action :remove_from do
   validate_remove_from
-  if already_added_to_group?(@current_resource.repository_to_add)
-    Chef::Nexus.node(node).remove_from_group_repository(@parsed_id, @parsed_repository_to_remove_id)
+  if repository_in_group?(@current_resource.name, @current_resource.repository_to_remove)
+    Chef::Nexus.nexus(node).remove_from_group_repository(@parsed_id, @parsed_repository_to_remove_id)
     new_resource.updated_by_last_action(true)
   end
 end
@@ -134,17 +137,8 @@ private
     end      
   end
 
-  def already_added_to_group?(repository_name)
-    require 'json'
-    parsed_repository_id = repository_name.gsub(" ", "_").downcase
-    begin
-      group_repository = JSON.parse(Chef::Nexus.nexus(node).get_group_repository(parsed_repository_id))
-      found_repository = group_repository["data"]["repositories]"].find{|repository| repository["id"] == parsed_repository_id }
-      return false unless found_repository.nil?
-    rescue NexusCli::RepositoryNotFoundException => e
-      Chef::Application.fatal!("You are attempting to add or remove a repository to/from a group repository that does not exist.")
-    end
-    true
+  def repository_in_group?(repository_name, repository_to_check)
+    Chef::Nexus.nexus(node).repository_in_group?(repository_name, repository_to_check)
   end
 
   def validate_create_proxy
