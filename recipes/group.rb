@@ -24,11 +24,20 @@ node[:nexus][:repository][:group].each do |repository|
   	type "group"
   end
 
-  repository[:includes].each do |repository_to_add|
+  repository[:add].each do |repository_to_add|
     nexus_repository repository[:name] do
       action            :add_to
       type              "group"
       repository_to_add repository_to_add
     end
   end
+
+  repository[:remove].each do |repository_to_remove|
+    nexus_repository repository[:name] do
+      action               :remove_from
+      type                 "group"
+      repository_to_remove repository_to_remove
+    end
+  end
+
 end
