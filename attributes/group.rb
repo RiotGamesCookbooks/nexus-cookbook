@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: nexus
-# Recipes:: cli
+# Attributes:: group
 #
-# Author:: Jesse Howarth (<him@jessehowarth.com>)
+# Author:: Kyle Allan (<kallan@riotgames.com>)
 # Copyright 2012, Riot Games
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,13 +17,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+#
 
-node[:nexus][:cli][:packages].each do |package_name|
-  package package_name do
-    action :install
-  end.run_action(:install)
-end
+# Example Value
+# [
+#  { :name => "Name", :add => ["Releases", "Snapshots"], :remove => ["Releases"] }
+# ]
+#
 
-chef_gem "nexus_cli" do
-  version "0.8.4"
-end
+default[:nexus][:repository][:group] = Array.new
