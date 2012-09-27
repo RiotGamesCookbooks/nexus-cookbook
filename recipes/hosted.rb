@@ -19,9 +19,9 @@
 #
 node[:nexus][:repository][:hosted].each do |repository|
   
-  nexus_repository repository[:name]
+  nexus_hosted_repository repository[:name]
 
-  nexus_repository repository[:name] do
+  nexus_hosted_repository repository[:name] do
     action      :update
     publisher   repository[:publisher]
   end
