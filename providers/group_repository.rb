@@ -26,7 +26,7 @@ def load_current_resource
   @parsed_id         = new_resource.name.gsub(" ", "_").downcase
   @parsed_repository = new_resource.repository.gsub(" ", "_").downcase unless new_resource.repository.nil?
 
-  @current_resource.repository @parsed_repository_to_add_id
+  @current_resource.repository @parsed_repository
 
   @current_resource
 end
