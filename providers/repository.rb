@@ -60,8 +60,6 @@ action :delete do
     case new_resource.type
     when "proxy", "hosted"
       Chef::Nexus.nexus(node).delete_repository(@parsed_id)
-    when "group"
-      Chef::Nexus.nexus(node).delete_group_repository(@parsed_id)
     end
     new_resource.updated_by_last_action(true)
   end
@@ -81,22 +79,6 @@ action :update do
     elsif new_resource.subscriber == false
       unset_subscriber
     end
-    new_resource.updated_by_last_action(true)
-  end
-end
-
-action :add_to do
-  validate_add_to
-  unless repository_in_group?(@current_resource.name, @current_resource.repository_to_add)
-    Chef::Nexus.nexus(node).add_to_group_repository(@parsed_id, @parsed_repository_to_add_id)
-    new_resource.updated_by_last_action(true)
-  end
-end
-
-action :remove_from do
-  validate_remove_from
-  if repository_in_group?(@current_resource.name, @current_resource.repository_to_remove)
-    Chef::Nexus.nexus(node).remove_from_group_repository(@parsed_id, @parsed_repository_to_remove_id)
     new_resource.updated_by_last_action(true)
   end
 end
@@ -128,30 +110,7 @@ private
     end
   end
 
-  def group_repository_exists?(name)
-    begin
-      Chef::Nexus.nexus(node).get_group_repository(name)
-      true
-    rescue NexusCli::RepositoryNotFoundException => e
-      return false
-    end      
-  end
-
-  def repository_in_group?(repository_name, repository_to_check)
-    Chef::Nexus.nexus(node).repository_in_group?(repository_name, repository_to_check)
-  end
-
   def validate_create_proxy
     Chef::Application.fatal!("If this repository is a Proxy repository, you also need to provide a url.") if new_resource.type == "proxy" && new_resource.url.nil?
     Chef::Application.fatal!("You need to provide a valid url.") if new_resource.type == "proxy" && (new_resource.url =~ URI::ABS_URI).nil?
-  end
-
-  def validate_add_to
-    Chef::Application.fatal!("You can only use the :add_to action if type is equal to 'group'.") unless new_resource.type == "group"
-    Chef::Application.fatal!("You need to provide the :repository_to_add attribute.") if new_resource.repository_to_add.nil?
-  end
-
-  def validate_remove_from
-    Chef::Application.fatal!("You can only use the :remove_from action if type is equal to 'group'.") unless new_resource.type == "group"
-    Chef::Application.fatal!("You need to provide the :repository_to_remove attribute.") if new_resource.repository_to_remove.nil?
   end

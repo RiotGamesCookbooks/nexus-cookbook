@@ -1,7 +1,8 @@
 #
 # Cookbook Name:: nexus
-# Recipe:: group
+# Resource:: group_repository
 #
+# Author:: Kyle Allan (<kallan@riotgames.com>)
 # Copyright 2012, Riot Games
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,22 +17,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-#
-node[:nexus][:repository][:group].each do |repository|
-  
-  nexus_group_repository repository[:name]
 
-  repository[:add].each do |repository_to_add|
-    nexus_group_repository repository[:name] do
-      action     :add_to
-      repository repository_to_add
-    end
-  end
+actions :create, :delete, :add_to, :remove_from
+default_action :create
 
-  repository[:remove].each do |repository_to_remove|
-    nexus_group_repository repository[:name] do
-      action     :remove_from
-      repository repository_to_remove
-    end
-  end
-end
+attribute :name, :kind_of       => String, :name_attribute => true
+attribute :repository, :kind_of => String
