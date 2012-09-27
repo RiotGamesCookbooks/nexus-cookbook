@@ -18,56 +18,34 @@
 # limitations under the License.
 #
 
-attr_reader :parsed_id
-attr_reader :parsed_repository_to_add_id
-attr_reader :parsed_repository_to_remove_id
-
 def load_current_resource
-  @current_resource = Chef::Resource::NexusRepository.new(new_resource.name)
+  @current_resource = Chef::Resource::NexusProxyRepository.new(new_resource.name)
 
   run_context.include_recipe "nexus::cli"
 
   @parsed_id                      = new_resource.name.gsub(" ", "_").downcase
-  @parsed_repository_to_add_id    = new_resource.repository_to_add.gsub(" ", "_").downcase unless new_resource.repository_to_add.nil?
-  @parsed_repository_to_remove_id = new_resource.repository_to_remove.gsub(" ", "_").downcase unless new_resource.repository_to_remove.nil?
-
-  @current_resource.repository_to_add    @parsed_repository_to_add_id
-  @current_resource.repository_to_remove @parsed_repository_to_remove_id
 
   @current_resource
 end
 
 action :create do
-  case new_resource.type
-  when "proxy", "hosted"
-    unless repository_exists?(@current_resource.name)
-      validate_create_proxy
-      Chef::Nexus.nexus(node).create_repository(new_resource.name, true, new_resource.url)
-      set_publisher if new_resource.publisher
-      set_subscriber if new_resource.subscriber
-      new_resource.updated_by_last_action(true)
-    end
-  when "group"
-    unless group_repository_exists?(@current_resource.name)
-      Chef::Nexus.nexus(node).create_group_repository(new_resource.name)
-      new_resource.updated_by_last_action(true)
-    end
+  unless repository_exists?(@current_resource.name)
+    Chef::Nexus.nexus(node).create_repository(new_resource.name, true, new_resource.url)
+    set_publisher if new_resource.publisher
+    set_subscriber if new_resource.subscriber
+    new_resource.updated_by_last_action(true)
   end
 end
 
 action :delete do
-  if repository_exists?(@current_resource.name) || (new_resource.type == "group" && group_repository_exists?(@current_resource.name))
-    case new_resource.type
-    when "proxy", "hosted"
-      Chef::Nexus.nexus(node).delete_repository(@parsed_id)
-    end
+  if repository_exists?(@current_resource.name)
+    Chef::Nexus.nexus(node).delete_repository(@parsed_id)
     new_resource.updated_by_last_action(true)
   end
 end
 
 action :update do
   if repository_exists?(@current_resource.name)
-    Chef::Application.fatal!("You cannot update a group repository.") if new_resource.type == "group"
     if new_resource.publisher
       set_publisher
     elsif new_resource.publisher == false
@@ -108,9 +86,4 @@ private
     rescue NexusCli::RepositoryNotFoundException => e
       return false
     end
-  end
-
-  def validate_create_proxy
-    Chef::Application.fatal!("If this repository is a Proxy repository, you also need to provide a url.") if new_resource.type == "proxy" && new_resource.url.nil?
-    Chef::Application.fatal!("You need to provide a valid url.") if new_resource.type == "proxy" && (new_resource.url =~ URI::ABS_URI).nil?
   end

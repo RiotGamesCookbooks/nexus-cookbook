@@ -19,19 +19,18 @@
 #
 node[:nexus][:repository][:proxy].each do |repository|
   
-  nexus_repository repository[:name] do
-    action   :create
-    type     "proxy"
-    url      repository[:url]
+  nexus_proxy_repository repository[:name] do
+    action :create
+    url    repository[:url]
   end
 
-  nexus_repository repository[:name] do
-    action      :update
-    subscriber  repository[:subscriber]
+  nexus_proxy_repository repository[:name] do
+    action     :update
+    subscriber repository[:subscriber]
   end
 
-  nexus_repository repository[:name] do
-    action      :update
-    publisher  repository[:publisher]
+  nexus_proxy_repository repository[:name] do
+    action    :update
+    publisher repository[:publisher]
   end
 end

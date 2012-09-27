@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: nexus
-# Resource:: repository
+# Resource:: proxy_repository
 #
 # Author:: Kyle Allan (<kallan@riotgames.com>)
 # Copyright 2012, Riot Games
@@ -18,13 +18,10 @@
 # limitations under the License.
 #
 
-actions :create, :delete, :update, :add_to, :remove_from
+actions :create, :delete, :update
 default_action :create
 
 attribute :name, :kind_of                 => String, :name_attribute => true
-attribute :type, :kind_of                 => String, :equal_to => ["hosted", "proxy", "group"], :default => "hosted"
-attribute :url, :kind_of                  => String
+attribute :url, :kind_of                  => String, :required => true
 attribute :publisher, :kind_of            => [TrueClass, FalseClass], :default => nil
 attribute :subscriber, :kind_of           => [TrueClass, FalseClass], :default => nil
-attribute :repository_to_add, :kind_of    => String
-attribute :repository_to_remove, :kind_of => String
