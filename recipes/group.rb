@@ -28,10 +28,12 @@ node[:nexus][:repository][:group].each do |repository|
     end
   end
 
-  repository[:remove].each do |repository_to_remove|
-    nexus_group_repository repository[:name] do
-      action     :remove_from
-      repository repository_to_remove
+  if repository[:remove]
+    repository[:remove].each do |repository_to_remove|
+      nexus_group_repository repository[:name] do
+        action     :remove_from
+        repository repository_to_remove
+      end
     end
   end
 end
