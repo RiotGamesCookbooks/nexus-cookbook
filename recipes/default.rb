@@ -56,6 +56,7 @@ ark node[:nexus][:name] do
   owner node[:nexus][:user]
   group node[:nexus][:group]
   checksum node[:nexus][:checksum]
+  extension "tar.gz"
   action :install
 end
 
@@ -96,7 +97,11 @@ end
 data_bag_item = Chef::Nexus.get_ssl_certificate_data_bag
 
 if data_bag_item[node[:nexus][:ssl_certificate][:key]]
-  
+
+  log "Using ssl_certificate data bag entry for #{node[:nexus][:ssl_certificate][:key]}" do
+    level :info
+  end
+
   data_bag_item = data_bag_item[node[:nexus][:ssl_certificate][:key]]
   certificate = Chef::Nexus.get_ssl_certificate_crt(data_bag_item)
   key = Chef::Nexus.get_ssl_certificate_key(data_bag_item)
