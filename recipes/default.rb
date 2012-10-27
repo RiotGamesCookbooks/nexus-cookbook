@@ -50,14 +50,19 @@ directory user_home do
   action :create
 end
 
-ark node[:nexus][:name] do
-  url node[:nexus][:url]
-  version node[:nexus][:version]
-  owner node[:nexus][:user]
-  group node[:nexus][:group]
-  checksum node[:nexus][:checksum]
-  extension "tar.gz"
-  action :install
+artifact_deploy node[:nexus][:name] do
+  version           node[:nexus][:version]
+  artifact_location node[:nexus][:url]
+  deploy_to         node[:nexus][:home]
+  owner             node[:nexus][:user]
+  group             node[:nexus][:group]
+
+  before_migrate Proc.new {
+    bluepill_service "nexus" do
+      action [:stop]
+      only_if do File.exist?(node[:nexus][:bin_dir]) end
+    end
+  }
 end
 
 template "#{node[:nexus][:conf_dir]}/nexus.properties" do
