@@ -37,16 +37,16 @@ group node[:nexus][:group] do
 end
 
 user node[:nexus][:group] do
-  gid node[:nexus][:group]
-  shell "/bin/bash"
-  home user_home
+  gid    node[:nexus][:group]
+  shell  "/bin/bash"
+  home   user_home
   system true
 end
 
 directory user_home do
-  owner node[:nexus][:user]
-  group node[:nexus][:group]
-  mode "0755"
+  owner  node[:nexus][:user]
+  group  node[:nexus][:group]
+  mode   "0755"
   action :create
 end
 
@@ -119,8 +119,8 @@ if data_bag_item[node[:nexus][:ssl_certificate][:key]]
 
   file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key" do
     content key
-    mode "077"
-    action :create
+    mode    "077"
+    action  :create
   end
 else
   log "Could not find ssl_certificate data bag, using default certificate." do
@@ -129,22 +129,22 @@ else
 
   cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt" do
     source "self_signed_cert.crt"
-    mode "077"
+    mode   "077"
     action :create
   end
 
   cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key" do
     source "self_signed_key.key"
-    mode "077"
+    mode   "077"
     action :create
   end
 end
 
 template "#{node[:nexus][:conf_dir]}/jetty.xml" do
   source "jetty.xml.erb"
-  owner node[:nexus][:user]
-  group node[:nexus][:group] 
-  mode "0775"  
+  owner  node[:nexus][:user]
+  group  node[:nexus][:group] 
+  mode   "0775"  
   variables(
     :loopback => node[:nexus][:jetty][:loopback]
   )
@@ -152,16 +152,16 @@ end
 
 template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
   source "nexus_proxy.nginx.conf.erb"
-  owner "root"
-  group "root"
-  mode "0644"
+  owner  "root"
+  group  "root"
+  mode   "0644"
   variables(
     :ssl_certificate => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt",
-    :ssl_key => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key",
-    :listen_port => node[:nexus][:nginx_proxy][:listen_port],
-    :server_name => node[:nexus][:nginx_proxy][:server_name],
-    :fqdn => node[:fqdn],
-    :options => node[:nexus][:nginx][:options]
+    :ssl_key         => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key",
+    :listen_port     => node[:nexus][:nginx_proxy][:listen_port],
+    :server_name     => node[:nexus][:nginx_proxy][:server_name],
+    :fqdn            => node[:fqdn],
+    :options         => node[:nexus][:nginx][:options]
   )
 end
 
@@ -170,18 +170,18 @@ node[:nexus][:plugins].each do |plugin|
 end
 
 directory node[:nexus][:mount][:nfs][:mount_point] do
-  owner node[:nexus][:user]
-  group node[:nexus][:group]
-  mode "0755"
-  action :create
+  owner     node[:nexus][:user]
+  group     node[:nexus][:group]
+  mode      "0755"
+  action    :create
   recursive true
-  only_if {node[:nexus][:mount][:nfs][:enable]}
+  only_if   {node[:nexus][:mount][:nfs][:enable]}
 end
 
 mount "#{node[:nexus][:mount][:nfs][:mount_point]}" do
-  action [:mount, :enable]
-  device node[:nexus][:mount][:nfs][:device_path]
-  fstype "nfs"
+  action  [:mount, :enable]
+  device  node[:nexus][:mount][:nfs][:device_path]
+  fstype  "nfs"
   options "rw"
   only_if {node[:nexus][:mount][:nfs][:enable]}
 end
@@ -214,7 +214,7 @@ end
 nginx_site 'nexus_proxy.conf'
 
 bluepill_service "nexus" do
-  action [:enable, :load, :start]
+  action   [:enable, :load, :start]
   notifies :restart, "service[nginx]", :immediately
 end
 
@@ -231,7 +231,7 @@ default_credentials = data_bag_item["default_admin"]
 updated_credentials = data_bag_item["updated_admin"]
 
 nexus_user "admin" do
-  action :change_password
+  action       :change_password
   old_password default_credentials["password"]
-  password updated_credentials["password"]
+  password     updated_credentials["password"]
 end
