@@ -23,15 +23,15 @@ def load_current_resource
 end
 
 action :install do
-  unless ::File.exists?("#{node[:nexus][:home]}/nexus/WEB-INF/plugin-repository/#{@current_resource.name}")
+  unless ::File.exists?("#{node[:nexus][:current_path]}/nexus/WEB-INF/plugin-repository/#{@current_resource.name}")
     plugin = new_resource.name
     matched_plugin = get_plugin(plugin)
     if matched_plugin.nil? || matched_plugin.empty?
       log "Plugin #{plugin} did not match any optional-plugins for your Nexus installation."
     else
-      log "Adding symlink #{node[:nexus][:home]}/nexus/WEB-INF/plugin-repository/#{matched_plugin} to #{node[:nexus][:home]}/nexus/WEB-INF/optional-plugins/#{matched_plugin}"
-      link "#{node[:nexus][:home]}/nexus/WEB-INF/plugin-repository/#{matched_plugin}" do
-        to "#{node[:nexus][:home]}/nexus/WEB-INF/optional-plugins/#{matched_plugin}"
+      log "Adding symlink #{node[:nexus][:current_path]}/nexus/WEB-INF/plugin-repository/#{matched_plugin} to #{node[:nexus][:home]}/nexus/WEB-INF/optional-plugins/#{matched_plugin}"
+      link "#{node[:nexus][:current_path]}/nexus/WEB-INF/plugin-repository/#{matched_plugin}" do
+        to "#{node[:nexus][:current_path]}/nexus/WEB-INF/optional-plugins/#{matched_plugin}"
       end
     end
     new_resource.updated_by_last_action(true)
@@ -40,7 +40,7 @@ end
 
 private
 def available_plugins
-  Dir.entries("#{node[:nexus][:home]}/nexus/WEB-INF/optional-plugins")
+  Dir.entries("#{node[:nexus][:current_path]}/nexus/WEB-INF/optional-plugins")
 end
 
 def get_plugin(plugin)

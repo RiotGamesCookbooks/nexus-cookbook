@@ -28,9 +28,14 @@ default[:nexus][:host]                                         = '0.0.0.0'
 default[:nexus][:context_path]                                 = '/nexus'
 
 default[:nexus][:name]                                         = 'nexus'
+default[:nexus][:bundle_name]                                  = "#{node[:nexus][:name]}-#{node[:nexus][:version]}"
 default[:nexus][:home]                                         = "/usr/local/#{node[:nexus][:name]}"
-default[:nexus][:conf_dir]                                     = "#{node[:nexus][:home]}/conf"
-default[:nexus][:bin_dir]                                      = "#{node[:nexus][:home]}/bin"
+
+default[:nexus][:current_path]                                 = "#{node[:nexus][:home]}/current/#{node[:nexus][:bundle_name]}"
+
+default[:nexus][:conf_dir]                                     = "#{node[:nexus][:current_path]}/conf"
+default[:nexus][:bin_dir]                                      = "#{node[:nexus][:current_path]}/bin"
+
 default[:nexus][:work_dir]                                     = "/nexus/sonatype-work/nexus"
 
 default[:nexus][:jetty][:loopback]                             = true

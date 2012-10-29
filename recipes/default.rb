@@ -71,11 +71,11 @@ template "#{node[:nexus][:conf_dir]}/nexus.properties" do
   group node[:nexus][:group]
   mode "0775"
   variables(
-    :nexus_port => node[:nexus][:port],
-    :nexus_host => node[:nexus][:host],
+    :nexus_port         => node[:nexus][:port],
+    :nexus_host         => node[:nexus][:host],
     :nexus_context_path => node[:nexus][:context_path],
-    :work_dir => node[:nexus][:work_dir],
-    :fqdn => node[:fqdn]
+    :work_dir           => node[:nexus][:work_dir],
+    :fqdn               => node[:fqdn]
   )
 end
 
@@ -85,9 +85,9 @@ template "#{node[:nexus][:bin_dir]}/#{node[:nexus][:name]}" do
   group "root"
   mode "0775"
   variables(
-    :platform => platform,
+    :platform   => platform,
     :nexus_port => node[:nexus][:port],
-    :nexus_home => node[:nexus][:home],
+    :nexus_home => node[:nexus][:current_path],
     :nexus_user => node[:nexus][:user]
   )
 end
