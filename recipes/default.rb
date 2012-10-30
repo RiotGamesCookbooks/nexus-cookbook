@@ -217,6 +217,8 @@ end
 
 nexus_settings "baseUrl" do
   value "https://#{node[:nexus][:nginx_proxy][:server_name]}:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
+  retries 3
+  retry_delay 6
 end
 
 nexus_settings "forceBaseUrl" do
