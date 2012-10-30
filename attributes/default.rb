@@ -22,16 +22,21 @@ default[:nexus][:version]                                      = '2.1.2'
 default[:nexus][:user]                                         = 'nexus'
 default[:nexus][:group]                                        = 'nexus'
 default[:nexus][:url]                                          = "http://www.sonatype.org/downloads/nexus-#{node[:nexus][:version]}-bundle.tar.gz"
-default[:nexus][:checksum]                                     = '32fcf0fcfb45e4ee8bc53149131d34257da62758515e7b9d24c92d6ad083dbc9'
 
 default[:nexus][:port]                                         = '8081'
 default[:nexus][:host]                                         = '0.0.0.0'
 default[:nexus][:context_path]                                 = '/nexus'
 
 default[:nexus][:name]                                         = 'nexus'
+default[:nexus][:bundle_name]                                  = "#{node[:nexus][:name]}-#{node[:nexus][:version]}"
 default[:nexus][:home]                                         = "/usr/local/#{node[:nexus][:name]}"
-default[:nexus][:conf_dir]                                     = "#{node[:nexus][:home]}/conf"
-default[:nexus][:bin_dir]                                      = "#{node[:nexus][:home]}/bin"
+
+default[:nexus][:current_path]                                 = "#{node[:nexus][:home]}/current/#{node[:nexus][:bundle_name]}"
+default[:nexus][:pid_dir]                                      = "#{node[:nexus][:home]}/shared/pids"
+
+default[:nexus][:conf_dir]                                     = "#{node[:nexus][:current_path]}/conf"
+default[:nexus][:bin_dir]                                      = "#{node[:nexus][:current_path]}/bin"
+
 default[:nexus][:work_dir]                                     = "/nexus/sonatype-work/nexus"
 
 default[:nexus][:jetty][:loopback]                             = true
