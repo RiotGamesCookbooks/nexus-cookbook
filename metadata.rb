@@ -10,7 +10,6 @@ version          "0.15.2"
   supports os
 end
 
-depends "ark", "~> 0.0.11"
 depends "java", "~> 1.5.2"
 depends "nginx", "~> 1.0.0"
-depends "bluepill", "~> 1.0.6"
+depends "artifact", "~> 0.10.10"

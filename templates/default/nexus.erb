@@ -38,7 +38,7 @@ WRAPPER_CONF="${NEXUS_HOME}/bin/jsw/conf/wrapper.conf"
 PRIORITY=
 
 # Location of the pid file.
-#PIDDIR="."
+PIDDIR="<%= @nexus_pid %>"
 
 # If uncommented, causes the Wrapper to be shutdown using an anchor file.
 #  When launched with the 'start' command, it will also ignore all INT and
@@ -409,19 +409,6 @@ console() {
     fi
 }
 
-remove_log() {
-  # Delete the log on startup
-  rm -f <%= @nexus_home %>/logs/wrapper.log
-}
-
-run_until() {
-  OUTPUT=0;
-  while [ "$OUTPUT" = 0 ]; do
-    OUTPUT=`cat <%= @nexus_home %>/logs/wrapper.log | grep -c "org.eclipse.jetty.server.AbstractConnector - Started SelectChannelConnector@127.0.0.1:<%= @nexus_port %>"`;
-    # Waiting until org.eclipse.jetty.server.AbstractConnector - Started SelectChannelConnector@127.0.0.1:8081 appears in the log
-  done
-}
-
 start() {
     echo "Starting $APP_LONG_NAME..."
     getpid
@@ -429,9 +416,7 @@ start() {
     then
         # The string passed to eval must handles spaces in paths correctly.
         COMMAND_LINE="$CMDNICE \"$WRAPPER_CMD\" \"$WRAPPER_CONF\" wrapper.syslog.ident=$APP_NAME wrapper.pidfile=\"$PIDFILE\" wrapper.daemonize=TRUE $ANCHORPROP $IGNOREPROP $LOCKPROP"
-        remove_log
         eval $COMMAND_LINE
-        run_until
     else
         echo "$APP_LONG_NAME is already running."
         exit 1
