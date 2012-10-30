@@ -58,10 +58,50 @@ artifact_deploy node[:nexus][:name] do
   group             node[:nexus][:group]
 
   before_migrate Proc.new {
-    bluepill_service "nexus" do
-      action [:stop]
-      only_if do File.exist?(node[:nexus][:bin_dir]) end
+    #bluepill_service "nexus" do
+    #  action [:stop, :disable]
+    #end
+    service "nexus" do
+      action :stop
+      only_if do File.exist?("/etc/init.d/nexus") end
     end
+  }
+
+  restart_proc Proc.new {
+    template "#{node[:bluepill][:conf_dir]}/nexus.pill" do
+      source "nexus.pill.erb"
+      mode 0644
+      variables(
+        :pid_dir  => node[:bluepill][:pid_dir],
+        :bin_dir  => node[:nexus][:bin_dir],
+        :home_dir => node[:nexus][:current_path],
+        :name     => node[:nexus][:name]
+      )
+    end
+
+    template "#{node[:nexus][:bin_dir]}/#{node[:nexus][:name]}" do
+      source "nexus.erb"
+      owner "root"
+      group "root"
+      mode "0775"
+      variables(
+        :platform   => platform,
+        :nexus_port => node[:nexus][:port],
+        :nexus_home => node[:nexus][:current_path],
+        :nexus_user => node[:nexus][:user]
+      )
+    end
+
+    link "/etc/init.d/nexus" do
+      to "#{node[:nexus][:bin_dir]}/nexus"
+    end
+
+    service "nexus" do
+      action :start
+    end
+    #bluepill_service "nexus" do
+    #  action [:enable, :load]
+    #end
   }
 end
 
@@ -76,19 +116,6 @@ template "#{node[:nexus][:conf_dir]}/nexus.properties" do
     :nexus_context_path => node[:nexus][:context_path],
     :work_dir           => node[:nexus][:work_dir],
     :fqdn               => node[:fqdn]
-  )
-end
-
-template "#{node[:nexus][:bin_dir]}/#{node[:nexus][:name]}" do
-  source "nexus.erb"
-  owner "root"
-  group "root"
-  mode "0775"
-  variables(
-    :platform   => platform,
-    :nexus_port => node[:nexus][:port],
-    :nexus_home => node[:nexus][:current_path],
-    :nexus_user => node[:nexus][:user]
   )
 end
 
@@ -200,21 +227,11 @@ end
 #  only_if {node[:nexus][:mount][:nfs][:enable]}
 #end
 
-template "#{node[:bluepill][:conf_dir]}/nexus.pill" do
-  source "nexus.pill.erb"
-  mode 0644
-  variables(
-    :pid_dir => node[:bluepill][:pid_dir],
-    :bin_dir => node[:nexus][:bin_dir],
-    :home_dir => node[:nexus][:home],
-    :name => node[:nexus][:name]
-  )
-end
-
 nginx_site 'nexus_proxy.conf'
 
-bluepill_service "nexus" do
-  action   [:enable, :load, :start]
+#bluepill_service "nexus" do
+service "nexus" do
+  action :start
   notifies :restart, "service[nginx]", :immediately
 end
 
