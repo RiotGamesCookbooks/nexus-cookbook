@@ -32,6 +32,7 @@ default[:nexus][:bundle_name]                                  = "#{node[:nexus]
 default[:nexus][:home]                                         = "/usr/local/#{node[:nexus][:name]}"
 
 default[:nexus][:current_path]                                 = "#{node[:nexus][:home]}/current/#{node[:nexus][:bundle_name]}"
+default[:nexus][:pid_dir]                                      = "#{node[:nexus][:home]}/shared/pids"
 
 default[:nexus][:conf_dir]                                     = "#{node[:nexus][:current_path]}/conf"
 default[:nexus][:bin_dir]                                      = "#{node[:nexus][:current_path]}/bin"

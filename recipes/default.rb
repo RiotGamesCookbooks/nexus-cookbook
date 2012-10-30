@@ -18,13 +18,10 @@
 # limitations under the License.
 #
 #
-include_recipe "ark"
 include_recipe "java"
 include_recipe "nginx"
-include_recipe "bluepill"
 
 user_home = "/#{node[:nexus][:user]}"
-path_file_name = "#{user_home}/nexus-#{node[:nexus][:version]}-bundle.tar.gz"
 
 platform = ""
 case node[:platform]
@@ -48,75 +45,6 @@ directory user_home do
   group  node[:nexus][:group]
   mode   "0755"
   action :create
-end
-
-artifact_deploy node[:nexus][:name] do
-  version           node[:nexus][:version]
-  artifact_location node[:nexus][:url]
-  deploy_to         node[:nexus][:home]
-  owner             node[:nexus][:user]
-  group             node[:nexus][:group]
-
-  before_migrate Proc.new {
-    #bluepill_service "nexus" do
-    #  action [:stop, :disable]
-    #end
-    service "nexus" do
-      action :stop
-      only_if do File.exist?("/etc/init.d/nexus") end
-    end
-  }
-
-  restart_proc Proc.new {
-    template "#{node[:bluepill][:conf_dir]}/nexus.pill" do
-      source "nexus.pill.erb"
-      mode 0644
-      variables(
-        :pid_dir  => node[:bluepill][:pid_dir],
-        :bin_dir  => node[:nexus][:bin_dir],
-        :home_dir => node[:nexus][:current_path],
-        :name     => node[:nexus][:name]
-      )
-    end
-
-    template "#{node[:nexus][:bin_dir]}/#{node[:nexus][:name]}" do
-      source "nexus.erb"
-      owner "root"
-      group "root"
-      mode "0775"
-      variables(
-        :platform   => platform,
-        :nexus_port => node[:nexus][:port],
-        :nexus_home => node[:nexus][:current_path],
-        :nexus_user => node[:nexus][:user]
-      )
-    end
-
-    link "/etc/init.d/nexus" do
-      to "#{node[:nexus][:bin_dir]}/nexus"
-    end
-
-    service "nexus" do
-      action :start
-    end
-    #bluepill_service "nexus" do
-    #  action [:enable, :load]
-    #end
-  }
-end
-
-template "#{node[:nexus][:conf_dir]}/nexus.properties" do
-  source "nexus.properties.erb"
-  owner node[:nexus][:user]
-  group node[:nexus][:group]
-  mode "0775"
-  variables(
-    :nexus_port         => node[:nexus][:port],
-    :nexus_host         => node[:nexus][:host],
-    :nexus_context_path => node[:nexus][:context_path],
-    :work_dir           => node[:nexus][:work_dir],
-    :fqdn               => node[:fqdn]
-  )
 end
 
 directory "#{node[:nginx][:dir]}/shared/certificates" do
@@ -167,16 +95,6 @@ else
   end
 end
 
-template "#{node[:nexus][:conf_dir]}/jetty.xml" do
-  source "jetty.xml.erb"
-  owner  node[:nexus][:user]
-  group  node[:nexus][:group] 
-  mode   "0775"  
-  variables(
-    :loopback => node[:nexus][:jetty][:loopback]
-  )
-end
-
 template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
   source "nexus_proxy.nginx.conf.erb"
   owner  "root"
@@ -190,10 +108,6 @@ template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
     :fqdn            => node[:fqdn],
     :options         => node[:nexus][:nginx][:options]
   )
-end
-
-node[:nexus][:plugins].each do |plugin| 
-  nexus_plugin plugin
 end
 
 directory node[:nexus][:mount][:nfs][:mount_point] do
@@ -229,10 +143,76 @@ end
 
 nginx_site 'nexus_proxy.conf'
 
-#bluepill_service "nexus" do
+artifact_deploy node[:nexus][:name] do
+  version           node[:nexus][:version]
+  artifact_location node[:nexus][:url]
+  deploy_to         node[:nexus][:home]
+  owner             node[:nexus][:user]
+  group             node[:nexus][:group]
+
+  before_migrate Proc.new {
+    service "nexus" do
+      action :stop
+      only_if do File.exist?("/etc/init.d/nexus") end
+    end
+  }
+
+  restart_proc Proc.new {
+    template "#{node[:nexus][:bin_dir]}/#{node[:nexus][:name]}" do
+      source "nexus.erb"
+      owner "root"
+      group "root"
+      mode "0775"
+      variables(
+        :platform   => platform,
+        :nexus_port => node[:nexus][:port],
+        :nexus_home => node[:nexus][:current_path],
+        :nexus_user => node[:nexus][:user],
+        :nexus_pid  => node[:nexus][:pid_dir]
+      )
+    end
+    
+    template "#{node[:nexus][:conf_dir]}/nexus.properties" do
+      source "nexus.properties.erb"
+      owner node[:nexus][:user]
+      group node[:nexus][:group]
+      mode "0775"
+      variables(
+        :nexus_port         => node[:nexus][:port],
+        :nexus_host         => node[:nexus][:host],
+        :nexus_context_path => node[:nexus][:context_path],
+        :work_dir           => node[:nexus][:work_dir],
+        :fqdn               => node[:fqdn]
+      )
+    end
+
+    template "#{node[:nexus][:conf_dir]}/jetty.xml" do
+      source "jetty.xml.erb"
+      owner  node[:nexus][:user]
+      group  node[:nexus][:group] 
+      mode   "0775"  
+      variables(
+        :loopback => node[:nexus][:jetty][:loopback]
+      )
+    end
+    
+    node[:nexus][:plugins].each do |plugin| 
+      nexus_plugin plugin
+    end
+
+    link "/etc/init.d/nexus" do
+      to "#{node[:nexus][:bin_dir]}/nexus"
+    end
+  }
+end
+
 service "nexus" do
   action :start
-  notifies :restart, "service[nginx]", :immediately
+  provider Chef::Provider::Service::Init
+end
+
+service "nginx" do
+  action :restart
 end
 
 nexus_settings "baseUrl" do
