@@ -40,6 +40,62 @@ name       | Name of the plugin to install | String  | name
 
 Resource provider for creating and deleting Neuxs repositories.
 
+The `nexus::group`, `nexus::hosted`, and `nexus::proxy` recipes all use a respective data bag
+to hold the repository data. The data bags should be created and will look like the following:
+
+  knife data bag create nexus group_repositories -c <your chef config>
+
+  {
+    "id": "group_repositories",
+    "localhost": {
+      "repositories": [
+        {
+          "name": "My Group",
+          "add": ["Artifacts", "Whatever"]
+        }
+      ]
+    },
+    "my-server-1": {
+      ...
+    }
+  }
+
+  knife data bag create nexus hosted_repositories -c <your chef config>
+
+  {
+    "id": "hosted_repositories",
+    "localhost": {
+      "repositories": [
+        {
+          "name": "My Hosted",
+          "publisher": true
+        }
+      ]
+    },
+    "my-server-1": {
+      ...
+    }
+  }
+
+  knife data bag create nexus proxy_repositories -c <your chef config>
+
+  {
+    "id": "proxy_repositories",
+    "localhost": {
+      "repositories": [
+        {
+          "name": "Whatever",
+          "url": "http://www.my-proxy.com/",
+          "subscriber": true,
+          "preemptive_fetch": true
+        }
+      ]
+    },
+    "my-server-1": {
+      ...
+    }
+  }
+
 ### Actions
 Action  | Description              | Default
 ------- |-------------             |---------
@@ -48,13 +104,14 @@ delete  | Deletes a repository     |
 update  | Updates a repository     | 
 
 ### Attributes
-Attribute  | Description                   			               | Type                  | Default
----------  |-------------                  			               |-----                  |--------
-name       | Name of the repository to create/delete               | String                | name
-type       | The type of repository - either "hosted" or "proxy".  | String                |
-url        | The url used for a proxy repository.                  | String                |
-publisher  | Whether this repository is a publisher of artifacts.  | TrueClass, FalseClass |
-subscriber | Whether this repository is a subscriber to artifacts. | TrueClass, FalseClass |
+Attribute        | Description                   			                                 | Type                  | Default
+---------        |-------------                  			                                 |-----                  |--------
+name             | Name of the repository to create/delete                             | String                | name
+type             | The type of repository - either "hosted" or "proxy".                | String                |
+url              | The url used for a proxy repository.                                | String                |
+publisher        | Whether this repository is a publisher of artifacts.                | TrueClass, FalseClass |
+subscriber       | Whether this repository is a subscriber to artifacts.               | TrueClass, FalseClass |
+preemptive_fetch | Whether this (proxy) repository should preemptively fetch artifacts | TrueClass, FalseClass |
 
 ## nexus\_settings
 
@@ -133,7 +190,7 @@ Action  		        | Description              						 | Default
 enable  		        | Enables the Smart Proxy functionality.         | Yes
 disable  		        | Disables the Smart Proxy functionality.        | 
 add_trusted_key  		| Adds a trusted key to the server.              | 
-delete_trusted_key  	| Removes a trusted key from the server.         | 
+delete_trusted_key  | Removes a trusted key from the server.         | 
 
 
 ### Attributes
@@ -158,14 +215,25 @@ The following attributes are set under the `nexus` namespace:
 * url - sets the URL where the nexus package is located
 * port - the port to run nexus on
 * host - the hostname to use for nexus
-* path - the `user` home directory
+* context_path - the `user` home directory
 * name - the name of the Nexus
+* bundle_name - the name of the internal folder of the Nexus tar. Usually nexus-{professional or nothing}-{VERSION}
 * home - the installation directory for nexus. Uses name.
+* current_path - the above home/current/bundle_name. The artifact_deploy resource uses the `current` symlink to denote the currently installed version.
+* pid_dir - the pid directory defined in the nexus.erb template. Saves a pid in the `pids` directory created by the artifact_deploy resource.
 * conf_dir - the above home/conf
 * bin_dir - the above home/bin
 * work_dir - the above path/sonatype-work/nexus
 * plugins - an Array of Nexus plugins that will be installed by the default recipe.
-* create_repositories - an Array of repositories that will be created by the default recipe.
+
+The following attribute is set under the `nexus::jetty` namespace:
+
+* loopback - if true, the jetty.xml.erb will be written to disable access to anything but localhost. Useful for enabling access to Nexus via Jetty's HTTP connection.
+
+The following attributes are set under the `nexus::ssl` namespace and are related to the SSL settings of Nexus:
+
+* verify - if true, the calls in the chef_nexus.rb library will verify SSL connections. This is useful to disable when working with a self-signed certificate.
+* ssl\_certificate::key - the key to look for in the `nexus::ssl_certificate` encrypted data bag.
 
 The following attributes are set under `nexus::nginx` namespace:
 
@@ -191,6 +259,13 @@ The following attributes are set under the `nexus::smart_proxy` namespace:
 * enable - true if we want to enable Smart Proxy, false if not.
 * host - The host to use for Smart Proxy configuration.
 * port - The port to use for Smart Proxy configuration.
+
+The following attributes are not fully supported but are under the `nexus::mount` namespace:
+
+* nfs::enable - enables an NFS mount.
+* nfs::mount\_point - the local path to mount an NFS drive to.
+* nfs::device\_path - the remote server where the NFS drive is located.
+* nfs::non_mount_dir - Sonatype does not recommend using NFS with Nexus, because of Solr searchs on particular directories of the Nexus installation.
 
 SSL
 ===

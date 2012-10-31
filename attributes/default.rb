@@ -39,6 +39,8 @@ default[:nexus][:bin_dir]                                      = "#{node[:nexus]
 
 default[:nexus][:work_dir]                                     = "/nexus/sonatype-work/nexus"
 
+default[:nexus][:plugins]                                      = ['nexus-custom-metadata-plugin']
+
 default[:nexus][:jetty][:loopback]                             = true
 
 default[:nexus][:ssl][:verify]                                 = true
@@ -46,8 +48,6 @@ default[:nexus][:ssl_certificate][:key]                        = node[:fqdn]
 
 default[:nexus][:nginx_proxy][:listen_port]                    = 8443
 default[:nexus][:nginx_proxy][:server_name]                    = node[:fqdn]
-
-default[:nexus][:plugins]                                      = ['nexus-custom-metadata-plugin']
 
 default[:nexus][:nginx][:options][:client_max_body_size]       = '200M'
 default[:nexus][:nginx][:options][:client_body_buffer_size]    = '512k'
