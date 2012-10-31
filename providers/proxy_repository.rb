@@ -72,7 +72,7 @@ private
   end
 
   def set_subscriber
-    Chef::Nexus.nexus(node).enable_artifact_subscribe(@parsed_id)
+    Chef::Nexus.nexus(node).enable_artifact_subscribe(@parsed_id, new_resource.preemptive_fetch)
   end
 
   def unset_subscriber
