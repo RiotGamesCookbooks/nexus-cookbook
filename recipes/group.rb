@@ -17,20 +17,22 @@
 # limitations under the License.
 #
 #
-node[:nexus][:repository][:group].each do |repository|
-  
-  nexus_group_repository repository[:name]
+data_bag_for_node = Chef::Nexus.get_group_repositories_data_bag[node[:hostname]]
 
-  repository[:add].each do |repository_to_add|
-    nexus_group_repository repository[:name] do
+data_bag_for_node["repositories"].each do |repository|
+  
+  nexus_group_repository repository["name"]
+
+  repository["add"].each do |repository_to_add|
+    nexus_group_repository repository["name"] do
       action     :add_to
       repository repository_to_add
     end
   end
 
-  if repository[:remove]
-    repository[:remove].each do |repository_to_remove|
-      nexus_group_repository repository[:name] do
+  if repository["remove"]
+    repository["remove"].each do |repository_to_remove|
+      nexus_group_repository repository["name"] do
         action     :remove_from
         repository repository_to_remove
       end

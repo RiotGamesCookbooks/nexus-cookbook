@@ -27,6 +27,7 @@ class Chef
     SSL_CERTIFICATE_DATABAG_ITEM = "ssl_certificate"
     PROXY_REPOSITORIES_DATABAG_ITEM = "proxy_repositories"
     HOSTED_REPOSITORIES_DATABAG_ITEM = "hosted_repositories"
+    GROUP_REPOSITORIES_DATABAG_ITEM = "group_repositories"
     SSL_CERTIFICATE_CRT = "crt"
     SSL_CERTIFICATE_KEY = "key"
     
@@ -37,6 +38,10 @@ class Chef
 
       def get_hosted_repositories_data_bag
         Chef::DataBagItem.load(DATABAG, HOSTED_REPOSITORIES_DATABAG_ITEM)
+      end
+
+      def get_group_repositories_data_bag
+        Chef::DataBagItem.load(DATABAG, GROUP_REPOSITORIES_DATABAG_ITEM)
       end
 
       def get_ssl_certificate_data_bag
