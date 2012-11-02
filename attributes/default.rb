@@ -18,10 +18,11 @@
 # limitations under the License.
 #
 #
-default[:nexus][:version]                                      = '2.1.2'
+default[:nexus][:version]                                      = '2.2-01'
 default[:nexus][:user]                                         = 'nexus'
 default[:nexus][:group]                                        = 'nexus'
 default[:nexus][:url]                                          = "http://www.sonatype.org/downloads/nexus-#{node[:nexus][:version]}-bundle.tar.gz"
+default[:nexus][:checksum]                                     = '6758f0b095d2df445f72351be7368e3ed4bac2b4f67b0da2d41dc963f06847d5'
 
 default[:nexus][:port]                                         = '8081'
 default[:nexus][:host]                                         = '0.0.0.0'
