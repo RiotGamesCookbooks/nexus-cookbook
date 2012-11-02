@@ -51,7 +51,7 @@ default[:nexus][:nginx_proxy][:listen_port]                    = 8443
 default[:nexus][:nginx_proxy][:server_name]                    = node[:fqdn]
 
 default[:nexus][:nginx][:server][:options]                     = {
-  :client_body_buffer_size => '200M',
+  :client_max_body_size    => '200M',
   :client_body_buffer_size => '512k',
   :keepalive_timeout       => '0'
 }
