@@ -16,21 +16,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-#
-node[:nexus][:repository][:proxy].each do |repository|
+data_bag_for_node = Chef::Nexus.get_proxy_repositories_data_bag[node[:hostname]]
+
+data_bag_for_node["repositories"].each do |repository|
   
-  nexus_proxy_repository repository[:name] do
+  nexus_proxy_repository repository["name"] do
     action :create
-    url    repository[:url]
+    url    repository["url"]
   end
 
-  nexus_proxy_repository repository[:name] do
-    action     :update
-    subscriber repository[:subscriber]
+  nexus_proxy_repository repository["name"] do
+    action           :update
+    subscriber       repository["subscriber"]
+    preemptive_fetch repository["preemptive_fetch"]
   end
 
-  nexus_proxy_repository repository[:name] do
+  nexus_proxy_repository repository["name"] do
     action    :update
-    publisher repository[:publisher]
+    publisher repository["publisher"]
   end
 end

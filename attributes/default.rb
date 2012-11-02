@@ -18,10 +18,11 @@
 # limitations under the License.
 #
 #
-default[:nexus][:version]                                      = '2.1.2'
+default[:nexus][:version]                                      = '2.2-01'
 default[:nexus][:user]                                         = 'nexus'
 default[:nexus][:group]                                        = 'nexus'
 default[:nexus][:url]                                          = "http://www.sonatype.org/downloads/nexus-#{node[:nexus][:version]}-bundle.tar.gz"
+default[:nexus][:checksum]                                     = '6758f0b095d2df445f72351be7368e3ed4bac2b4f67b0da2d41dc963f06847d5'
 
 default[:nexus][:port]                                         = '8081'
 default[:nexus][:host]                                         = '0.0.0.0'
@@ -39,6 +40,8 @@ default[:nexus][:bin_dir]                                      = "#{node[:nexus]
 
 default[:nexus][:work_dir]                                     = "/nexus/sonatype-work/nexus"
 
+default[:nexus][:plugins]                                      = ['nexus-custom-metadata-plugin']
+
 default[:nexus][:jetty][:loopback]                             = true
 
 default[:nexus][:ssl][:verify]                                 = true
@@ -47,10 +50,15 @@ default[:nexus][:ssl_certificate][:key]                        = node[:fqdn]
 default[:nexus][:nginx_proxy][:listen_port]                    = 8443
 default[:nexus][:nginx_proxy][:server_name]                    = node[:fqdn]
 
-default[:nexus][:plugins]                                      = ['nexus-custom-metadata-plugin']
+default[:nexus][:nginx][:server][:options]                     = {
+  :client_body_buffer_size => '200M',
+  :client_body_buffer_size => '512k',
+  :keepalive_timeout       => '0'
+}
 
-default[:nexus][:nginx][:options][:client_max_body_size]       = '200M'
-default[:nexus][:nginx][:options][:client_body_buffer_size]    = '512k'
+default[:nexus][:nginx][:proxy][:options]                      = {
+  
+}
 
 default[:nexus][:cli][:url]                                    = "https://#{node[:nexus][:nginx_proxy][:server_name]}:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
 default[:nexus][:cli][:repository]                             = "releases"

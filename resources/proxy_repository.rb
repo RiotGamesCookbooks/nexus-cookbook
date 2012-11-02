@@ -25,3 +25,4 @@ attribute :name, :kind_of                 => String, :name_attribute => true
 attribute :url, :kind_of                  => String, :required => true
 attribute :publisher, :kind_of            => [TrueClass, FalseClass], :default => nil
 attribute :subscriber, :kind_of           => [TrueClass, FalseClass], :default => nil
+attribute :preemptive_fetch, :kind_of     => [TrueClass, FalseClass], :default => false

@@ -106,7 +106,8 @@ template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
     :listen_port     => node[:nexus][:nginx_proxy][:listen_port],
     :server_name     => node[:nexus][:nginx_proxy][:server_name],
     :fqdn            => node[:fqdn],
-    :options         => node[:nexus][:nginx][:options]
+    :server_options  => node[:nexus][:nginx][:server][:options],
+    :proxy_options   => node[:nexus][:nginx][:proxy][:options]
   )
 end
 
@@ -146,13 +147,15 @@ nginx_site 'nexus_proxy.conf'
 artifact_deploy node[:nexus][:name] do
   version           node[:nexus][:version]
   artifact_location node[:nexus][:url]
+  artifact_checksum node[:nexus][:checksum]
   deploy_to         node[:nexus][:home]
   owner             node[:nexus][:user]
   group             node[:nexus][:group]
 
-  before_migrate Proc.new {
+  before_extract Proc.new {
     service "nexus" do
       action :stop
+      provider Chef::Provider::Service::Init
       only_if do File.exist?("/etc/init.d/nexus") end
     end
   }
@@ -209,16 +212,13 @@ end
 service "nexus" do
   action :start
   provider Chef::Provider::Service::Init
-end
-
-service "nginx" do
-  action :restart
+  notifies :restart, "service[nginx]", :immediately
 end
 
 nexus_settings "baseUrl" do
   value "https://#{node[:nexus][:nginx_proxy][:server_name]}:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
   retries 3
-  retry_delay 6
+  retry_delay 8
 end
 
 nexus_settings "forceBaseUrl" do
