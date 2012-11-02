@@ -25,5 +25,5 @@ node[:nexus][:cli][:packages].each do |package_name|
 end
 
 chef_gem "nexus_cli" do
-  version "0.9.1"
+  version "1.0.0"
 end

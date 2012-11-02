@@ -17,12 +17,14 @@
 # limitations under the License.
 #
 #
-node[:nexus][:repository][:hosted].each do |repository|
+data_bag_for_node = Chef::Nexus.get_hosted_repositories_data_bag[node[:hostname]]
+ 
+data_bag_for_node["repositories"].each do |repository|
   
-  nexus_hosted_repository repository[:name]
+  nexus_hosted_repository repository["name"]
 
-  nexus_hosted_repository repository[:name] do
-    action      :update
-    publisher   repository[:publisher]
+  nexus_hosted_repository repository["name"] do
+    action    :update
+    publisher repository["publisher"]
   end
 end
