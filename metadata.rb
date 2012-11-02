@@ -12,4 +12,4 @@ end
 
 depends "java", "~> 1.5.2"
 depends "nginx", "~> 1.0.0"
-depends "artifact", "~> 0.10.10"
+depends "artifact", "~> 0.11.0"

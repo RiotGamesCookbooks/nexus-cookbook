@@ -146,13 +146,15 @@ nginx_site 'nexus_proxy.conf'
 artifact_deploy node[:nexus][:name] do
   version           node[:nexus][:version]
   artifact_location node[:nexus][:url]
+  artifact_checksum node[:nexus][:checksum]
   deploy_to         node[:nexus][:home]
   owner             node[:nexus][:user]
   group             node[:nexus][:group]
 
-  before_migrate Proc.new {
+  before_extract Proc.new {
     service "nexus" do
       action :stop
+      provider Chef::Provider::Service::Init
       only_if do File.exist?("/etc/init.d/nexus") end
     end
   }
@@ -209,10 +211,7 @@ end
 service "nexus" do
   action :start
   provider Chef::Provider::Service::Init
-end
-
-service "nginx" do
-  action :restart
+  notifies :restart, "service[nginx]", :immediately
 end
 
 nexus_settings "baseUrl" do
