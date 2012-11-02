@@ -237,9 +237,10 @@ The following attributes are set under the `nexus::ssl` namespace and are relate
 
 The following attributes are set under `nexus::nginx` namespace:
 
-* listen\_port - the port to listen on for nginx
-* server\_name - the name of the nginx server
-* options - used to generate options in the nginx conf file
+* listen\_port - the port to listen on for nginx.
+* server\_name - the name of the nginx server.
+* server::options - used to generate options in the `server` section of the nginx conf file.
+* proxy::options - used to generate proxy options in the `location` section of the nginx conf file.
 
 The following attributes are set under the `nexus::cli` namespace:
 

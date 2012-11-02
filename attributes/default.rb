@@ -50,8 +50,15 @@ default[:nexus][:ssl_certificate][:key]                        = node[:fqdn]
 default[:nexus][:nginx_proxy][:listen_port]                    = 8443
 default[:nexus][:nginx_proxy][:server_name]                    = node[:fqdn]
 
-default[:nexus][:nginx][:options][:client_max_body_size]       = '200M'
-default[:nexus][:nginx][:options][:client_body_buffer_size]    = '512k'
+default[:nexus][:nginx][:server][:options]                     = {
+  :client_body_buffer_size => '200M',
+  :client_body_buffer_size => '512k',
+  :keepalive_timeout       => '0'
+}
+
+default[:nexus][:nginx][:proxy][:options]                      = {
+  
+}
 
 default[:nexus][:cli][:url]                                    = "https://#{node[:nexus][:nginx_proxy][:server_name]}:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
 default[:nexus][:cli][:repository]                             = "releases"

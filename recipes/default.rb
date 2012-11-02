@@ -106,7 +106,8 @@ template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
     :listen_port     => node[:nexus][:nginx_proxy][:listen_port],
     :server_name     => node[:nexus][:nginx_proxy][:server_name],
     :fqdn            => node[:fqdn],
-    :options         => node[:nexus][:nginx][:options]
+    :server_options  => node[:nexus][:nginx][:server][:options],
+    :proxy_options   => node[:nexus][:nginx][:proxy][:options]
   )
 end
 
