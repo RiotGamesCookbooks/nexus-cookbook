@@ -45,7 +45,9 @@ to hold the repository data. The data bags should be created and will look like 
 
   knife data bag create nexus group_repositories -c <your chef config>
 
-  {
+  Your data bag should look like the following:
+
+  `{
     "id": "group_repositories",
     "localhost": {
       "repositories": [
@@ -58,11 +60,13 @@ to hold the repository data. The data bags should be created and will look like 
     "my-server-1": {
       ...
     }
-  }
+  }`
 
   knife data bag create nexus hosted_repositories -c <your chef config>
 
-  {
+  Your data bag should look like the following:
+
+  `{
     "id": "hosted_repositories",
     "localhost": {
       "repositories": [
@@ -75,11 +79,13 @@ to hold the repository data. The data bags should be created and will look like 
     "my-server-1": {
       ...
     }
-  }
+  }`
 
   knife data bag create nexus proxy_repositories -c <your chef config>
 
-  {
+  Your data bag should look like the following:
+
+  `{
     "id": "proxy_repositories",
     "localhost": {
       "repositories": [
@@ -94,7 +100,7 @@ to hold the repository data. The data bags should be created and will look like 
     "my-server-1": {
       ...
     }
-  }
+  }`
 
 ### Actions
 Action  | Description              | Default
