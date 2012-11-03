@@ -43,7 +43,7 @@ Resource provider for creating and deleting Neuxs repositories.
 The `nexus::group`, `nexus::hosted`, and `nexus::proxy` recipes all use a respective data bag
 to hold the repository data. The data bags should be created and will look like the following:
 
-  knife data bag create nexus group_repositories -c <your chef config>
+  knife data bag create nexus group_repositories -c your/chef/config
 
   Your data bag should look like the following:
 
@@ -62,7 +62,7 @@ to hold the repository data. The data bags should be created and will look like 
     }
   }
 
-  knife data bag create nexus hosted_repositories -c <your chef config>
+  knife data bag create nexus hosted_repositories -c your/chef/config
 
   Your data bag should look like the following:
 
@@ -81,7 +81,7 @@ to hold the repository data. The data bags should be created and will look like 
     }
   }
 
-  knife data bag create nexus proxy_repositories -c <your chef config>
+  knife data bag create nexus proxy_repositories -c your/chef/config
 
   Your data bag should look like the following:
 
@@ -383,4 +383,3 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
