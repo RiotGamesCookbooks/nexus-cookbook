@@ -32,16 +32,16 @@ class Chef
     SSL_CERTIFICATE_KEY = "key"
     
     class << self
-      def get_proxy_repositories_data_bag
-        Chef::DataBagItem.load(DATABAG, PROXY_REPOSITORIES_DATABAG_ITEM)
+      def get_proxy_repositories_data_bag(node)
+        data_bag_item_for_hostname(node, DATABAG, PROXY_REPOSITORIES_DATABAG_ITEM)
       end
 
-      def get_hosted_repositories_data_bag
-        Chef::DataBagItem.load(DATABAG, HOSTED_REPOSITORIES_DATABAG_ITEM)
+      def get_hosted_repositories_data_bag(node)
+        data_bag_item_for_hostname(node, DATABAG, HOSTED_REPOSITORIES_DATABAG_ITEM)
       end
 
-      def get_group_repositories_data_bag
-        Chef::DataBagItem.load(DATABAG, GROUP_REPOSITORIES_DATABAG_ITEM)
+      def get_group_repositories_data_bag(node)
+        data_bag_item_for_hostname(node, DATABAG, GROUP_REPOSITORIES_DATABAG_ITEM)
       end
 
       def get_ssl_certificate_data_bag
@@ -125,6 +125,31 @@ class Chef
       end
 
       private
+
+        # Finds a data bag item. Looks first for an entry in the data bag item
+        # for the node's hostname. Otherwise returns the _wildcard entry.
+        # 
+        # @param [Node] The node hash
+        # @param [String] The data bag to load
+        # @param [String] The data bag item to load
+        # 
+        # @return [DataBagItem] The data bag item found
+        def data_bag_item_for_hostname(node, data_bag, data_bag_item)
+          data_bag_item = Chef::DataBagItem.load(data_bag, data_bag_item)
+          if data_bag_item[node[:hostname]]
+            return data_bag_item[node[:hostname]]
+          end
+
+          default_data_bag_item = data_bag_item['_wildcard']
+          if default_data_bag_item
+            message = "Encrypted data bag item #{data_bag_item} does not contain an entry for #{node[:hostname]}. "
+            message << "Using default data bag item entry '_wildcard'."
+            Chef::Log.warn message
+            return default_data_bag_item
+          end
+
+          raise Nexus::EncryptedDataBagNotFound.new(data_bag_item)
+        end
 
         def validate_credentials_data_bag(data_bag_item)
           raise Nexus::InvalidDataBagItem.new(CREDENTIALS_DATABAG_ITEM, "default_admin") unless data_bag_item["default_admin"]
