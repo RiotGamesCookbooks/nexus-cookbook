@@ -142,8 +142,8 @@ class Chef
 
           default_data_bag_item = data_bag_item['_wildcard']
           if default_data_bag_item
-            message = "Encrypted data bag item #{data_bag_item} does not contain an entry for #{node[:hostname]}. "
-            message << "Using default data bag item entry '_wildcard'."
+            message = "Data bag item #{data_bag_item} does not contain an entry for '#{node[:hostname]}'. "
+            message << "Attempting to use default data bag item entry '_wildcard'."
             Chef::Log.warn message
             return default_data_bag_item
           end
