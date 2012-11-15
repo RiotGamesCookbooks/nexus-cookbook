@@ -33,7 +33,7 @@ end
 
 action :create do
   unless group_repository_exists?(@current_resource.name)
-    Chef::Nexus.nexus(node).create_group_repository(new_resource.name)
+    Chef::Nexus.nexus(node).create_group_repository(new_resource.name, nil, nil)
     new_resource.updated_by_last_action(true)
   end
 end

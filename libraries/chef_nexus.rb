@@ -101,10 +101,10 @@ class Chef
         overrides = {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository]}
         begin
           merged_credentials = overrides.merge(default_credentials)
-          NexusCli::Factory.create(merged_credentials, node[:nexus][:ssl][:verify])
+          NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:ssl][:verify])
         rescue NexusCli::PermissionsException, NexusCli::CouldNotConnectToNexusException, NexusCli::UnexpectedStatusCodeException => e
           merged_credentials = overrides.merge(updated_credentials)
-          NexusCli::Factory.create(merged_credentials, node[:nexus][:ssl][:verify])
+          NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:ssl][:verify])
         end
       end
 
@@ -112,7 +112,7 @@ class Chef
         require 'nexus_cli'
         overrides = {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository], "username" => username, "password" => password}
         begin
-          nexus = NexusCli::Factory.create(overrides, node[:nexus][:ssl][:verify])
+          nexus = NexusCli::RemoteFactory.create(overrides, node[:nexus][:ssl][:verify])
           true
         rescue NexusCli::PermissionsException, NexusCli::CouldNotConnectToNexusException, NexusCli::UnexpectedStatusCodeException => e
           false
