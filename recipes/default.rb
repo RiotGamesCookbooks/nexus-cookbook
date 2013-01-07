@@ -234,3 +234,5 @@ nexus_user "admin" do
   old_password default_credentials["password"]
   password     updated_credentials["password"]
 end
+
+node.set[:nexus][:cli][:default_admin_credentials_updated] = true

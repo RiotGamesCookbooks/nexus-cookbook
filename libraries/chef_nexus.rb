@@ -96,16 +96,15 @@ class Chef
       def nexus(node)
         require 'nexus_cli'
         data_bag_item = get_credentials_data_bag
-        default_credentials = data_bag_item["default_admin"]
-        updated_credentials = data_bag_item["updated_admin"]
-        overrides = {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository]}
-        begin
-          merged_credentials = overrides.merge(default_credentials)
-          NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:ssl][:verify])
-        rescue NexusCli::PermissionsException, NexusCli::CouldNotConnectToNexusException, NexusCli::UnexpectedStatusCodeException => e
-          merged_credentials = overrides.merge(updated_credentials)
-          NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:ssl][:verify])
+        
+        if node[:nexus][:cli][:default_admin_credentials_updated]
+          credentials = data_bag_item["updated_admin"]
+        else
+          credentials = data_bag_item["default_admin"]
         end
+        overrides = {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository]}
+        merged_credentials = overrides.merge(credentials)
+        NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:ssl][:verify])
       end
 
       def check_old_credentials(username, password, node)
