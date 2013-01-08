@@ -217,8 +217,6 @@ end
 
 nexus_settings "baseUrl" do
   value "https://#{node[:nexus][:nginx_proxy][:server_name]}:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
-  retries 3
-  retry_delay 8
 end
 
 nexus_settings "forceBaseUrl" do
@@ -235,4 +233,8 @@ nexus_user "admin" do
   password     updated_credentials["password"]
 end
 
-node.set[:nexus][:cli][:default_admin_credentials_updated] = true
+ruby_block "set flag that default admin credentials were changed" do
+  block do
+    node.set[:nexus][:cli][:default_admin_credentials_updated] = true
+  end
+end
