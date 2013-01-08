@@ -115,7 +115,7 @@ class Chef
             credentials = data_bag_item["default_admin"]
           end
           merged_credentials = overrides.merge(credentials)
-          NexusCli::RemoteFactory.create(credentials, node[:nexus][:ssl][:verify])
+          NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:ssl][:verify])
         end
       end
 
