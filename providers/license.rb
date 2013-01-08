@@ -28,7 +28,7 @@ end
 
 action :install do
 
-  unless licensed? && running_nexus_pro?
+  unless Chef::Nexus.nexus_unavailable?(node) || (licensed? && running_nexus_pro?)
 
     require 'base64'
     data_bag_item = Chef::Nexus.get_license_data_bag

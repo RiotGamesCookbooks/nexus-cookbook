@@ -28,7 +28,7 @@ end
 
 action :set_level do
   
-  unless same_logging_level?
+  unless Chef::Nexus.nexus_unavailable?(node) || same_logging_level?
 
     Chef::Nexus.nexus(node).set_logger_level(new_resource.level)
     new_resource.updated_by_last_action(true)

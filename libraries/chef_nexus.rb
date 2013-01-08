@@ -95,17 +95,48 @@ class Chef
 
       def nexus(node)
         require 'nexus_cli'
-        data_bag_item = get_credentials_data_bag
+        data_bag_item = get_credentials_data_bag        
         default_credentials = data_bag_item["default_admin"]
         updated_credentials = data_bag_item["updated_admin"]
+
         overrides = {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository]}
-        begin
-          merged_credentials = overrides.merge(default_credentials)
-          NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:ssl][:verify])
-        rescue NexusCli::PermissionsException, NexusCli::CouldNotConnectToNexusException, NexusCli::UnexpectedStatusCodeException => e
-          merged_credentials = overrides.merge(updated_credentials)
-          NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:ssl][:verify])
+        if Chef::Config[:solo]
+          begin
+            merged_credentials = overrides.merge(default_credentials)
+            NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:ssl][:verify])
+          rescue NexusCli::PermissionsException, NexusCli::CouldNotConnectToNexusException, NexusCli::UnexpectedStatusCodeException => e
+            merged_credentials = overrides.merge(updated_credentials)
+            NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:ssl][:verify])
+          end
+        else
+          if node[:nexus][:cli][:default_admin_credentials_updated]
+            credentials = data_bag_item["updated_admin"]
+          else
+            credentials = data_bag_item["default_admin"]
+          end
+          merged_credentials = overrides.merge(credentials)
+          NexusCli::RemoteFactory.create(credentials, node[:nexus][:ssl][:verify])
         end
+      end
+
+      def nexus_available?(node)        
+        retries = node[:nexus][:cli][:retries]
+        begin
+          nexus(node)
+          return true
+        rescue NexusCli::CouldNotConnectToNexusException, NexusCli::UnexpectedStatusCodeException => e
+          if retries > 0
+            retries -= 1
+            Chef::Log.info "Could not connect to Nexus, #{retries} attempt(s) left"
+            sleep node[:nexus][:cli][:retry_delay]
+            retry
+          end
+          return false
+        end
+      end
+
+      def nexus_unavailable?(node)
+        !nexus_available?(node)
       end
 
       def check_old_credentials(username, password, node)

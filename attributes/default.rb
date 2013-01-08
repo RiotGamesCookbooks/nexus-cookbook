@@ -18,11 +18,11 @@
 # limitations under the License.
 #
 #
-default[:nexus][:version]                                      = '2.2-01'
+default[:nexus][:version]                                      = '2.3.0-04'
 default[:nexus][:user]                                         = 'nexus'
 default[:nexus][:group]                                        = 'nexus'
 default[:nexus][:url]                                          = "http://www.sonatype.org/downloads/nexus-#{node[:nexus][:version]}-bundle.tar.gz"
-default[:nexus][:checksum]                                     = '6758f0b095d2df445f72351be7368e3ed4bac2b4f67b0da2d41dc963f06847d5'
+default[:nexus][:checksum]                                     = 'dab522ebd4f8e393b61f4aed32f7bfc67bbac6d67bf3cacaca8ee9db943274f0'
 
 default[:nexus][:port]                                         = '8081'
 default[:nexus][:host]                                         = '0.0.0.0'
@@ -62,7 +62,10 @@ default[:nexus][:nginx][:proxy][:options]                      = {
 
 default[:nexus][:cli][:url]                                    = "https://#{node[:nexus][:nginx_proxy][:server_name]}:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
 default[:nexus][:cli][:repository]                             = "releases"
+default[:nexus][:cli][:default_admin_credentials_updated]      = false
 default[:nexus][:cli][:packages]                               = ["libxml2-devel", "libxslt-devel"]
+default[:nexus][:cli][:retries]                                = 3
+default[:nexus][:cli][:retry_delay]                            = 10
 
 default[:nexus][:smart_proxy][:enable]                         = true
 default[:nexus][:smart_proxy][:host]                           = nil
