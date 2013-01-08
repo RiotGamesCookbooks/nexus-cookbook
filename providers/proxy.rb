@@ -28,7 +28,7 @@ end
 
 action :enable do
   
-  unless smart_proxy_enabled_same_settings?
+  unless Chef::Nexus.nexus_unavailable?(node) || smart_proxy_enabled_same_settings?
     enable_smart_proxy
     new_resource.updated_by_last_action(true)
   end
@@ -36,7 +36,7 @@ end
 
 action :disable do
 
-  if smart_proxy_enabled?
+  if Chef::Nexus.nexus_available?(node) && smart_proxy_enabled?
     disable_smart_proxy
     new_resource.updated_by_last_action(true)
   end
@@ -44,7 +44,7 @@ end
 
 action :add_trusted_key do
 
-  unless certificate_exists?
+  unless Chef::Nexus.nexus_unavailable?(node) || certificate_exists?
     verify_add_trusted_key
     Chef::Nexus.nexus(node).add_trusted_key(new_resource.certificate, new_resource.description, false)
     new_resource.updated_by_last_action(true)
@@ -53,7 +53,7 @@ end
 
 action :delete_trusted_key do
 
-  if trusted_key_exists?
+  if Chef::Nexus.nexus_available?(node) && trusted_key_exists?
     verify_delete_trusted_key
     Chef::Nexus.nexus(node).delete_trusted_key(new_resource.id)
     new_resource.updated_by_last_action(true)

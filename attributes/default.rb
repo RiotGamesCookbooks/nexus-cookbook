@@ -64,6 +64,8 @@ default[:nexus][:cli][:url]                                    = "https://#{node
 default[:nexus][:cli][:repository]                             = "releases"
 default[:nexus][:cli][:default_admin_credentials_updated]      = false
 default[:nexus][:cli][:packages]                               = ["libxml2-devel", "libxslt-devel"]
+default[:nexus][:cli][:retries]                                = 3
+default[:nexus][:cli][:retry_delay]                            = 10
 
 default[:nexus][:smart_proxy][:enable]                         = true
 default[:nexus][:smart_proxy][:host]                           = nil

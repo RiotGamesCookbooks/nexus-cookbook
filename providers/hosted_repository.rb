@@ -29,7 +29,7 @@ def load_current_resource
 end
 
 action :create do
-  unless repository_exists?(@current_resource.name)
+  unless Chef::Nexus.nexus_unavailable?(node) || repository_exists?(@current_resource.name)
     Chef::Nexus.nexus(node).create_repository(new_resource.name, false, nil, nil, nil, nil)
     set_publisher if new_resource.publisher
     new_resource.updated_by_last_action(true)
@@ -37,14 +37,14 @@ action :create do
 end
 
 action :delete do
-  if repository_exists?(@current_resource.name)
+  if Chef::Nexus.nexus_available?(node) && repository_exists?(@current_resource.name)
     Chef::Nexus.nexus(node).delete_repository(@parsed_id)
     new_resource.updated_by_last_action(true)
   end
 end
 
 action :update do
-  if repository_exists?(@current_resource.name)
+  if Chef::Nexus.nexus_available?(node) && repository_exists?(@current_resource.name)
     if new_resource.publisher
       set_publisher
     elsif new_resource.publisher == false
