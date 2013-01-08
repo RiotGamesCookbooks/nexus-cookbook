@@ -20,6 +20,7 @@
 #
 include_recipe "java"
 include_recipe "nginx"
+include_recipe "build-essential"
 
 user_home = "/#{node[:nexus][:user]}"
 
@@ -217,8 +218,6 @@ end
 
 nexus_settings "baseUrl" do
   value "https://#{node[:nexus][:nginx_proxy][:server_name]}:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
-  retries 3
-  retry_delay 8
 end
 
 nexus_settings "forceBaseUrl" do
@@ -233,4 +232,10 @@ nexus_user "admin" do
   action       :change_password
   old_password default_credentials["password"]
   password     updated_credentials["password"]
+end
+
+ruby_block "set flag that default admin credentials were changed" do
+  block do
+    node.set[:nexus][:cli][:default_admin_credentials_updated] = true
+  end
 end

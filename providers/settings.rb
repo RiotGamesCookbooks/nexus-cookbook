@@ -28,7 +28,7 @@ def load_current_resource
 end
 
 action :update do
-  unless path_value_equals?(@current_resource.value)
+  unless Chef::Nexus.nexus_unavailable?(node) || path_value_equals?(@current_resource.value)
     update_nexus_settings_json
     new_resource.updated_by_last_action(true)
   end
