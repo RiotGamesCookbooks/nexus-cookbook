@@ -1,7 +1,4 @@
-chef_api :config
 site :opscode
+chef_api :config
 
 metadata
-
-cookbook "yum", "~> 2.0.6"
-cookbook "build-essential", "~> 1.3.2"

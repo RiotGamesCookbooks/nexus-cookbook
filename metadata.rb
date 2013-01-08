@@ -12,5 +12,6 @@ end
 
 depends "java", "~> 1.5.2"
 depends "nginx", "~> 1.0.0"
-depends "artifact", "~> 0.11.0"
-depends "build-essential"
+depends "artifact", "~> 0.11.5"
+depends "build-essential", "~> 1.3.2"
+depends "yum", "~> 2.0.6"
