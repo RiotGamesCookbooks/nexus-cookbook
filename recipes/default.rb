@@ -20,6 +20,7 @@
 #
 include_recipe "java"
 include_recipe "nginx"
+include_recipe "build-essential"
 
 user_home = "/#{node[:nexus][:user]}"
 
