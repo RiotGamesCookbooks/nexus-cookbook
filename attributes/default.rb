@@ -31,13 +31,7 @@ default[:nexus][:context_path]                                 = '/nexus'
 default[:nexus][:name]                                         = 'nexus'
 default[:nexus][:bundle_name]                                  = "#{node[:nexus][:name]}-#{node[:nexus][:version]}"
 default[:nexus][:home]                                         = "/usr/local/#{node[:nexus][:name]}"
-
-default[:nexus][:current_path]                                 = "#{node[:nexus][:home]}/current/#{node[:nexus][:bundle_name]}"
 default[:nexus][:pid_dir]                                      = "#{node[:nexus][:home]}/shared/pids"
-
-default[:nexus][:conf_dir]                                     = "#{node[:nexus][:current_path]}/conf"
-default[:nexus][:bin_dir]                                      = "#{node[:nexus][:current_path]}/bin"
-
 default[:nexus][:work_dir]                                     = "/nexus/sonatype-work/nexus"
 
 default[:nexus][:plugins]                                      = ['nexus-custom-metadata-plugin']
