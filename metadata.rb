@@ -10,8 +10,7 @@ version          IO.read(File.join(File.dirname(__FILE__), 'VERSION')) rescue "0
   supports os
 end
 
-depends "java", "~> 1.5.2"
-depends "nginx", "~> 1.0.0"
-depends "artifact", "~> 0.11.5"
-depends "build-essential"
-depends "yum"
+depends "java", "~> 1.9.0"
+depends "nginx", "~> 1.2.0"
+depends "artifact", "~> 1.1.2"
+depends "build-essential", "~> 1.3.2"
