@@ -17,10 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-attr_reader :nexus_plugins_path
-
 def load_current_resource
-  @nexus_plugins_path = get_nexus_plugins_path
   @current_resource = Chef::Resource::NexusPlugin.new(new_resource.name)
 end
 
@@ -42,7 +39,7 @@ end
 private
 
   # @return [String] the joined path of the Nexus installation's plugin-repository
-  def get_nexus_plugins_path
+  def nexus_plugins_path
     ::File.join(new_resource.nexus_path, node[:nexus][:bundle_name], "/nexus/WEB-INF/plugin-repository")
   end
 
