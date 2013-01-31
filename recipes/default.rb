@@ -219,6 +219,10 @@ artifact_deploy node[:nexus][:name] do
 end
 
 service "nexus" do
+  action :enable
+end
+
+service "nexus" do
   action   :start
   provider Chef::Provider::Service::Init
   notifies :restart, "service[nginx]", :immediately
