@@ -135,10 +135,6 @@ class Chef
         end
       end
 
-      def nexus_unavailable?(node)
-        !nexus_available?(node)
-      end
-
       def check_old_credentials(username, password, node)
         require 'nexus_cli'
         overrides = {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository], "username" => username, "password" => password}
