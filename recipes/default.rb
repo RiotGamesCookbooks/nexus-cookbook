@@ -204,6 +204,13 @@ artifact_deploy node[:nexus][:name] do
         :loopback => node[:nexus][:jetty][:loopback]
       )
     end
+
+    cookbook_file "#{bin_dir}/jsw/conf/wrapper.conf" do
+      source "wrapper.conf"
+      mode   "0775"
+      action :create
+    end
+
     
     node[:nexus][:plugins].each do |plugin| 
       nexus_plugin plugin do
