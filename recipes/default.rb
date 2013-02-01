@@ -213,7 +213,6 @@ artifact_deploy node[:nexus][:name] do
       )
     end
 
-    
     node[:nexus][:plugins].each do |plugin| 
       nexus_plugin plugin do
         plugin_path ::File.join(release_path, node[:nexus][:bundle_name], "nexus/WEB-INF/optional-plugins")
