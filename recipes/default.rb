@@ -49,9 +49,9 @@ directory user_home do
 end
 
 directory "#{node[:nginx][:dir]}/shared/certificates" do
-  owner "root"
-  group "root"
-  mode "700"
+  owner     "root"
+  group     "root"
+  mode      "700"
   recursive true
 end
 
@@ -69,7 +69,7 @@ if data_bag_item[node[:nexus][:ssl_certificate][:key]]
 
   file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt" do
     content certificate
-    mode "077"
+    mode    "077"
     action :create
   end
 
@@ -161,26 +161,31 @@ artifact_deploy node[:nexus][:name] do
     end
   }
 
-  restart_proc Proc.new {
-    template "#{node[:nexus][:bin_dir]}/#{node[:nexus][:name]}" do
+  configure Proc.new {
+
+    nexus_home = ::File.join(release_path, node[:nexus][:bundle_name])
+    conf_dir   = ::File.join(nexus_home, "conf")
+    bin_dir    = ::File.join(nexus_home, "bin")
+
+    template "#{bin_dir}/#{node[:nexus][:name]}" do
       source "nexus.erb"
-      owner "root"
-      group "root"
-      mode "0775"
+      owner  "root"
+      group  "root"
+      mode   "0775"
       variables(
         :platform   => platform,
         :nexus_port => node[:nexus][:port],
-        :nexus_home => node[:nexus][:current_path],
+        :nexus_home => nexus_home,
         :nexus_user => node[:nexus][:user],
         :nexus_pid  => node[:nexus][:pid_dir]
       )
     end
     
-    template "#{node[:nexus][:conf_dir]}/nexus.properties" do
+    template "#{conf_dir}/nexus.properties" do
       source "nexus.properties.erb"
-      owner node[:nexus][:user]
-      group node[:nexus][:group]
-      mode "0775"
+      owner  node[:nexus][:user]
+      group  node[:nexus][:group]
+      mode   "0775"
       variables(
         :nexus_port         => node[:nexus][:port],
         :nexus_host         => node[:nexus][:host],
@@ -190,7 +195,7 @@ artifact_deploy node[:nexus][:name] do
       )
     end
 
-    template "#{node[:nexus][:conf_dir]}/jetty.xml" do
+    template "#{conf_dir}/jetty.xml" do
       source "jetty.xml.erb"
       owner  node[:nexus][:user]
       group  node[:nexus][:group] 
@@ -201,18 +206,20 @@ artifact_deploy node[:nexus][:name] do
     end
     
     node[:nexus][:plugins].each do |plugin| 
-      nexus_plugin plugin
+      nexus_plugin plugin do
+        plugin_path ::File.join(release_path, node[:nexus][:bundle_name], "nexus/WEB-INF/optional-plugins")
+        nexus_path  release_path
+      end
     end
 
     link "/etc/init.d/nexus" do
-      to "#{node[:nexus][:bin_dir]}/nexus"
+      to "#{bin_dir}/nexus"
     end
   }
 end
 
 service "nexus" do
-  action :start
-  provider Chef::Provider::Service::Init
+  action   [:enable, :start]
   notifies :restart, "service[nginx]", :immediately
 end
 
