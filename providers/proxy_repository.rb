@@ -22,9 +22,9 @@ def load_current_resource
   @current_resource = Chef::Resource::NexusProxyRepository.new(new_resource.name)
 
   run_context.include_recipe "nexus::cli"
-  Chef::Application.fatal!("Could not connect to Nexus. Please ensure Nexus is running.") unless Chef::Nexus.nexus_available?(node)
+  Chef::Nexus.ensure_nexus_available(node)
 
-  @parsed_id = new_resource.name.gsub(" ", "_").downcase
+  @parsed_id = Chef::Nexus.parse_identifier(new_resource.name)
 
   @current_resource
 end

@@ -22,10 +22,10 @@ def load_current_resource
   @current_resource = Chef::Resource::NexusGroupRepository.new(new_resource.name)
 
   run_context.include_recipe "nexus::cli"
-  Chef::Application.fatal!("Could not connect to Nexus. Please ensure Nexus is running.") unless Chef::Nexus.nexus_available?(node)
+  Chef::Nexus.ensure_nexus_available(node)
 
-  @parsed_id         = new_resource.name.gsub(" ", "_").downcase
-  @parsed_repository = new_resource.repository.gsub(" ", "_").downcase unless new_resource.repository.nil?
+  @parsed_id         = Chef::Nexus.parse_identifier(new_resource.name)
+  @parsed_repository = Chef::Nexus.parse_identifier(new_resource.repository) unless new_resource.repository.nil?
 
   @current_resource.repository @parsed_repository
 

@@ -23,7 +23,7 @@ def load_current_resource
   @current_resource.old_password new_resource.old_password
   
   run_context.include_recipe "nexus::cli"
-  Chef::Application.fatal!("Could not connect to Nexus. Please ensure Nexus is running.") unless Chef::Nexus.nexus_available?(node)
+  Chef::Nexus.ensure_nexus_available(node)
 
   @current_resource
 end

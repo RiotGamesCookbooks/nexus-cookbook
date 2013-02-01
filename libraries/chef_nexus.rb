@@ -189,6 +189,17 @@ class Chef
         end
       end
 
+      # Checks to ensure the Nexus server is available. When
+      # it is unavailable, the Chef run is failed. Otherwise
+      # the Chef run continues.
+      # 
+      # @param  node [Chef::Node] the Chef node
+      # 
+      # @return [NilClass]
+      def ensure_nexus_available(node)
+        Chef::Application.fatal!("Could not connect to Nexus. Please ensure Nexus is running.") unless Chef::Nexus.nexus_available?(node)
+      end
+
       # Attempts to connect to the Nexus and retries if a connection 
       # cannot be made.
       # 
@@ -228,6 +239,20 @@ class Chef
         rescue NexusCli::PermissionsException, NexusCli::CouldNotConnectToNexusException, NexusCli::UnexpectedStatusCodeException => e
           false
         end
+      end
+
+      # Returns a 'safe-for-Nexus' identifier by replacing
+      # spaces with underscores and downcasing the entire
+      # String.
+      # 
+      # @param  nexus_identifier [String] a Nexus identifier
+      # 
+      # @example
+      #   Chef::Nexus.parse_identifier("Artifacts Repository") => "artifacts_repository"
+      # 
+      # @return [String] a safe-for-Nexus version of the identifier
+      def parse_identifier(nexus_identifier)
+        nexus_identifier.gsub(" ", "_").downcase
       end
 
       def decode(value)
