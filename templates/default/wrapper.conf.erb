@@ -51,11 +51,11 @@ wrapper.restart.reload_configuration=TRUE
 wrapper.on_exit.12=RESTART
 
 # Set up JSW logging
-# wrapper.logfile=logs/wrapper.log
-# wrapper.logfile.format=PM
-# wrapper.logfile.loglevel=INFO
-# wrapper.logfile.maxsize=10m
-# wrapper.logfile.maxfiles=10
+wrapper.logfile=<%= ::File.join(@shared_path, "wrapper.log") %>
+wrapper.logfile.format=PM
+wrapper.logfile.loglevel=INFO
+wrapper.logfile.maxsize=10m
+wrapper.logfile.maxfiles=10
 
 # Set up system logging (if needed, change to INFO or other valid values)
 wrapper.syslog.loglevel=NONE

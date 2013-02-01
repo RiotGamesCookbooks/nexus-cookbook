@@ -205,10 +205,12 @@ artifact_deploy node[:nexus][:name] do
       )
     end
 
-    cookbook_file "#{bin_dir}/jsw/conf/wrapper.conf" do
-      source "wrapper.conf"
+    template "#{bin_dir}/jsw/conf/wrapper.conf" do
+      source "wrapper.conf.erb"
       mode   "0775"
-      action :create
+      variables(
+        :shared_path => ::File.join(shared_path, "log")
+      )
     end
 
     
