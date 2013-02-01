@@ -22,14 +22,15 @@ def load_current_resource
   @current_resource = Chef::Resource::NexusProxyRepository.new(new_resource.name)
 
   run_context.include_recipe "nexus::cli"
+  Chef::Application.fatal!("Could not connect to Nexus. Please ensure Nexus is running.") unless Chef::Nexus.nexus_available?(node)
 
-  @parsed_id                      = new_resource.name.gsub(" ", "_").downcase
+  @parsed_id = new_resource.name.gsub(" ", "_").downcase
 
   @current_resource
 end
 
 action :create do
-  unless Chef::Nexus.nexus_unavailable?(node) || repository_exists?(@current_resource.name)
+  unless repository_exists?(@current_resource.name)
     Chef::Nexus.nexus(node).create_repository(new_resource.name, true, new_resource.url, nil, nil, nil)
     set_publisher if new_resource.publisher
     set_subscriber if new_resource.subscriber
@@ -38,14 +39,14 @@ action :create do
 end
 
 action :delete do
-  if Chef::Nexus.nexus_available?(node) && repository_exists?(@current_resource.name)
+  if repository_exists?(@current_resource.name)
     Chef::Nexus.nexus(node).delete_repository(@parsed_id)
     new_resource.updated_by_last_action(true)
   end
 end
 
 action :update do
-  if Chef::Nexus.nexus_available?(node) && repository_exists?(@current_resource.name)
+  if repository_exists?(@current_resource.name)
     if new_resource.publisher
       set_publisher
     elsif new_resource.publisher == false

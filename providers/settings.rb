@@ -23,12 +23,13 @@ def load_current_resource
   @current_resource.value new_resource.value
 
   run_context.include_recipe "nexus::cli"
-
+  Chef::Application.fatal!("Could not connect to Nexus. Please ensure Nexus is running.") unless Chef::Nexus.nexus_available?(node)
+  
   @current_resource
 end
 
 action :update do
-  unless Chef::Nexus.nexus_unavailable?(node) || path_value_equals?(@current_resource.value)
+  unless path_value_equals?(@current_resource.value)
     update_nexus_settings_json
     new_resource.updated_by_last_action(true)
   end

@@ -23,33 +23,34 @@ def load_current_resource
   @current_resource.old_password new_resource.old_password
   
   run_context.include_recipe "nexus::cli"
+  Chef::Application.fatal!("Could not connect to Nexus. Please ensure Nexus is running.") unless Chef::Nexus.nexus_available?(node)
 
   @current_resource
 end
 
 action :create do
-  unless Chef::Nexus.nexus_unavailable?(node) || user_exists?(@current_resource.username)
+  unless user_exists?(@current_resource.username)
     create_user
     new_resource.updated_by_last_action(true)
   end
 end
 
 action :update do
-  if Chef::Nexus.nexus_available?(node) && user_exists?(@current_resource.username)
+  if user_exists?(@current_resource.username)
     update_user
     new_resource.updated_by_last_action(true)
   end
 end
 
 action :delete do
-  if Chef::Nexus.nexus_available?(node) && user_exists?(@current_resource.username)
+  if user_exists?(@current_resource.username)
     delete_user
     new_resource.updated_by_last_action(true)
   end
 end
 
 action :change_password do
-  if Chef::Nexus.nexus_available?(node) && old_credentials_equals?(@current_resource.username, @current_resource.old_password)
+  if old_credentials_equals?(@current_resource.username, @current_resource.old_password)
     change_password
     new_resource.updated_by_last_action(true)
   end
