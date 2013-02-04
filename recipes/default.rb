@@ -152,12 +152,24 @@ artifact_deploy node[:nexus][:name] do
   deploy_to         node[:nexus][:home]
   owner             node[:nexus][:user]
   group             node[:nexus][:group]
+  symlinks({
+    "log" => "#{node[:nexus][:bundle_name]}/logs"
+  })
 
   before_extract Proc.new {
     service "nexus" do
       action :stop
       provider Chef::Provider::Service::Init
       only_if do File.exist?("/etc/init.d/nexus") end
+    end
+  }
+
+  before_symlink Proc.new {
+    nexus_home = ::File.join(release_path, node[:nexus][:bundle_name])
+
+    directory "#{nexus_home}/logs" do
+      recursive true
+      action :delete
     end
   }
 
@@ -202,14 +214,6 @@ artifact_deploy node[:nexus][:name] do
       mode   "0775"  
       variables(
         :loopback => node[:nexus][:jetty][:loopback]
-      )
-    end
-
-    template "#{bin_dir}/jsw/conf/wrapper.conf" do
-      source "wrapper.conf.erb"
-      mode   "0775"
-      variables(
-        :shared_path => ::File.join(shared_path, "log")
       )
     end
 
