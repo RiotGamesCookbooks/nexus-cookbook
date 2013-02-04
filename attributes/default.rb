@@ -38,6 +38,7 @@ default[:nexus][:plugins]                                      = []
 
 default[:nexus][:jetty][:loopback]                             = true
 
+default[:nexus][:ssl][:jetty]                                  = false
 default[:nexus][:ssl][:verify]                                 = true
 default[:nexus][:ssl_certificate][:key]                        = node[:fqdn]
 
