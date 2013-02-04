@@ -152,12 +152,24 @@ artifact_deploy node[:nexus][:name] do
   deploy_to         node[:nexus][:home]
   owner             node[:nexus][:user]
   group             node[:nexus][:group]
+  symlinks({
+    "log" => "#{node[:nexus][:bundle_name]}/logs"
+  })
 
   before_extract Proc.new {
     service "nexus" do
       action :stop
       provider Chef::Provider::Service::Init
       only_if do File.exist?("/etc/init.d/nexus") end
+    end
+  }
+
+  before_symlink Proc.new {
+    nexus_home = ::File.join(release_path, node[:nexus][:bundle_name])
+
+    directory "#{nexus_home}/logs" do
+      recursive true
+      action :delete
     end
   }
 
@@ -204,7 +216,7 @@ artifact_deploy node[:nexus][:name] do
         :loopback => node[:nexus][:jetty][:loopback]
       )
     end
-    
+
     node[:nexus][:plugins].each do |plugin| 
       nexus_plugin plugin do
         plugin_path ::File.join(release_path, node[:nexus][:bundle_name], "nexus/WEB-INF/optional-plugins")
