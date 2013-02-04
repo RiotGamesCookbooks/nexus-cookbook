@@ -20,17 +20,6 @@
 include_recipe "java"
 include_recipe "build-essential"
 
-if node[:nexus][:ssl][:jetty]
-  include_recipe "nexus::nginx"
-else
-  jetty_ssl = {
-    :keystore_path  => 
-    :password       =>
-    :key_password   =>
-    :trust_password =>
-  }
-end
-
 user_home = "/#{node[:nexus][:user]}"
 
 platform = ""
@@ -72,6 +61,29 @@ mount "#{node[:nexus][:mount][:nfs][:mount_point]}" do
   fstype  "nfs"
   options "rw"
   only_if {node[:nexus][:mount][:nfs][:enable]}
+end
+
+jetty_ssl = nil
+
+if node[:nexus][:ssl][:nginx]
+  include_recipe "nexus::nginx"
+elsif node[:nexus][:ssl][:jetty]
+  credentials = Chef::Nexus.get_credentials_data_bag
+
+  jetty_ssl = {
+    :keystore_path  => node[:nexus][:ssl][:jetty_keystore_path],
+    :password       => credentials["keystore"]["password"],
+    :key_password   => credentials["keystore"]["key_password"],
+    :trust_password => credentials["keystore"]["trust_password"]
+  }
+
+  directory "#{node[:nexus][:ssl][:jetty_keystore_path]}" do
+    owner     node[:nexus][:user]
+    group     node[:nexus][:group]
+    mode      "0755"
+    action    :create
+    recursive true
+  end
 end
 
 artifact_deploy node[:nexus][:name] do
@@ -162,15 +174,12 @@ end
 
 service "nexus" do
   action   [:enable, :start]
-  notifies :restart, "service[nginx]", :immediately
 end
 
-nexus_settings "baseUrl" do
-  value "https://#{node[:nexus][:nginx_proxy][:server_name]}:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
-end
-
-nexus_settings "forceBaseUrl" do
-  value true
+if node[:nexus][:ssl][:nginx]
+  service "nginx" do
+    action :restart
+  end
 end
 
 data_bag_item = Chef::Nexus.get_credentials(node)
@@ -178,9 +187,9 @@ default_credentials = data_bag_item["default_admin"]
 updated_credentials = data_bag_item["updated_admin"]
 
 nexus_user "admin" do
-  action       :change_password
   old_password default_credentials["password"]
   password     updated_credentials["password"]
+  action       :change_password
 end
 
 ruby_block "set flag that default admin credentials were changed" do
