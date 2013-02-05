@@ -29,7 +29,7 @@ nexus_proxy "enable smart proxy" do
   only_if { node[:nexus][:smart_proxy][:enable] }
 end
 
-data_bag_item = Chef::Nexus.get_certificates_data_bag(node)
+data_bag_item = Chef::Nexus.get_trusted_certificates_data_bag(node)
 data_bag_item.to_hash.each do |key, value|
 
   unless key == "id"

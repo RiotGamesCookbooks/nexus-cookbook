@@ -20,12 +20,12 @@
 #
 class Chef
   module Nexus
-    DATABAG = "nexus"
-    WILDCARD_DATABAG_ITEM = "_wildcard"
-    CERTIFICATES_DATABAG_ITEM = "certificates"
-    SSL_CERTIFICATE_DATABAG_ITEM = "ssl_certificate"
-    SSL_CERTIFICATE_CRT = "crt"
-    SSL_CERTIFICATE_KEY = "key"
+    DEFAULT_DATABAG              = "nexus"
+    TRUSTED_CERTIFICATES_DATABAG = "nexus_trusted_certificates"
+    SSL_CERTIFICATES_DATABAG     = "nexus_ssl_certificates"
+    WILDCARD_DATABAG_ITEM        = "_wildcard"
+    SSL_CERTIFICATE_CRT          = "crt"
+    SSL_CERTIFICATE_KEY          = "key"
     
     class << self
 
@@ -33,9 +33,29 @@ class Chef
       # named after the current Chef environment. If one is not found, an item named
       # "_wildcard" will be used.
       # 
+      # @param node [Chef::Node] the Chef node
+      # 
       # @return [Chef::Mash] the data bag item as a Mash with indifferent access
       def get_nexus_data_bag(node)
-        encrypted_data_bag_for(node, DATABAG)
+        encrypted_data_bag_for(node, DEFAULT_DATABAG)
+      end
+
+      # Loads the credentials entry from the nexus data bag item
+      # 
+      # @param  node [Chef::Node] the Chef node
+      # 
+      # @return [Chef::Mash] the credentials entry in the data bag item
+      def get_credentials(node)
+        get_nexus_data_bag(node)[:credentials]
+      end
+
+      # Loads the license entry from the nexus data bag item
+      # 
+      # @param  node [Chef::Node] the Chef node
+      # 
+      # @return [Chef::Mash] the license entry in the data bag item
+      def get_license(node)
+        get_nexus_data_bag(node)[:license]
       end
 
       # Loads the proxy_repositories entry from the nexus data bag item.
@@ -65,21 +85,32 @@ class Chef
         get_nexus_data_bag(node)[:group_repositories]
       end
 
-      # Loads the ssl_certificate encrypted data bag item.
+      # Loads the nexus_ssl_certificates encrypted data bag item for this node.
       # 
       # @example
-      #   knife data bag load nexus proxy_repositories --secret-file
+      #   knife data bag load nexus_ssl_certificates _wildcard --secret-file
       # 
       # @param  node [Chef::Node] the Chef node
       # 
-      # @return [Chef::EncryptedDataBagItem] the loaded data bag item
-      def get_ssl_certificate_data_bag
-        begin
-          data_bag_item = Chef::EncryptedDataBagItem.load(DATABAG, SSL_CERTIFICATE_DATABAG_ITEM)
-        rescue Net::HTTPServerException => e
-          raise Nexus::EncryptedDataBagNotFound.new(CREDENTIALS_DATABAG_ITEM)
+      # @return [Chef::Mash] the loaded data bag item
+      def get_ssl_certificate_data_bag(node)
+        if Chef::Config[:solo]
+          Chef::Log.info "Chef Solo does not play nicely with Encrypted Data Bags."
+          Chef::Log.info "Returning default values in a Hash."
+          nil
+        else
+          encrypted_data_bag_for(node, SSL_CERTIFICATES_DATABAG)
         end
-        data_bag_item
+      end
+
+      # Loads the nexus_trusted_certificates data bag item for this node.
+      # 
+      # @example
+      #   knife data bag load nexus_trusted_certificates _wildcard --secret-file
+      # 
+      # @return [Chef::Mash] the loaded data bag item
+      def get_trusted_certificates_data_bag(node)
+        encrypted_data_bag_for(node, TRUSTED_CERTIFICATES_DATABAG)
       end
 
       # Loads and decode64s the SSL_CERTIFICATE_CRT entry from the given
@@ -104,22 +135,6 @@ class Chef
         Base64.decode64(data_bag_item[SSL_CERTIFICATE_KEY])
       end
 
-      # Loads the certificates data bag item.
-      # 
-      # @example
-      #   knife data bag load nexus certificates --secret-file
-      # 
-      # @return [Chef::EncryptedDataBagItem] the loaded data bag item
-      def get_certificates_data_bag(node)
-        begin
-          data_bag_item = Chef::EncryptedDataBagItem.load(DATABAG, CERTIFICATES_DATABAG_ITEM)
-        rescue Net::HTTPServerException => e
-          raise Nexus::EncryptedDataBagNotFound.new(CERTIFICATES_DATABAG_ITEM)
-        end
-        validate_certificates_data_bag(data_bag_item, node)
-        data_bag_item
-      end
-
       # Creates and returns an instance of a NexusCli::RemoteFactory that
       # will be authenticated with the info inside the credentials data bag
       # item.
@@ -129,9 +144,9 @@ class Chef
       # @return [NexusCli::RemoteFactory] a connection to a Nexus server
       def nexus(node)
         require 'nexus_cli'
-        data_bag_item = get_credentials_data_bag        
-        default_credentials = data_bag_item["default_admin"]
-        updated_credentials = data_bag_item["updated_admin"]
+        credentials_entry = get_credentials(node)        
+        default_credentials = credentials_entry[:default_admin]
+        updated_credentials = credentials_entry[:updated_admin]
 
         overrides = {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository]}
         if Chef::Config[:solo]
@@ -144,9 +159,9 @@ class Chef
           end
         else
           if node[:nexus][:cli][:default_admin_credentials_updated]
-            credentials = data_bag_item["updated_admin"]
+            credentials = credentials_entry[:updated_admin]
           else
-            credentials = data_bag_item["default_admin"]
+            credentials = credentials_entry[:default_admin]
           end
           merged_credentials = overrides.merge(credentials)
           NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:ssl][:verify])
@@ -246,6 +261,7 @@ class Chef
         end
 
         def encrypted_data_bag_item(data_bag, data_bag_item)
+          Chef::Log.info "LOADING: #{data_bag} and #{data_bag_item}"
           Mash.from_hash(Chef::EncryptedDataBagItem.load(data_bag, data_bag_item).to_hash)
         rescue Net::HTTPServerException => e
           nil
