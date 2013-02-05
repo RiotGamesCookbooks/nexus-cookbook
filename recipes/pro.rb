@@ -3,7 +3,7 @@
 # Recipe:: pro
 #
 # Author:: Kyle Allan (<kallan@riotgames.com>)
-# Copyright 2012, Riot Games
+# Copyright 2013, Riot Games
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,11 +35,11 @@ data_bag_item.to_hash.each do |key, value|
   unless key == "id"
     log "Trusting #{key}"
 
-    certificate = Chef::Nexus.decode(value["certificate"])
+    certificate = Chef::Nexus.decode(value[:certificate])
 
-    nexus_proxy "install a trusted key with description #{value["description"]}" do
+    nexus_proxy "install a trusted key with description #{value[:description]}" do
       action      :add_trusted_key
-      description value["description"]
+      description value[:description]
       certificate certificate
     end
   end

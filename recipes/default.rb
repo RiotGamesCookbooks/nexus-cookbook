@@ -3,7 +3,7 @@
 # Recipe:: default
 #
 # Author:: Kyle Allan (<kallan@riotgames.com>)
-# Copyright 2012, Riot Games
+# Copyright 2013, Riot Games
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -244,13 +244,13 @@ nexus_settings "forceBaseUrl" do
 end
 
 data_bag_item = Chef::Nexus.get_credentials(node)
-default_credentials = data_bag_item["default_admin"]
-updated_credentials = data_bag_item["updated_admin"]
+default_credentials = data_bag_item[:default_admin]
+updated_credentials = data_bag_item[:updated_admin]
 
 nexus_user "admin" do
   action       :change_password
-  old_password default_credentials["password"]
-  password     updated_credentials["password"]
+  old_password default_credentials[:password]
+  password     updated_credentials[:password]
 end
 
 ruby_block "set flag that default admin credentials were changed" do

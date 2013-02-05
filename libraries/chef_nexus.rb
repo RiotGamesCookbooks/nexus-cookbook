@@ -3,7 +3,7 @@
 # Library:: chef_nexus
 #
 # Author:: Kyle Allan (<kallan@riotgames.com>)
-# Copyright 2012, Riot Games
+# Copyright 2013, Riot Games
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,7 +46,22 @@ class Chef
       # 
       # @return [Chef::Mash] the credentials entry in the data bag item
       def get_credentials(node)
-        get_nexus_data_bag(node)[:credentials]
+        if Chef::Config[:solo]
+          Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
+          Chef::Log.info "Returning default values in a Hash."
+          {
+            :default_admin => {
+              :username => "admin",
+              :password => "admin123"
+            },
+            :updated_admin => {
+              :username => "admin",
+              :password => "password1"
+            }
+          }
+        else
+          get_nexus_data_bag(node)[:credentials]
+        end
       end
 
       # Loads the license entry from the nexus data bag item
@@ -55,7 +70,13 @@ class Chef
       # 
       # @return [Chef::Mash] the license entry in the data bag item
       def get_license(node)
-        get_nexus_data_bag(node)[:license]
+        if Chef::Config[:solo]
+          Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
+          Chef::Log.info "Returning default values in a Hash."
+          nil
+        else
+          get_nexus_data_bag(node)[:license]
+        end
       end
 
       # Loads the proxy_repositories entry from the nexus data bag item.
@@ -64,7 +85,13 @@ class Chef
       # 
       # @return [Chef::Mash] the proxy_repositories entry in the data bag item
       def get_proxy_repositories(node)
-        get_nexus_data_bag(node)[:proxy_repositories]
+        if Chef::Config[:solo]
+          Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
+          Chef::Log.info "Returning default values in a Hash."
+          {}
+        else
+          get_nexus_data_bag(node)[:proxy_repositories]
+        end
       end
 
       # Loads the hosted_repositories entry from the nexus data bag item.
@@ -73,7 +100,19 @@ class Chef
       # 
       # @return [Chef::Mash] the hosted_repositories entry in the data bag item
       def get_hosted_repositories(node)
-        get_nexus_data_bag(node)[:hosted_repositories]
+        if Chef::Config[:solo]
+          Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
+          Chef::Log.info "Returning default values in a Hash."
+          {
+            :repositories => [
+              {
+                :name => "Artifacts"
+              }
+            ]
+          }
+        else
+          get_nexus_data_bag(node)[:hosted_repositories]
+        end
       end
 
       # Loads the group_repositories entry from the nexus data bag item.
@@ -82,7 +121,23 @@ class Chef
       # 
       # @return [Chef::Mash] the group_repositories entry in the data bag item
       def get_group_repositories(node)
-        get_nexus_data_bag(node)[:group_repositories]
+        if Chef::Config[:solo]
+          Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
+          Chef::Log.info "Returning default values in a Hash."
+          {
+            :repositories => [
+              {
+                :name => "Group",
+                :add  => [
+                  "Releases",
+                  "Artifacts"
+                ]
+              }
+            ]
+          }
+        else
+          get_nexus_data_bag(node)[:group_repositories]
+        end
       end
 
       # Loads the nexus_ssl_certificates encrypted data bag item for this node.
@@ -95,7 +150,7 @@ class Chef
       # @return [Chef::Mash] the loaded data bag item
       def get_ssl_certificate_data_bag(node)
         if Chef::Config[:solo]
-          Chef::Log.info "Chef Solo does not play nicely with Encrypted Data Bags."
+          Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
           Chef::Log.info "Returning default values in a Hash."
           nil
         else
@@ -120,8 +175,7 @@ class Chef
       # 
       # @return [String] the decoded certificate string
       def get_ssl_certificate_crt(data_bag_item)
-        require 'base64'
-        Base64.decode64(data_bag_item[SSL_CERTIFICATE_CRT])
+        decode(data_bag_item[SSL_CERTIFICATE_CRT])
       end
 
       # Loads and decode64s the SSL_CERTIFICATE_KEY entry from the given
@@ -131,8 +185,7 @@ class Chef
       # 
       # @return [String] the decoded certificate key string
       def get_ssl_certificate_key(data_bag_item)
-        require 'base64'
-        Base64.decode64(data_bag_item[SSL_CERTIFICATE_KEY])
+        decode(data_bag_item[SSL_CERTIFICATE_KEY])
       end
 
       # Creates and returns an instance of a NexusCli::RemoteFactory that
@@ -261,7 +314,6 @@ class Chef
         end
 
         def encrypted_data_bag_item(data_bag, data_bag_item)
-          Chef::Log.info "LOADING: #{data_bag} and #{data_bag_item}"
           Mash.from_hash(Chef::EncryptedDataBagItem.load(data_bag, data_bag_item).to_hash)
         rescue Net::HTTPServerException => e
           nil

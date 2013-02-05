@@ -2,7 +2,7 @@
 # Cookbook Name:: nexus
 # Recipe:: hosted
 #
-# Copyright 2012, Riot Games
+# Copyright 2013, Riot Games
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
