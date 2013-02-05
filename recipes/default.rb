@@ -55,6 +55,7 @@ directory "#{node[:nginx][:dir]}/shared/certificates" do
   recursive true
 end
 
+# TODO: Come back to this and fix it for Chef-client runs
 data_bag_item = Chef::Nexus.get_ssl_certificate_data_bag(node)
 
 if data_bag_item
