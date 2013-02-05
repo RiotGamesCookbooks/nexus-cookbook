@@ -148,7 +148,7 @@ class Chef
       # @param  node [Chef::Node] the Chef node
       # 
       # @return [Chef::Mash] the loaded data bag item
-      def get_ssl_certificate_data_bag(node)
+      def get_ssl_certificates_data_bag(node)
         if Chef::Config[:solo]
           Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
           Chef::Log.info "Returning default values in a Hash."

@@ -26,9 +26,9 @@ directory "#{node[:nginx][:dir]}/shared/certificates" do
   recursive true
 end
 
-data_bag_item = Chef::Nexus.get_ssl_certificate_data_bag
+data_bag_item = Chef::Nexus.get_ssl_certificates_data_bag
 
-if data_bag_item[node[:nexus][:ssl_certificate][:key]]
+if data_bag_item
 
   log "Using ssl_certificate data bag entry for #{node[:nexus][:ssl_certificate][:key]}" do
     level :info
