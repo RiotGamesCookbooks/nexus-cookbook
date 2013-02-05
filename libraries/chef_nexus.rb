@@ -301,7 +301,7 @@ class Chef
             return environment_data_bag_item
           end
 
-          default_data_bag_item = encrypted_data_bag_item(data_bag, "_wildcard")
+          default_data_bag_item = encrypted_data_bag_item(data_bag, WILDCARD_DATABAG_ITEM)
           if default_data_bag_item
             msg = "Encrypted data bag '#{data_bag}' not found for environment '#{node.chef_environment}'! "
             msg << "Using default data bag item '_wildcard'."

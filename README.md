@@ -84,10 +84,14 @@ Below is how you should create your data bags for using this cookbook:
       }
     }
 
-TODO: Revisit this as it fleshes out
-
 The `nexus_ssl_certificates` data bag replaces the old `ssl_certificate` data bag item. The cookbook is also set up to look for
-Chef environment named items inside this data bag. Your data bag items should look like the following:
+Chef environment named items inside this data bag.
+
+Once the data bag item is loaded for the environment, the attribute [:nexus][:ssl_certificate][:key] is used to find an entry. The
+default value for the cookbook is the node's fqdn. Using this format, you can have a Chef environment with multiple Nexus servers that
+may need to use different SSL certificates.
+
+Your data bag items should look like the following:
 
     knife data bag create nexus_ssl_certificates _wildcard -c your/chef/config --secret-file your/encrypted_data_bag_key
 
@@ -99,11 +103,18 @@ Chef environment named items inside this data bag. Your data bag items should lo
       }
     }
 
-TODO: Revisit this as it fleshes out
-
-The `nexus_trusted_certificates` data bag replaces the old `certificates` data bag item.
+The `nexus_trusted_certificates` data bag replaces the old `certificates` data bag item. Each Chef environment maintains a data
+bag item for this data bag, and each entry inside the item should be keyed to a node's fully qualified domain name.
 
     knife data bag create nexus_trusted_certificates _wildcard -c your/chef/config --secret-file your/encrypted_data_bag_key
+
+    {
+      "id": "_wildcard",
+      "fully-qualified-domain-name": {
+        "description": "Trusted key for full-qualified-domain-name",
+        "certificate": "base64d Certificate from the Nexus Smart Proxy panel"
+      }
+    }
 
 
 Resources/Providers
@@ -321,26 +332,9 @@ change the password for that account to the password configured in the `updated_
 Smart Proxy Usage
 =================
 
-When Smart Proxy is enabled (`nexus::pro` recipe), repositories need to be set to become publishers or subscribers. In
-addition, we need to store the certificates of other Nexus servers on the server that Smart Proxy is being enabled on.
-
-  knife data bag create nexus certificates -c <your chef config> --secret-file=<your secret file>
-
-Your data bag will store a certificate and description based on the IP address of other Nexus servers and should look like the following:
-
-  {
-    "id": "certificates",
-    "192.168.0.1": {
-      "certificate": "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----\n",
-      "description": "192.168.0.1 Trusted Key"
-    },
-      "192.168.0.2": {
-        "certificate": "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----\n",
-        "description": "192.168.0.2 Trusted Key"
-      }
-  }
-
-Override the `nexus::repository` attributes to set these appropriately for your Nexus.
+If you are using Nexus Pro and when Smart Proxy is enabled, repositories need to be set to become publishers or subscribers. In
+addition, we need to store the certificates of other Nexus servers on the server that Smart Proxy is being enabled on. See the top
+section on Data Bags for how to configure the `nexus_trusted_certificates` data bag.
 
 Usage
 =====
