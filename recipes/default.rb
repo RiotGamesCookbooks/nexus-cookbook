@@ -244,13 +244,13 @@ nexus_settings "forceBaseUrl" do
 end
 
 data_bag_item = Chef::Nexus.get_credentials(node)
-default_credentials = data_bag_item[:default_admin]
-updated_credentials = data_bag_item[:updated_admin]
+default_credentials = data_bag_item["default_admin"]
+updated_credentials = data_bag_item["updated_admin"]
 
 nexus_user "admin" do
   action       :change_password
-  old_password default_credentials[:password]
-  password     updated_credentials[:password]
+  old_password default_credentials["password"]
+  password     updated_credentials["password"]
 end
 
 ruby_block "set flag that default admin credentials were changed" do

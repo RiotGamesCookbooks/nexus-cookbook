@@ -50,13 +50,13 @@ class Chef
           Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
           Chef::Log.info "Returning default values in a Hash."
           {
-            :default_admin => {
-              :username => "admin",
-              :password => "admin123"
+            "default_admin" => {
+              "username" => "admin",
+              "password" => "admin123"
             },
-            :updated_admin => {
-              :username => "admin",
-              :password => "password1"
+            "updated_admin" => {
+              "username" => "admin",
+              "password" => "password1"
             }
           }
         else
@@ -198,8 +198,8 @@ class Chef
       def nexus(node)
         require 'nexus_cli'
         credentials_entry = get_credentials(node)        
-        default_credentials = credentials_entry[:default_admin]
-        updated_credentials = credentials_entry[:updated_admin]
+        default_credentials = credentials_entry["default_admin"]
+        updated_credentials = credentials_entry["updated_admin"]
 
         overrides = {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository]}
         if Chef::Config[:solo]
@@ -212,9 +212,9 @@ class Chef
           end
         else
           if node[:nexus][:cli][:default_admin_credentials_updated]
-            credentials = credentials_entry[:updated_admin]
+            credentials = credentials_entry["updated_admin"]
           else
-            credentials = credentials_entry[:default_admin]
+            credentials = credentials_entry["default_admin"]
           end
           merged_credentials = overrides.merge(credentials)
           NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:ssl][:verify])

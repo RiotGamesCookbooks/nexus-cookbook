@@ -34,7 +34,7 @@ default[:nexus][:home]                                         = "/usr/local/#{n
 default[:nexus][:pid_dir]                                      = "#{node[:nexus][:home]}/shared/pids"
 default[:nexus][:work_dir]                                     = "/nexus/sonatype-work/nexus"
 
-default[:nexus][:plugins]                                      = ['nexus-custom-metadata-plugin']
+default[:nexus][:plugins]                                      = []
 
 default[:nexus][:jetty][:loopback]                             = true
 
