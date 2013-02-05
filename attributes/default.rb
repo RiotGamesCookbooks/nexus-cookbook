@@ -3,7 +3,7 @@
 # Attributes:: default
 #
 # Author:: Kyle Allan (<kallan@riotgames.com>)
-# Copyright 2012, Riot Games
+# Copyright 2013, Riot Games
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ default[:nexus][:home]                                         = "/usr/local/#{n
 default[:nexus][:pid_dir]                                      = "#{node[:nexus][:home]}/shared/pids"
 default[:nexus][:work_dir]                                     = "/nexus/sonatype-work/nexus"
 
-default[:nexus][:plugins]                                      = ['nexus-custom-metadata-plugin']
+default[:nexus][:plugins]                                      = []
 
 default[:nexus][:jetty][:loopback]                             = true
 

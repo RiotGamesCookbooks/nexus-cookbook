@@ -1,3 +1,5 @@
+require 'berkshelf/vagrant'
+
 Vagrant::Config.run do |config|
   # All Vagrant configuration is done here. The most common configuration
   # options are documented and commented below. For a complete reference,
@@ -38,15 +40,20 @@ Vagrant::Config.run do |config|
   config.ssh.timeout   = 120
 
   config.vm.provision :chef_solo do |chef|
-    chef.cookbooks_path = ["cookbooks"]
-    chef.data_bags_path = "data_bags"
-    chef.encrypted_data_bag_secret_key_path = "/Users/kallan/chef-repo2/encrypted_data_bag_key"
     
     chef.json = {
       :mysql => {
         :server_root_password => 'rootpass',
         :server_debian_password => 'debpass',
         :server_repl_password => 'replpass'
+      },
+      :nexus => {
+        :jetty => {
+          :loopback => false
+        },
+        :ssl => {
+          :verify => false
+        }
       }
     }
 
@@ -54,14 +61,4 @@ Vagrant::Config.run do |config|
       "recipe[nexus::default]"
     ]
   end
-
-  # config.vm.provision :chef_client do |chef|
-  #   chef.chef_server_url = 'https://api.opscode.com/organizations/vialstudios'
-  #   chef.validation_client_name = 'vialstudios-validator'
-  #   chef.validation_key_path = '/Users/reset/.chef/vialstudios-validator.pem'
-  #
-  #   chef.run_list = [
-  #     "recipe[nexus::default]"
-  #   ]
-  # end
 end
