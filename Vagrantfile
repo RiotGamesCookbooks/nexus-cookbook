@@ -53,7 +53,7 @@ Vagrant::Config.run do |config|
         },
         :ssl => {
           :verify => false
-        },
+        }
       }
     }
 
