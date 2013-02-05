@@ -39,13 +39,13 @@ default[:nexus][:plugins]                                      = []
 default[:nexus][:jetty][:loopback]                             = true
 
 default[:nexus][:ssl][:jetty]                                  = false
-default[:nexus][:ssl][:nginx]                                  = true
+default[:nexus][:ssl][:nginx]                                  = false
 default[:nexus][:ssl][:jetty_keystore_path]                    = "#{node[:nexus][:home]}/shared/certs"
-
 default[:nexus][:ssl][:verify]                                 = true
+default[:nexus][:ssl][:port]                                   = 8443
+
 default[:nexus][:ssl_certificate][:key]                        = node[:fqdn]
 
-default[:nexus][:nginx_proxy][:listen_port]                    = 8443
 default[:nexus][:nginx_proxy][:server_name]                    = node[:fqdn]
 
 default[:nexus][:nginx][:server][:options]                     = {
@@ -58,7 +58,6 @@ default[:nexus][:nginx][:proxy][:options]                      = {
   
 }
 
-default[:nexus][:cli][:url]                                    = "https://#{node[:nexus][:nginx_proxy][:server_name]}:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
 default[:nexus][:cli][:repository]                             = "releases"
 default[:nexus][:cli][:default_admin_credentials_updated]      = false
 default[:nexus][:cli][:packages]                               = ["libxml2-devel", "libxslt-devel"]
