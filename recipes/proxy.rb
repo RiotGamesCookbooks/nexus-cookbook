@@ -2,7 +2,7 @@
 # Cookbook Name:: nexus
 # Recipe:: proxy
 #
-# Copyright 2012, Riot Games
+# Copyright 2013, Riot Games
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,23 +16,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-data_bag_for_node = Chef::Nexus.get_proxy_repositories_data_bag(node)
+data_bag_for_node = Chef::Nexus.get_proxy_repositories(node)
 
-data_bag_for_node["repositories"].each do |repository|
+data_bag_for_node[:repositories].each do |repository|
   
-  nexus_proxy_repository repository["name"] do
+  nexus_proxy_repository repository[:name] do
     action :create
-    url    repository["url"]
+    url    repository[:url]
   end
 
-  nexus_proxy_repository repository["name"] do
+  nexus_proxy_repository repository[:name] do
     action           :update
-    subscriber       repository["subscriber"]
-    preemptive_fetch repository["preemptive_fetch"]
+    subscriber       repository[:subscriber]
+    preemptive_fetch repository[:preemptive_fetch]
   end
 
-  nexus_proxy_repository repository["name"] do
+  nexus_proxy_repository repository[:name] do
     action    :update
-    publisher repository["publisher"]
+    publisher repository[:publisher]
   end
 end

@@ -3,7 +3,7 @@
 # Recipe:: default
 #
 # Author:: Kyle Allan (<kallan@riotgames.com>)
-# Copyright 2012, Riot Games
+# Copyright 2013, Riot Games
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,9 +55,9 @@ directory "#{node[:nginx][:dir]}/shared/certificates" do
   recursive true
 end
 
-data_bag_item = Chef::Nexus.get_ssl_certificate_data_bag
+data_bag_item = Chef::Nexus.get_ssl_certificate_data_bag(node)
 
-if data_bag_item[node[:nexus][:ssl_certificate][:key]]
+if data_bag_item
 
   log "Using ssl_certificate data bag entry for #{node[:nexus][:ssl_certificate][:key]}" do
     level :info
@@ -79,7 +79,7 @@ if data_bag_item[node[:nexus][:ssl_certificate][:key]]
     action  :create
   end
 else
-  log "Could not find ssl_certificate data bag, using default certificate." do
+  log "Could not find nexus_ssl_certificate data bag, using default certificate." do
     level :warn
   end
 
@@ -243,7 +243,7 @@ nexus_settings "forceBaseUrl" do
   value true
 end
 
-data_bag_item = Chef::Nexus.get_credentials_data_bag
+data_bag_item = Chef::Nexus.get_credentials(node)
 default_credentials = data_bag_item["default_admin"]
 updated_credentials = data_bag_item["updated_admin"]
 

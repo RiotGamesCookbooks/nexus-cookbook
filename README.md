@@ -18,6 +18,105 @@ The following cookbooks are dependencies:
 * ark
 * nginx
 
+Data Bags
+=========
+
+As of version 1.0.0, this cookbook now uses fewer, more standardized Encrypted Data Bags. Following the style used 
+at Riot, Data bags are created per Chef Environment and default to a data bag item named "_wildcard" if there is no environmental
+data bag item. 
+
+The biggest changes to v1.0.0 are the combination of the Nexus credentials, license, and *_repositories data bags into one.
+
+Below is how you should create your data bags for using this cookbook:
+    
+    knife data bag create nexus _wildcard -c your/chef/config --secret-file your/encrypted_data_bag_key
+
+    {
+      "id": "_wildcard",
+      "credentials": {
+        "default_admin": {
+          "username": "admin",
+          "password": "admin123"
+        },
+        "updated_admin": {
+          "username": "admin",
+          "password": "new_password"
+        }
+      },
+      "license": {
+        "file": "base64d license file"
+      },
+      "group_repositories": {
+        "repositories": [
+          {
+            "name": "My Group",
+            "add": [
+              "Releases",
+              "Snapshots"
+            ]
+          }
+        ]
+      },
+      "hosted_repositories": {
+        "repositories": [
+          {
+            "name": "Hosted Files"
+          },
+          {
+            "name": "More Hosted Files",
+            "publisher": true
+          }
+        ]
+      },
+      "proxy_repositories": {
+        "repositories": [
+          {
+            "name": "Proxy Repo",
+            "url": "http://some-remote-repository"
+          },
+          {
+            "name": "Another Proxy Repo",
+            "url": "http://some-other-remote-repository",
+            "subscriber": true,
+            "publisher": true
+          }
+        ]
+      }
+    }
+
+The `nexus_ssl_certificates` data bag replaces the old `ssl_certificate` data bag item. The cookbook is also set up to look for
+Chef environment named items inside this data bag.
+
+Once the data bag item is loaded for the environment, the attribute [:nexus][:ssl_certificate][:key] is used to find an entry. The
+default value for the cookbook is the node's fqdn. Using this format, you can have a Chef environment with multiple Nexus servers that
+may need to use different SSL certificates.
+
+Your data bag items should look like the following:
+
+    knife data bag create nexus_ssl_certificates _wildcard -c your/chef/config --secret-file your/encrypted_data_bag_key
+
+    {
+      "id": "_wildcard",
+      "fully-qualified-domain-name": {
+        "crt": "base64-encoded-ssl-certificate",
+        "key": "base64-encoded-private-key"
+      }
+    }
+
+The `nexus_trusted_certificates` data bag replaces the old `certificates` data bag item. Each Chef environment maintains a data
+bag item for this data bag, and each entry inside the item should be keyed to a node's fully qualified domain name.
+
+    knife data bag create nexus_trusted_certificates _wildcard -c your/chef/config --secret-file your/encrypted_data_bag_key
+
+    {
+      "id": "_wildcard",
+      "fully-qualified-domain-name": {
+        "description": "Trusted key for full-qualified-domain-name",
+        "certificate": "base64d Certificate from the Nexus Smart Proxy panel"
+      }
+    }
+
+
 Resources/Providers
 ===================
 
@@ -39,68 +138,6 @@ name       | Name of the plugin to install | String  | name
 ## nexus\_repository
 
 Resource provider for creating and deleting Neuxs repositories.
-
-The `nexus::group`, `nexus::hosted`, and `nexus::proxy` recipes all use a respective data bag
-to hold the repository data. The data bags should be created and will look like the following:
-
-  knife data bag create nexus group_repositories -c your/chef/config
-
-  Your data bag should look like the following:
-
-  {
-    "id": "group_repositories",
-    "localhost": {
-      "repositories": [
-        {
-          "name": "My Group",
-          "add": ["Artifacts", "Whatever"]
-        }
-      ]
-    },
-    "my-server-1": {
-      ...
-    }
-  }
-
-  knife data bag create nexus hosted_repositories -c your/chef/config
-
-  Your data bag should look like the following:
-
-  {
-    "id": "hosted_repositories",
-    "localhost": {
-      "repositories": [
-        {
-          "name": "My Hosted",
-          "publisher": true
-        }
-      ]
-    },
-    "my-server-1": {
-    ...
-    }
-  }
-
-  knife data bag create nexus proxy_repositories -c your/chef/config
-
-  Your data bag should look like the following:
-
-  {
-    "id": "proxy_repositories",
-    "localhost": {
-      "repositories": [
-        {
-          "name": "Whatever",
-          "url": "http://www.my-proxy.com/",
-          "subscriber": true,
-          "preemptive_fetch": true
-        }
-      ]
-    },
-    "my-server-1": {
-      ...
-    }
-  }
 
 ### Actions
 Action  | Description              | Default
@@ -139,16 +176,16 @@ value      | The new value to update the path to.                     | String, 
 Resource provider for creating, deleting, and modifying Nexus user accounts.
 
 ### Actions
-Action      | Description                          | Default
--------     |-------------                         |---------
-create      | Creates a new Nexus user.                      | Yes
+Action          | Description                                    | Default
+-------         |-------------                                   |---------
+create          | Creates a new Nexus user.                      | Yes
 delete          | Deletes a Nexus user.                          | 
 update          | Updates a Nexus user with updated information  |
 change_password | Changes a Nexus user's password                |
 
 ### Attributes
-Attribute    | Description                                | Type                  | Default
----------    |-------------                               |-----                  |--------
+Attribute    | Description                                              | Type                  | Default
+---------    |-------------                                             |-----                  |--------
 username     | The element of the settings that is going to be changed. | String                | name
 first_name   | The first name of the user.                              | String                |
 last_name    | The last name of the user.                               | String                |
@@ -160,30 +197,16 @@ roles        | A list of roles (permissions) to apply to the user.      | Array 
 
 ## nexus\_license
 
-Resource provider for installing a license file into Nexus. This LWRP uses an encrypted data bag namespaced
-under nexus license.
-
-  knife data bag create nexus license -c <your chef config> --secret-file<your secret file>
-
-Your data bag should look like the following:
-
-  {
-    "id": "license"
-    "file": "<base64 encoded string of your .lic file>"
-  }
-
-It is *very important* that you base64 encode your Nexus license before storage inside the data bag.
-  
-  openssl base64 -in /path/to/your/license.lic
+Resource provider for installing a license file into Nexus. 
 
 ### Actions
-Action   | Description                           | Default
--------  |-------------                          |---------
+Action   | Description                                       | Default
+-------  |-------------                                      |---------
 install  | Installs a license file into the server.          | Yes
 
 ### Attributes
-Attribute  | Description                                           | Type                          | Default
----------  |-------------                                          |-----                          |--------
+Attribute  | Description                                                       | Type                          | Default
+---------  |-------------                                                      |-----                          |--------
 name       | Some useful information about the license. Similar to ruby_block. | String                        | name
 
 ## nexus\_proxy
@@ -191,8 +214,8 @@ name       | Some useful information about the license. Similar to ruby_block. |
 Resource provider for manipulating the Nexus' settings for Smart Proxy.
 
 ### Actions
-Action              | Description                          | Default
--------             |-------------                         |---------
+Action              | Description                                    | Default
+-------             |-------------                                   |---------
 enable              | Enables the Smart Proxy functionality.         | Yes
 disable             | Disables the Smart Proxy functionality.        | 
 add_trusted_key     | Adds a trusted key to the server.              | 
@@ -200,8 +223,8 @@ delete_trusted_key  | Removes a trusted key from the server.         |
 
 
 ### Attributes
-Attribute    | Description                                                      | Type                  | Default
----------    |-------------                                                     |-----                  |--------
+Attribute    | Description                                                                    | Type                  | Default
+---------    |-------------                                                                   |-----                  |--------
 name         | Some useful information about the proxy. Similar to ruby_block.                | String                | name
 id           | Used for delete_trusted_key. The id of the key to delete.                      | String                |
 host         | The host to use for Smart Proxy. Used for enable.                              | String                |
@@ -274,30 +297,11 @@ The following attributes are not fully supported but are under the `nexus::mount
 * nfs::device\_path - the remote server where the NFS drive is located.
 * nfs::non_mount_dir - Sonatype does not recommend using NFS with Nexus, because of Solr searchs on particular directories of the Nexus installation.
 
-SSL
-===
+SSL Certificates
+================
 
 The files directory contains a self-signed certificate and key that are installed to `nginx::dir/shared/certificates/nexus-proxy.crt` 
 and `nginx::dir/shared/certificates/nexus-proxy.key`.
-
-By default, the cookbook will look for a ssl_certificate encrypted data bag:
-
-  knife data bag create nexus ssl_certificate -c <your chef config> --secret-file=<your secret file>
-
-Your data bag should look like the following:
-
-  {
-      "id": "ssl_certificate",
-      "fully-qualified-domain-name": {
-        "crt": "base64-encoded-ssl-certificate",
-        "key": "base64-encoded-private-key"
-      },
-      ...
-    }
-
-The cookbook will look for an entry for your node[:fqdn] in the data bag, and if found, will get the certificate and key,
-base64 decode them, and write them using the `file` resource. If there is no entry in the data bag, the default action will
-use the `cookbook_file` resource to copy the self-signed certificate and key and install them.
 
 Nexus Usage
 ===========
@@ -328,26 +332,9 @@ change the password for that account to the password configured in the `updated_
 Smart Proxy Usage
 =================
 
-When Smart Proxy is enabled (`nexus::pro` recipe), repositories need to be set to become publishers or subscribers. In
-addition, we need to store the certificates of other Nexus servers on the server that Smart Proxy is being enabled on.
-
-  knife data bag create nexus certificates -c <your chef config> --secret-file=<your secret file>
-
-Your data bag will store a certificate and description based on the IP address of other Nexus servers and should look like the following:
-
-  {
-    "id": "certificates",
-    "192.168.0.1": {
-      "certificate": "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----\n",
-      "description": "192.168.0.1 Trusted Key"
-    },
-      "192.168.0.2": {
-        "certificate": "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----\n",
-        "description": "192.168.0.2 Trusted Key"
-      }
-  }
-
-Override the `nexus::repository` attributes to set these appropriately for your Nexus.
+If you are using Nexus Pro and when Smart Proxy is enabled, repositories need to be set to become publishers or subscribers. In
+addition, we need to store the certificates of other Nexus servers on the server that Smart Proxy is being enabled on. See the top
+section on Data Bags for how to configure the `nexus_trusted_certificates` data bag.
 
 Usage
 =====
@@ -370,7 +357,7 @@ Author:: Kyle Allan (<kallan@riotgames.com>)
 Based on work by Joseph Holsten (<joseph@josephholsten.com>), Charles Scott (<connaryscott@gmail.com>),
 Greg Schueler (<greg.schueler@gmail.com>), and Seth Chisamore (<schisamo@opscode.com>)
 
-Copyright 2012, Riot Games
+Copyright 2013, Riot Games
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
