@@ -3,7 +3,7 @@
 # Provider:: license
 #
 # Author:: Kyle Allan (<kallan@riotgames.com>)
-# Copyright 2012, Riot Games
+# Copyright 2013, Riot Games
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,10 +30,8 @@ end
 action :install do
 
   unless licensed? && running_nexus_pro?
-
-    require 'base64'
-    data_bag_item = Chef::Nexus.get_license_data_bag
-    license_data = Base64.decode64(data_bag_item["file"])
+    data_bag_item = Chef::Nexus.get_license(node)
+    license_data = Chef::Nexus.decode(data_bag_item["file"])
     Chef::Nexus.nexus(node).install_license_bytes(license_data)
     new_resource.updated_by_last_action(true)
   end
