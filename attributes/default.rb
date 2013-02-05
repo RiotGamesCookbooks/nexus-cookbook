@@ -36,7 +36,7 @@ default[:nexus][:work_dir]                                     = "/nexus/sonatyp
 
 default[:nexus][:plugins]                                      = []
 
-default[:nexus][:jetty][:loopback]                             = true
+default[:nexus][:jetty][:loopback]                             = false
 
 default[:nexus][:ssl][:jetty]                                  = false
 default[:nexus][:ssl][:nginx]                                  = false

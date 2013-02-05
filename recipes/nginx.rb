@@ -26,7 +26,7 @@ directory "#{node[:nginx][:dir]}/shared/certificates" do
   recursive true
 end
 
-data_bag_item = Chef::Nexus.get_ssl_certificates_data_bag
+data_bag_item = Chef::Nexus.get_ssl_certificates_data_bag(node)
 
 if data_bag_item
 
