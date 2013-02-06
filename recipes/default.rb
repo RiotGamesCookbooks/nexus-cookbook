@@ -17,9 +17,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-#
 include_recipe "java"
-include_recipe "nginx"
 include_recipe "build-essential"
 
 user_home = "/#{node[:nexus][:user]}"
@@ -48,70 +46,6 @@ directory user_home do
   action :create
 end
 
-directory "#{node[:nginx][:dir]}/shared/certificates" do
-  owner     "root"
-  group     "root"
-  mode      "700"
-  recursive true
-end
-
-data_bag_item = Chef::Nexus.get_ssl_certificate_data_bag(node)
-
-if data_bag_item
-
-  log "Using ssl_certificate data bag entry for #{node[:nexus][:ssl_certificate][:key]}" do
-    level :info
-  end
-
-  data_bag_item = data_bag_item[node[:nexus][:ssl_certificate][:key]]
-  certificate = Chef::Nexus.get_ssl_certificate_crt(data_bag_item)
-  key = Chef::Nexus.get_ssl_certificate_key(data_bag_item)
-
-  file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt" do
-    content certificate
-    mode    "077"
-    action :create
-  end
-
-  file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key" do
-    content key
-    mode    "077"
-    action  :create
-  end
-else
-  log "Could not find nexus_ssl_certificate data bag, using default certificate." do
-    level :warn
-  end
-
-  cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt" do
-    source "self_signed_cert.crt"
-    mode   "077"
-    action :create
-  end
-
-  cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key" do
-    source "self_signed_key.key"
-    mode   "077"
-    action :create
-  end
-end
-
-template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
-  source "nexus_proxy.nginx.conf.erb"
-  owner  "root"
-  group  "root"
-  mode   "0644"
-  variables(
-    :ssl_certificate => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt",
-    :ssl_key         => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key",
-    :listen_port     => node[:nexus][:nginx_proxy][:listen_port],
-    :server_name     => node[:nexus][:nginx_proxy][:server_name],
-    :fqdn            => node[:fqdn],
-    :server_options  => node[:nexus][:nginx][:server][:options],
-    :proxy_options   => node[:nexus][:nginx][:proxy][:options]
-  )
-end
-
 directory node[:nexus][:mount][:nfs][:mount_point] do
   owner     node[:nexus][:user]
   group     node[:nexus][:group]
@@ -129,21 +63,28 @@ mount "#{node[:nexus][:mount][:nfs][:mount_point]}" do
   only_if {node[:nexus][:mount][:nfs][:enable]}
 end
 
-# Sonatype recommends not using NFS at all, and if you have to use it
-# you should symlink the indexer and timeline directories to a non-NFS
-# drive. Commenting this out for now until we run into a problem with NFS.
+jetty_ssl = nil
 
-#link "#{node[:nexus][:work_dir]}/indexer" do
-#  to node[:nexus][:mount][:nfs][:non_mount_dir][:indexer]
-#  only_if {node[:nexus][:mount][:nfs][:enable]}
-#end
+if node[:nexus][:ssl][:nginx]
+  include_recipe "nexus::nginx"
+elsif node[:nexus][:ssl][:jetty]
+  credentials = Chef::Nexus.get_credentials_data_bag
 
-#link "#{node[:nexus][:work_dir]}/timeline" do
-#  to node[:nexus][:mount][:nfs][:non_mount_dir][:timeline]
-#  only_if {node[:nexus][:mount][:nfs][:enable]}
-#end
+  jetty_ssl = {
+    :keystore_path  => node[:nexus][:ssl][:jetty_keystore_path],
+    :password       => credentials[:keystore][:password],
+    :key_password   => credentials[:keystore][:key_password],
+    :trust_password => credentials[:keystore][:trust_password]
+  }
 
-nginx_site 'nexus_proxy.conf'
+  directory "#{node[:nexus][:ssl][:jetty_keystore_path]}" do
+    owner     node[:nexus][:user]
+    group     node[:nexus][:group]
+    mode      "0755"
+    action    :create
+    recursive true
+  end
+end
 
 artifact_deploy node[:nexus][:name] do
   version           node[:nexus][:version]
@@ -210,10 +151,11 @@ artifact_deploy node[:nexus][:name] do
     template "#{conf_dir}/jetty.xml" do
       source "jetty.xml.erb"
       owner  node[:nexus][:user]
-      group  node[:nexus][:group] 
-      mode   "0775"  
+      group  node[:nexus][:group]
+      mode   "0775"
       variables(
-        :loopback => node[:nexus][:jetty][:loopback]
+        :jetty_ssl => jetty_ssl,
+        :loopback  => node[:nexus][:jetty][:loopback]
       )
     end
 
@@ -232,15 +174,12 @@ end
 
 service "nexus" do
   action   [:enable, :start]
-  notifies :restart, "service[nginx]", :immediately
 end
 
-nexus_settings "baseUrl" do
-  value "https://#{node[:nexus][:nginx_proxy][:server_name]}:#{node[:nexus][:nginx_proxy][:listen_port]}/nexus"
-end
-
-nexus_settings "forceBaseUrl" do
-  value true
+if node[:nexus][:ssl][:nginx]
+  service "nginx" do
+    action :restart
+  end
 end
 
 data_bag_item = Chef::Nexus.get_credentials(node)
@@ -248,9 +187,9 @@ default_credentials = data_bag_item["default_admin"]
 updated_credentials = data_bag_item["updated_admin"]
 
 nexus_user "admin" do
-  action       :change_password
   old_password default_credentials["password"]
   password     updated_credentials["password"]
+  action       :change_password
 end
 
 ruby_block "set flag that default admin credentials were changed" do

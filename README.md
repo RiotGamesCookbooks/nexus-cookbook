@@ -18,6 +18,11 @@ The following cookbooks are dependencies:
 * ark
 * nginx
 
+Recipes
+=======
+
+
+
 Data Bags
 =========
 
@@ -242,9 +247,10 @@ The following attributes are set under the `nexus` namespace:
 * user - sets the user to install nexus under
 * group - sets the group to install nexus under
 * url - sets the URL where the nexus package is located
+* checksum - The SHA256 checksum of the Nexus installation package
 * port - the port to run nexus on
 * host - the hostname to use for nexus
-* context_path - the `user` home directory
+* context_path - the context path under which Nexus is running under. ie. "/nexus" #=> "http://localhost:8081/nexus"
 * name - the name of the Nexus
 * bundle_name - the name of the internal folder of the Nexus tar. Usually nexus-{professional or nothing}-{VERSION}
 * home - the installation directory for nexus. Uses name.
@@ -261,12 +267,16 @@ The following attribute is set under the `nexus::jetty` namespace:
 
 The following attributes are set under the `nexus::ssl` namespace and are related to the SSL settings of Nexus:
 
+* jetty - if true, the default recipe will configure Nexus to use Jetty's SSL connection.
+* nginx - if true, the default recipe will include the `nexus::nginx` recipe, installing and configuring an nginx SSL proxy server.
+* jetty_keystore_path - used for configuring where on the machine the keystore file will be that Jetty will use for its SSL configuration.
 * verify - if true, the calls in the chef_nexus.rb library will verify SSL connections. This is useful to disable when working with a self-signed certificate.
+* port - the default port for either Jetty or nginx SSL connections.
+
 * ssl\_certificate::key - the key to look for in the `nexus::ssl_certificate` encrypted data bag.
 
 The following attributes are set under `nexus::nginx` namespace:
 
-* listen\_port - the port to listen on for nginx.
 * server\_name - the name of the nginx server.
 * server::options - used to generate options in the `server` section of the nginx conf file.
 * proxy::options - used to generate proxy options in the `location` section of the nginx conf file.

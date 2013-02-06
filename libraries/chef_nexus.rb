@@ -148,7 +148,7 @@ class Chef
       # @param  node [Chef::Node] the Chef node
       # 
       # @return [Chef::Mash] the loaded data bag item
-      def get_ssl_certificate_data_bag(node)
+      def get_ssl_certificates_data_bag(node)
         if Chef::Config[:solo]
           Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
           Chef::Log.info "Returning default values in a Hash."
@@ -201,7 +201,9 @@ class Chef
         default_credentials = credentials_entry["default_admin"]
         updated_credentials = credentials_entry["updated_admin"]
 
-        overrides = {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository]}
+        url = generate_nexus_url(node)
+
+        overrides = {"url" => url, "repository" => node[:nexus][:cli][:repository]}
         if Chef::Config[:solo]
           begin
             merged_credentials = overrides.merge(default_credentials)
@@ -264,7 +266,8 @@ class Chef
       # @return [Boolean] true if a connection can be made, false otherwise
       def check_old_credentials(username, password, node)
         require 'nexus_cli'
-        overrides = {"url" => node[:nexus][:cli][:url], "repository" => node[:nexus][:cli][:repository], "username" => username, "password" => password}
+        url = generate_nexus_url(node)
+        overrides = {"url" => url, "repository" => node[:nexus][:cli][:repository], "username" => username, "password" => password}
         begin
           nexus = NexusCli::RemoteFactory.create(overrides, node[:nexus][:ssl][:verify])
           true
@@ -293,6 +296,14 @@ class Chef
       end
 
       private
+
+        def generate_nexus_url(node)
+          if node[:nexus][:ssl][:jetty] || node[:nexus][:ssl][:jetty]
+            "https://localhost:#{node[:nexus][:ssl][:port]}/nexus"
+          else
+            "http://localhost:#{node[:nexus][:port]}/nexus"
+          end
+        end
 
         def encrypted_data_bag_for(node, data_bag)
           environment_data_bag_item = encrypted_data_bag_item(data_bag, node.chef_environment)
