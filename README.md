@@ -28,6 +28,11 @@ Recipes
 * cli - installs packages at compilation time and uses `chef_gem` to instal the nexus_cli gem. Primarily used by the LWRPs of this cookbook.
 * group, hosted, proxy - recipe abstractions that get the appropriate entry from the data bag item and create repositories on the Nexus server.
 
+Usage
+=====
+
+Simply add the `nexus::default` recipe to the node where you want Sonatype Nexus installed.
+
 Data Bags
 =========
 
@@ -297,17 +302,6 @@ The following attributes are not fully supported but are under the `nexus::mount
 * nfs::enable - enables an NFS mount.
 * nfs::mount\_point - the local path to mount an NFS drive to.
 * nfs::device\_path - the remote server where the NFS drive is located.
-
-SSL Certificates
-================
-
-The files directory contains a self-signed certificate and key that are installed to `nginx::dir/shared/certificates/nexus-proxy.crt` 
-and `nginx::dir/shared/certificates/nexus-proxy.key`.
-
-Usage
-=====
-
-Simply add the "nexus::default" recipe to the node where you want Sonatype Nexus installed.
 
 License and Author
 ==================
