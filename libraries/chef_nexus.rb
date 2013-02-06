@@ -320,7 +320,6 @@ class Chef
             Chef::Log.warn msg
             return default_data_bag_item
           end
-
           raise Nexus::EncryptedDataBagNotFound.new(data_bag)
         end
 
@@ -351,7 +350,6 @@ class Chef
             Chef::Log.warn message
             return default_data_bag_item
           end
-
           raise Nexus::EncryptedDataBagNotFound.new(data_bag_item)
         end
     end

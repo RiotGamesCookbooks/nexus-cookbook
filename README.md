@@ -1,8 +1,8 @@
 Description
 ===========
 
-Installs and configures Sonatype Nexus and Nginx. Nginx is installed from source with the http\_ssl\_module.
-Nginx is configured to run as a proxy for Nexus using HTTPS/SSL.
+Installs and configures Sonatype Nexus. Can optionally configure and install an nginx installation or provide
+SSL access to the Jetty server that runs Nexus.
 
 Requirements
 ============
@@ -17,11 +17,16 @@ The following cookbooks are dependencies:
 * java
 * ark
 * nginx
+* artifact
+* build-essential
 
 Recipes
 =======
 
-
+* default - installs and configures a Nexus installation
+* nginx - installs and configures an nginx server that will proxy the Nexus server with SSL
+* cli - installs packages at compilation time and uses `chef_gem` to instal the nexus_cli gem. Primarily used by the LWRPs of this cookbook.
+* group, hosted, proxy - recipe abstractions that get the appropriate entry from the data bag item and create repositories on the Nexus server.
 
 Data Bags
 =========
@@ -287,25 +292,11 @@ The following attributes are set under the `nexus::cli` namespace:
 * repository - The repository that nexus_cli gem will use for push / pull operations. A requirement of nexus_cli, not used by this cookbook.
 * packages - required packages to install for using the `chef_gem "nexus_cli"`
 
-The following attributes are set under the `nexus::repository` namespace:
-
-* create_hosted - An Array of repository names that will be used to create Hosted Repositories.
-* create_proxy - A Hash of repository names to urls that will be used to create Proxy Repositories.
-* publishers - An Array of repository names that will be set to publish artifacts (Smart Proxy).
-* subscribers - An Array of repository names that will be set to subscribe to artifacts (Smart Proxy).
-
-The following attributes are set under the `nexus::smart_proxy` namespace:
-
-* enable - true if we want to enable Smart Proxy, false if not.
-* host - The host to use for Smart Proxy configuration.
-* port - The port to use for Smart Proxy configuration.
-
 The following attributes are not fully supported but are under the `nexus::mount` namespace:
 
 * nfs::enable - enables an NFS mount.
 * nfs::mount\_point - the local path to mount an NFS drive to.
 * nfs::device\_path - the remote server where the NFS drive is located.
-* nfs::non_mount_dir - Sonatype does not recommend using NFS with Nexus, because of Solr searchs on particular directories of the Nexus installation.
 
 SSL Certificates
 ================
@@ -313,52 +304,10 @@ SSL Certificates
 The files directory contains a self-signed certificate and key that are installed to `nginx::dir/shared/certificates/nexus-proxy.crt` 
 and `nginx::dir/shared/certificates/nexus-proxy.key`.
 
-Nexus Usage
-===========
-
-Many of the LWRPs utilize the Nexus CLI gem to interact with the Nexus server. In order to use them, you must first
-create an [encrypted data bag](http://wiki.opscode.com/display/chef/Encrypted+Data+Bags) that contains the credentials
-for your Nexus server.
-
-  knife data bag create nexus credentials -c <your chef config> --secret-file=<your secret file>
-
-Your data bag should look like the following:
-
-  {
-    "id": "credentials",
-    "default_admin": {
-      "username": "admin",
-      "password": "admin123"
-    },
-    "updated_admin": {
-      "username": "admin",
-      "password": "customize_me"
-    }
-  }
-
-Out-of-the-box, Nexus comes configured with a specific administrative username/password combo. The default recipe
-change the password for that account to the password configured in the `updated_admin` element.
-
-Smart Proxy Usage
-=================
-
-If you are using Nexus Pro and when Smart Proxy is enabled, repositories need to be set to become publishers or subscribers. In
-addition, we need to store the certificates of other Nexus servers on the server that Smart Proxy is being enabled on. See the top
-section on Data Bags for how to configure the `nexus_trusted_certificates` data bag.
-
 Usage
 =====
 
 Simply add the "nexus::default" recipe to the node where you want Sonatype Nexus installed.
-
-To install Nexus Pro and perform some extra steps, use the "nexus::pro" recipe. Most likely, all you'll need is
-to override the following attributes like so:
-
-    :nexus => {
-      :version => '2.1.2',
-      :checksum => 'new checksum',
-      :url => 'some/url/to/nexus-professional-2.1.2-bundle.tar.gz',
-    }
 
 License and Author
 ==================
