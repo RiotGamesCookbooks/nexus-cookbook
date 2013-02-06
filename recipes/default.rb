@@ -72,9 +72,9 @@ elsif node[:nexus][:ssl][:jetty]
 
   jetty_ssl = {
     :keystore_path  => node[:nexus][:ssl][:jetty_keystore_path],
-    :password       => credentials["keystore"]["password"],
-    :key_password   => credentials["keystore"]["key_password"],
-    :trust_password => credentials["keystore"]["trust_password"]
+    :password       => credentials[:keystore][:password],
+    :key_password   => credentials[:keystore][:key_password],
+    :trust_password => credentials[:keystore][:trust_password]
   }
 
   directory "#{node[:nexus][:ssl][:jetty_keystore_path]}" do
