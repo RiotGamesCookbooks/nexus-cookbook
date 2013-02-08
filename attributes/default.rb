@@ -45,6 +45,7 @@ default[:nexus][:ssl][:verify]                                 = true
 default[:nexus][:ssl][:port]                                   = 8443
 
 default[:nexus][:ssl_certificate][:key]                        = node[:fqdn]
+default[:nexus][:jetty_keystore][:key]                         = node[:fqdn]
 
 default[:nexus][:nginx_proxy][:server_name]                    = node[:fqdn]
 

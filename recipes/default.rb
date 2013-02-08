@@ -65,25 +65,22 @@ end
 
 jetty_ssl = nil
 
-if node[:nexus][:ssl][:nginx]
+if node[:nexus][:ssl][:nginx] && node[:nexus][:ssl][:jetty]
+  Chef::Application.fatal! "Cannot have both nginx and Jetty configured to use SSL for Nexus."
+elsif node[:nexus][:ssl][:nginx]
   include_recipe "nexus::nginx"
 elsif node[:nexus][:ssl][:jetty]
-  credentials = Chef::Nexus.get_credentials_data_bag
+  credentials = Chef::Nexus.get_credentials(node)
 
   jetty_ssl = {
     :keystore_path  => node[:nexus][:ssl][:jetty_keystore_path],
+    :ssl_port       => node[:nexus][:ssl][:port],
     :password       => credentials[:keystore][:password],
     :key_password   => credentials[:keystore][:key_password],
     :trust_password => credentials[:keystore][:trust_password]
   }
 
-  directory "#{node[:nexus][:ssl][:jetty_keystore_path]}" do
-    owner     node[:nexus][:user]
-    group     node[:nexus][:group]
-    mode      "0755"
-    action    :create
-    recursive true
-  end
+  include_recipe "nexus::jetty"
 end
 
 artifact_deploy node[:nexus][:name] do
@@ -100,7 +97,6 @@ artifact_deploy node[:nexus][:name] do
   before_extract Proc.new {
     service "nexus" do
       action :stop
-      provider Chef::Provider::Service::Init
       only_if do File.exist?("/etc/init.d/nexus") end
     end
   }
@@ -122,12 +118,11 @@ artifact_deploy node[:nexus][:name] do
 
     template "#{bin_dir}/#{node[:nexus][:name]}" do
       source "nexus.erb"
-      owner  "root"
-      group  "root"
+      owner  node[:nexus][:user]
+      group  node[:nexus][:group]
       mode   "0775"
       variables(
         :platform   => platform,
-        :nexus_port => node[:nexus][:port],
         :nexus_home => nexus_home,
         :nexus_user => node[:nexus][:user],
         :nexus_pid  => node[:nexus][:pid_dir]
