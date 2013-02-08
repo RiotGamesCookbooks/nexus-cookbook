@@ -118,19 +118,7 @@ Your data bag items should look like the following:
       }
     }
 
-The `nexus_trusted_certificates` data bag replaces the old `certificates` data bag item. Each Chef environment maintains a data
-bag item for this data bag, and each entry inside the item should be keyed to a node's fully qualified domain name.
-
-    knife data bag create nexus_trusted_certificates _wildcard -c your/chef/config --secret-file your/encrypted_data_bag_key
-
-    {
-      "id": "_wildcard",
-      "fully-qualified-domain-name": {
-        "description": "Trusted key for full-qualified-domain-name",
-        "certificate": "base64d Certificate from the Nexus Smart Proxy panel"
-      }
-    }
-
+The `certificates` data bag item has been removed.
 
 Resources/Providers
 ===================
