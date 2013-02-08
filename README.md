@@ -56,6 +56,11 @@ Below is how you should create your data bags for using this cookbook:
         "updated_admin": {
           "username": "admin",
           "password": "new_password"
+        },
+        "keystore": {
+          "password": "some_password",
+          "key_password": "some_password",
+          "trust_password": "some_password"
         }
       },
       "license": {
@@ -99,8 +104,9 @@ Below is how you should create your data bags for using this cookbook:
       }
     }
 
-The `nexus_ssl_certificates` data bag replaces the old `ssl_certificate` data bag item. The cookbook is also set up to look for
-Chef environment named items inside this data bag.
+The `nexus_ssl_files` data bag replaces the old `ssl_certificate` data bag item. The cookbook is also set up to look for
+Chef environment named items inside this data bag. This data bag should contain entries for either a certificate and key combo
+(for nginx) or a keystore (Jetty).
 
 Once the data bag item is loaded for the environment, the attribute [:nexus][:ssl_certificate][:key] is used to find an entry. The
 default value for the cookbook is the node's fqdn. Using this format, you can have a Chef environment with multiple Nexus servers that
@@ -108,13 +114,16 @@ may need to use different SSL certificates.
 
 Your data bag items should look like the following:
 
-    knife data bag create nexus_ssl_certificates _wildcard -c your/chef/config --secret-file your/encrypted_data_bag_key
+    knife data bag create nexus_ssl_files _wildcard -c your/chef/config --secret-file your/encrypted_data_bag_key
 
     {
       "id": "_wildcard",
       "fully-qualified-domain-name": {
         "crt": "base64-encoded-ssl-certificate",
         "key": "base64-encoded-private-key"
+      },
+      "another-fully-qualified-domain-name": {
+        "keystore": "base64-encoded-keystore-file"
       }
     }
 

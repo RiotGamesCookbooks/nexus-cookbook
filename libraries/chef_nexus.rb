@@ -20,9 +20,9 @@
 #
 class Chef
   module Nexus
-    DEFAULT_DATABAG              = "nexus"
-    SSL_CERTIFICATES_DATABAG     = "nexus_ssl_certificates"
-    WILDCARD_DATABAG_ITEM        = "_wildcard"
+    DEFAULT_DATABAG       = "nexus"
+    SSL_FILES_DATABAG     = "nexus_ssl_files"
+    WILDCARD_DATABAG_ITEM = "_wildcard"
     
     class << self
 
@@ -137,21 +137,21 @@ class Chef
         end
       end
 
-      # Loads the nexus_ssl_certificates encrypted data bag item for this node.
+      # Loads the nexus_ssl_files encrypted data bag item for this node.
       # 
       # @example
-      #   knife data bag load nexus_ssl_certificates _wildcard --secret-file
+      #   knife data bag load nexus_ssl_files _wildcard --secret-file
       # 
       # @param  node [Chef::Node] the Chef node
       # 
       # @return [Chef::Mash] the loaded data bag item
-      def get_ssl_certificates_data_bag(node)
+      def get_ssl_files_data_bag(node)
         if Chef::Config[:solo]
           Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
           Chef::Log.info "Returning default values in a Hash."
           nil
         else
-          encrypted_data_bag_for(node, SSL_CERTIFICATES_DATABAG)
+          encrypted_data_bag_for(node, SSL_FILES_DATABAG)
         end
       end
 
