@@ -7,7 +7,7 @@ It is recommended that you configure your own cookbook to override some of the a
 LWRPs to customize your installation to your liking.
 
 Major Improvements
-* [#22] New nexus::nginx recipe and a configurable way to use SSL with Jetty. 
+* [#22] New nexus::nginx recipe and a new nexus::jetty that helps Jetty use SSL.
 * [#18] Data bag usage has been completely reworked
 * [#19] The artifact-cookbook is now being used more effectively.
 * [#21] The Nexus file wrapper.log will no longer cause redeploys of Nexus.
