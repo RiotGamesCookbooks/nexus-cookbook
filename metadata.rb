@@ -13,4 +13,4 @@ end
 depends "java", "~> 1.9.0"
 depends "nginx", "~> 1.2.0"
 depends "artifact", "~> 1.2.0"
-depends "build-essential", "~> 1.3.2"
+depends "build-essential"
