@@ -274,18 +274,13 @@ class Chef
 
         def encrypted_data_bag_for(node, data_bag)
           @encrypted_data_bags = {} unless @encrypted_data_bags
-          key = [data_bag, node.chef_environment]
-          wildcard_key = [data_bag, WILDCARD_DATABAG_ITEM]
+          
+          @encrypted_data_bags[data_bag] = encrypted_data_bag_item(data_bag, node.chef_environment) unless @encrypted_data_bags.has_key?(data_bag)
+          @encrypted_data_bags[data_bag] = encrypted_data_bag_item(data_bag, WILDCARD_DATABAG_ITEM) unless @encrypted_data_bags.has_key?(data_bag)
 
-          @encrypted_data_bags[key] = encrypted_data_bag_item(data_bag, node.chef_environment) unless @encrypted_data_bags.has_key?(key)
-          @encrypted_data_bags[wildcard_key] = encrypted_data_bag_item(data_bag, WILDCARD_DATABAG_ITEM) unless @encrypted_data_bags.has_key?(wildcard_key)
-
-          if @encrypted_data_bags[key]
-            return @encrypted_data_bags[key]
-          elsif @encrypted_data_bags[wildcard_key]
-            return @encrypted_data_bags[wildcard_key]
+          if @encrypted_data_bags[data_bag]
+            return @encrypted_data_bags[data_bag]
           end
-
           raise Nexus::EncryptedDataBagNotFound.new(data_bag)
         end
 
