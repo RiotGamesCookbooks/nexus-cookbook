@@ -29,7 +29,7 @@ class Chef
       end
 
       def message
-        "Unable to locate the Nexus encrypted data bag '#{DATABAG}' or data bag item #{@data_bag_item}"
+        "Unable to locate the Nexus encrypted data bag '#{DEFAULT_DATABAG}' or data bag item #{@data_bag_item}"
       end
     end
 

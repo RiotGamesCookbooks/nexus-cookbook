@@ -26,17 +26,17 @@ directory "#{node[:nginx][:dir]}/shared/certificates" do
   recursive true
 end
 
-data_bag_item = Chef::Nexus.get_ssl_certificates_data_bag(node)
+data_bag_item = Chef::Nexus.get_ssl_files_data_bag(node)
 
-if data_bag_item
+if data_bag_item && data_bag_item[node[:nexus][:ssl_certificate][:key]]
 
-  log "Using ssl_certificate data bag entry for #{node[:nexus][:ssl_certificate][:key]}" do
+  log "Using nexus_ssl_files data bag entry for #{node[:nexus][:ssl_certificate][:key]}" do
     level :info
   end
 
   data_bag_item = data_bag_item[node[:nexus][:ssl_certificate][:key]]
-  certificate = Chef::Nexus.get_ssl_certificate_crt(data_bag_item)
-  key = Chef::Nexus.get_ssl_certificate_key(data_bag_item)
+  certificate   = Chef::Nexus.decode(data_bag_item[:crt])
+  key           = Chef::Nexus.decode(data_bag_item[:key])
 
   file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt" do
     content certificate
