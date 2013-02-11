@@ -23,10 +23,13 @@ The following cookbooks are dependencies:
 Recipes
 =======
 
-* default - installs and configures a Nexus installation
+* default - installs and configures a Nexus installation. Will use either `nexus::nginx` or `nexus::jetty` when corresponding `nexus::ssl::nginx` or 
+`nexus::ssl:jetty` flags are set.
 * nginx - installs and configures an nginx server that will proxy the Nexus server with SSL
+* jetty - creates a directory and writes a keystore file to the node. The default recipe will call this when the `nexus::ssl::jetty` is true,
+which will add more customization to the jetty.xml file for Nexus.
 * cli - installs packages at compilation time and uses `chef_gem` to instal the nexus_cli gem. Primarily used by the LWRPs of this cookbook.
-* group, hosted, proxy - recipe abstractions that get the appropriate entry from the data bag item and create repositories on the Nexus server.
+* group, hosted, proxy - recipe abstractions that get the appropriate entry from the nexus data bag and create repositories on the Nexus server.
 
 Usage
 =====

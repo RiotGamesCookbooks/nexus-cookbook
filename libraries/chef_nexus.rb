@@ -274,9 +274,12 @@ class Chef
 
         def encrypted_data_bag_for(node, data_bag)
           @encrypted_data_bags = {} unless @encrypted_data_bags
-          
-          @encrypted_data_bags[data_bag] = encrypted_data_bag_item(data_bag, node.chef_environment) unless @encrypted_data_bags.has_key?(data_bag)
-          @encrypted_data_bags[data_bag] = encrypted_data_bag_item(data_bag, WILDCARD_DATABAG_ITEM) unless @encrypted_data_bags.has_key?(data_bag)
+
+          if @encrypted_data_bags[data_bag].nil?
+            data_bag_item = encrypted_data_bag_item(data_bag, node.chef_environment)
+            data_bag_item ||= encrypted_data_bag_item(data_bag, WILDCARD_DATABAG_ITEM)
+            @encrypted_data_bags[data_bag] = data_bag_item
+          end          
 
           if @encrypted_data_bags[data_bag]
             return @encrypted_data_bags[data_bag]
