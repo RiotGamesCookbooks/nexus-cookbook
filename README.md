@@ -254,6 +254,7 @@ Attributes
 The following attributes are set under the `nexus` namespace:
 
 * version - sets the version to install
+* base_dir - sets the base directory under which to place the nexus user's home directory.
 * user - sets the user to install nexus under
 * group - sets the group to install nexus under
 * url - sets the URL where the nexus package is located
@@ -263,7 +264,7 @@ The following attributes are set under the `nexus` namespace:
 * context_path - the context path under which Nexus is running under. ie. "/nexus" #=> "http://localhost:8081/nexus"
 * name - the name of the Nexus
 * bundle_name - the name of the internal folder of the Nexus tar. Usually nexus-{professional or nothing}-{VERSION}
-* home - the installation directory for nexus. Uses name.
+* home - the installation directory for the nexus application. Uses name.
 * current_path - the above home/current/bundle_name. The artifact_deploy resource uses the `current` symlink to denote the currently installed version.
 * pid_dir - the pid directory defined in the nexus.erb template. Saves a pid in the `pids` directory created by the artifact_deploy resource.
 * conf_dir - the above home/conf

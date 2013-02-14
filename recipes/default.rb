@@ -20,7 +20,7 @@
 include_recipe "java"
 include_recipe "build-essential"
 
-user_home = "/#{node[:nexus][:user]}"
+user_home = ::File.join(node[:nexus][:base_dir], node[:nexus][:user])
 
 platform = ""
 case node[:platform]
