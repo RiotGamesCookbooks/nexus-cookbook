@@ -1,3 +1,8 @@
+## v1.1.0
+
+* Uses a newer version of the nexus_cli gem, which no longer requires libxml or libxslt packages.
+* Use an attribute to set the home of the nexus user this cookbook creates.
+
 ## v1.0.0
 
 This release features a number of improvements and changes to this cookbook. In particular, things to watch out for include a new
