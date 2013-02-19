@@ -18,12 +18,6 @@
 # limitations under the License.
 #
 
-node[:nexus][:cli][:packages].each do |package_name|
-  package package_name do
-    action :install
-  end.run_action(:install)
-end
-
 chef_gem "nexus_cli" do
-  version "2.0.2"
+  version "3.0.0"
 end
