@@ -207,7 +207,7 @@ class Chef
       # @param  node [Chef::Node] the node
       # 
       # @return [Boolean] true if a connection could be made, false otherwise
-      def nexus_available?(node)        
+      def nexus_available?(node)
         retries = node[:nexus][:cli][:retries]
         begin
           nexus(node)

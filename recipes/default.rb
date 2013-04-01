@@ -192,3 +192,14 @@ ruby_block "set flag that default admin credentials were changed" do
     node.set[:nexus][:cli][:default_admin_credentials_updated] = true
   end
 end
+
+template ::File.join(node[:nexus][:work_dir], "conf", "logback-nexus.xml") do
+  source "logback-nexus.xml.erb"
+  owner  node[:nexus][:user]
+  group  node[:nexus][:group]
+  mode "0664"
+  variables(
+    :logs_to_keep => node[:nexus][:logs][:logs_to_keep]
+  )
+  only_if { Chef::Nexus.nexus_available?(node) }
+end
