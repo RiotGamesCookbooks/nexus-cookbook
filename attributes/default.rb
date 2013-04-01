@@ -68,3 +68,5 @@ default[:nexus][:cli][:retry_delay]                            = 10
 default[:nexus][:mount][:nfs][:enable]                         = false
 default[:nexus][:mount][:nfs][:mount_point]                    = "/mnt/nexus"
 default[:nexus][:mount][:nfs][:device_path]                    = nil
+
+default[:nexus][:logs][:logs_to_keep]                          = 30
