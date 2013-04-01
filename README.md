@@ -271,6 +271,7 @@ The following attributes are set under the `nexus` namespace:
 * bin_dir - the above home/bin
 * work_dir - the above path/sonatype-work/nexus
 * plugins - an Array of Nexus plugins that will be installed by the default recipe.
+* logs::logs_to_keep - a fixnum value for the maximum number of logs the Nexus should keep.
 
 The following attribute is set under the `nexus::jetty` namespace:
 

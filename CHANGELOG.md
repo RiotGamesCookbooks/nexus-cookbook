@@ -1,3 +1,7 @@
+## v1.2.0
+
+* Add a template resource for logback-nexus.xml and a configurable option for keeping logs.
+
 ## v1.1.0
 
 * Uses a newer version of the nexus_cli gem, which no longer requires libxml or libxslt packages.
