@@ -85,7 +85,10 @@ class Chef
         if Chef::Config[:solo]
           Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
           Chef::Log.info "Returning default values in a Hash."
-          {}
+          {
+            :repositories => [
+            ]
+          }
         else
           get_nexus_data_bag(node)[:proxy_repositories]
         end
