@@ -1,3 +1,8 @@
+## v1.2.1
+
+* The proxy recipe should no longer causes failures on chef-solo runs.
+* Use the latest 1.5.0 version of artifact cookbook.
+
 ## v1.2.0
 
 * Add a template resource for logback-nexus.xml and a configurable option for keeping logs.
