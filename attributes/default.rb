@@ -71,3 +71,7 @@ default[:nexus][:mount][:nfs][:mount_point]                    = "/mnt/nexus"
 default[:nexus][:mount][:nfs][:device_path]                    = nil
 
 default[:nexus][:logs][:logs_to_keep]                          = 30
+
+default[:nexus][:hosted_repositories] = []
+default[:nexus][:proxy_repositories]  = []
+default[:nexus][:group_repositories]  = []

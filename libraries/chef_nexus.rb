@@ -85,12 +85,9 @@ class Chef
         if Chef::Config[:solo]
           Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
           Chef::Log.info "Returning default values in a Hash."
-          {
-            :repositories => [
-            ]
-          }
+          []
         else
-          get_nexus_data_bag(node)[:proxy_repositories]
+          node[:nexus][:proxy_repositories]
         end
       end
 
@@ -103,15 +100,13 @@ class Chef
         if Chef::Config[:solo]
           Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
           Chef::Log.info "Returning default values in a Hash."
-          {
-            :repositories => [
-              {
-                :name => "Artifacts"
-              }
-            ]
-          }
+          [
+            {
+              :name => "Artifacts"
+            }
+          ]
         else
-          get_nexus_data_bag(node)[:hosted_repositories]
+          node[:nexus][:hosted_repositories]
         end
       end
 
@@ -124,19 +119,17 @@ class Chef
         if Chef::Config[:solo]
           Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
           Chef::Log.info "Returning default values in a Hash."
-          {
-            :repositories => [
-              {
-                :name => "Group",
-                :add  => [
-                  "Releases",
-                  "Artifacts"
-                ]
-              }
-            ]
-          }
+          [
+            {
+              :name => "Group",
+              :add  => [
+                "Releases",
+                "Artifacts"
+              ]
+            }
+          ]
         else
-          get_nexus_data_bag(node)[:group_repositories]
+          node[:nexus][:group_repositories]
         end
       end
 

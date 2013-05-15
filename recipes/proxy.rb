@@ -16,9 +16,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-data_bag_for_node = Chef::Nexus.get_proxy_repositories(node)
+proxy_repositories = Chef::Nexus.get_proxy_repositories(node)
 
-data_bag_for_node[:repositories].each do |repository|
+proxy_repositories.each do |repository|
   
   nexus_proxy_repository repository[:name] do
     action :create
