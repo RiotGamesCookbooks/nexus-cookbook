@@ -30,10 +30,13 @@ nexus_user "admin" do
   old_password default_credentials["password"]
   password     updated_credentials["password"]
   action       :change_password
+  notifies :create, "ruby_block[set flag that default admin credentials were changed]", :immediately
+  only_if { updated_credentials }
 end
 
 ruby_block "set flag that default admin credentials were changed" do
   block do
     node.set[:nexus][:cli][:default_admin_credentials_updated] = true
   end
+  action :nothing
 end
