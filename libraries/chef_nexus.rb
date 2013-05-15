@@ -77,23 +77,29 @@ class Chef
       end
 
       # Loads the proxy_repositories
-      # 
+      #
+      # @param [Chef::Node] the Chef node
+      #
       # @return [Array<Hash>] the proxy_repositories
-      def get_proxy_repositories
+      def get_proxy_repositories(node)
         node[:nexus][:proxy_repositories]
       end
 
       # Loads the hosted_repositories
-      # 
+      #
+      # @param [Chef::Node] the Chef node
+      #
       # @return [Array<Hash>] the hosted_repositories
-      def get_hosted_repositories
+      def get_hosted_repositories(node)
         node[:nexus][:hosted_repositories]
       end
 
       # Loads the group_repositories
-      # 
+      #
+      # @param [Chef::Node] the Chef node
+      #
       # @return [Array<Hash>] the group_repositories
-      def get_group_repositories(node)
+      def get_group_repositories(node)(node)
         node[:nexus][:group_repositories]
       end
 
