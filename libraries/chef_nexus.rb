@@ -76,61 +76,25 @@ class Chef
         end
       end
 
-      # Loads the proxy_repositories entry from the nexus data bag item.
+      # Loads the proxy_repositories
       # 
-      # @param  node [Chef::Node] the Chef node
-      # 
-      # @return [Chef::Mash] the proxy_repositories entry in the data bag item
-      def get_proxy_repositories(node)
-        if Chef::Config[:solo]
-          Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
-          Chef::Log.info "Returning default values in a Hash."
-          []
-        else
-          node[:nexus][:proxy_repositories]
-        end
+      # @return [Array<Hash>] the proxy_repositories
+      def get_proxy_repositories
+        node[:nexus][:proxy_repositories]
       end
 
-      # Loads the hosted_repositories entry from the nexus data bag item.
+      # Loads the hosted_repositories
       # 
-      # @param  node [Chef::Node] the Chef node
-      # 
-      # @return [Chef::Mash] the hosted_repositories entry in the data bag item
-      def get_hosted_repositories(node)
-        if Chef::Config[:solo]
-          Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
-          Chef::Log.info "Returning default values in a Hash."
-          [
-            {
-              :name => "Artifacts"
-            }
-          ]
-        else
-          node[:nexus][:hosted_repositories]
-        end
+      # @return [Array<Hash>] the hosted_repositories
+      def get_hosted_repositories
+        node[:nexus][:hosted_repositories]
       end
 
-      # Loads the group_repositories entry from the nexus data bag item.
+      # Loads the group_repositories
       # 
-      # @param  node [Chef::Node] the Chef node
-      # 
-      # @return [Chef::Mash] the group_repositories entry in the data bag item
+      # @return [Array<Hash>] the group_repositories
       def get_group_repositories(node)
-        if Chef::Config[:solo]
-          Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
-          Chef::Log.info "Returning default values in a Hash."
-          [
-            {
-              :name => "Group",
-              :add  => [
-                "Releases",
-                "Artifacts"
-              ]
-            }
-          ]
-        else
-          node[:nexus][:group_repositories]
-        end
+        node[:nexus][:group_repositories]
       end
 
       # Loads the nexus_ssl_files encrypted data bag item for this node.
@@ -170,10 +134,10 @@ class Chef
         if Chef::Config[:solo]
           begin
             merged_credentials = overrides.merge(default_credentials)
-            NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:ssl][:verify])
+            NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:cli][:ssl][:verify])
           rescue NexusCli::PermissionsException, NexusCli::CouldNotConnectToNexusException, NexusCli::UnexpectedStatusCodeException => e
             merged_credentials = overrides.merge(updated_credentials)
-            NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:ssl][:verify])
+            NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:cli][:ssl][:verify])
           end
         else
           if node[:nexus][:cli][:default_admin_credentials_updated]
@@ -182,7 +146,7 @@ class Chef
             credentials = credentials_entry["default_admin"]
           end
           merged_credentials = overrides.merge(credentials)
-          NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:ssl][:verify])
+          NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:cli][:ssl][:verify])
         end
       end
 
@@ -232,7 +196,7 @@ class Chef
         url = generate_nexus_url(node)
         overrides = {"url" => url, "repository" => node[:nexus][:cli][:repository], "username" => username, "password" => password}
         begin
-          nexus = NexusCli::RemoteFactory.create(overrides, node[:nexus][:ssl][:verify])
+          nexus = NexusCli::RemoteFactory.create(overrides, node[:nexus][:cli][:ssl][:verify])
           true
         rescue NexusCli::PermissionsException, NexusCli::CouldNotConnectToNexusException, NexusCli::UnexpectedStatusCodeException => e
           false
@@ -261,7 +225,7 @@ class Chef
       private
 
         def generate_nexus_url(node)
-          if node[:nexus][:ssl][:jetty] || node[:nexus][:ssl][:jetty]
+          if node[:nexus][:app_server_proxy][:ssl][:enabled]
             "https://localhost:#{node[:nexus][:ssl][:port]}/nexus"
           else
             "http://localhost:#{node[:nexus][:port]}/nexus"

@@ -19,6 +19,6 @@
 #
 if node[:nexus][:app_server_proxy][:nginx][:enabled]
   include_recipe "nexus::_nginx"
-elsif node[:nexus][:app_server_proxy][:jetty][:enabled]
+elsif node[:nexus][:app_server_proxy][:jetty][:enabled] && [:nexus][:app_server_proxy][:ssl][:enabled]
   include_recipe "nexus::_jetty"
 end
