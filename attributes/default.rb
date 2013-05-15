@@ -18,7 +18,7 @@
 # limitations under the License.
 #
 #
-default[:nexus][:version]                                      = '2.3.1-01'
+default[:nexus][:version]                                      = '2.4.0-09'
 default[:nexus][:base_dir]                                      = '/'
 default[:nexus][:user]                                         = 'nexus'
 default[:nexus][:group]                                        = 'nexus'
