@@ -38,6 +38,12 @@ default[:nexus][:work_dir]                                     = "/nexus/sonatyp
 
 default[:nexus][:plugins]                                      = []
 
+default[:nexus][:logs][:logs_to_keep]                          = 30
+
+default[:nexus][:hosted_repositories] = []
+default[:nexus][:proxy_repositories]  = []
+default[:nexus][:group_repositories]  = []
+
 default[:nexus][:app_server_proxy][:nginx][:enabled]           = false
 default[:nexus][:app_server_proxy][:nginx][:server_name]       = node[:fqdn]
 
@@ -49,13 +55,13 @@ default[:nexus][:app_server_proxy][:ssl][:enabled]             = false
 default[:nexus][:app_server_proxy][:ssl][:port]                = 8443
 default[:nexus][:app_server_proxy][:ssl][:key]                 = node[:fqdn]
 
-default[:nexus][:nginx][:server][:options]                     = {
+default[:nexus][:app_server_proxy][:nginx][:server][:options]  = {
   :client_max_body_size    => '200M',
   :client_body_buffer_size => '512k',
   :keepalive_timeout       => '0'
 }
 
-default[:nexus][:nginx][:proxy][:options]                      = {
+default[:nexus][:app_server_proxy][:nginx][:proxy][:options]   = {
   
 }
 
@@ -64,9 +70,3 @@ default[:nexus][:cli][:repository]                             = "releases"
 default[:nexus][:cli][:default_admin_credentials_updated]      = false
 default[:nexus][:cli][:retries]                                = 3
 default[:nexus][:cli][:retry_delay]                            = 10
-
-default[:nexus][:logs][:logs_to_keep]                          = 30
-
-default[:nexus][:hosted_repositories] = []
-default[:nexus][:proxy_repositories]  = []
-default[:nexus][:group_repositories]  = []

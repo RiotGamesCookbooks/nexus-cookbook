@@ -18,18 +18,15 @@ The following cookbooks are dependencies:
 * ark
 * nginx
 * artifact
-* build-essential
 
 Recipes
 =======
 
-* default - installs and configures a Nexus installation. Will use either `nexus::nginx` or `nexus::jetty` when corresponding `nexus::ssl::nginx` or 
-`nexus::ssl:jetty` flags are set.
-* nginx - installs and configures an nginx server that will proxy the Nexus server with SSL
-* jetty - creates a directory and writes a keystore file to the node. The default recipe will call this when the `nexus::ssl::jetty` is true,
-which will add more customization to the jetty.xml file for Nexus.
+* default - the recipe you want in your run-list. Configures a system and installs a Nexus server.
+* app - the core recipe used for installing the Nexus server.
+* app\_server\_proxy - wraps some logic for whether or not an nginx installation is needed or if directories for SSL support are needed.
 * cli - installs packages at compilation time and uses `chef_gem` to instal the nexus_cli gem. Primarily used by the LWRPs of this cookbook.
-* group, hosted, proxy - recipe abstractions that get the appropriate entry from the nexus data bag and create repositories on the Nexus server.
+
 
 Usage
 =====
@@ -44,11 +41,11 @@ will be used to reflect the version in the downloads URL.
 Data Bags
 =========
 
-As of version 1.0.0, this cookbook now uses fewer, more standardized Encrypted Data Bags. Following the style used 
+As of version 2.0.0, this cookbook now uses fewer, more standardized Encrypted Data Bags. Following the style used 
 at Riot, Data bags are created per Chef Environment and default to a data bag item named "_wildcard" if there is no environmental
 data bag item. 
 
-The biggest changes to v1.0.0 are the combination of the Nexus credentials, license, and *_repositories data bags into one.
+For version 2.0.0, the data bag has been revised to only include the credentials, and license elements.
 
 Below is how you should create your data bags for using this cookbook:
     
@@ -73,52 +70,13 @@ Below is how you should create your data bags for using this cookbook:
       },
       "license": {
         "file": "base64d license file"
-      },
-      "group_repositories": {
-        "repositories": [
-          {
-            "name": "My Group",
-            "add": [
-              "Releases",
-              "Snapshots"
-            ]
-          }
-        ]
-      },
-      "hosted_repositories": {
-        "repositories": [
-          {
-            "name": "Hosted Files"
-          },
-          {
-            "name": "More Hosted Files",
-            "publisher": true
-          }
-        ]
-      },
-      "proxy_repositories": {
-        "repositories": [
-          {
-            "name": "Proxy Repo",
-            "url": "http://some-remote-repository"
-          },
-          {
-            "name": "Another Proxy Repo",
-            "url": "http://some-other-remote-repository",
-            "subscriber": true,
-            "publisher": true
-          }
-        ]
       }
     }
 
-The `nexus_ssl_files` data bag replaces the old `ssl_certificate` data bag item. The cookbook is also set up to look for
-Chef environment named items inside this data bag. This data bag should contain entries for either a certificate and key combo
-(for nginx) or a keystore (Jetty).
+The keystore element is only important when configuring SSL and using Jetty as the primary application server.
 
-Once the data bag item is loaded for the environment, the attribute [:nexus][:ssl_certificate][:key] is used to find an entry. The
-default value for the cookbook is the node's fqdn. Using this format, you can have a Chef environment with multiple Nexus servers that
-may need to use different SSL certificates.
+When you want to configure the Nexus to be served via SSL, you will need to set the nexus.app\_server\_proxy.ssl.enabled attribtue and configure an
+encrypted data bag.
 
 Your data bag items should look like the following:
 
@@ -134,8 +92,6 @@ Your data bag items should look like the following:
         "keystore": "base64-encoded-keystore-file"
       }
     }
-
-The `certificates` data bag item has been removed.
 
 Resources/Providers
 ===================
@@ -256,60 +212,52 @@ description  | The description of the other Nexus. Used for add_trusted_key.    
 Attributes
 ==========
 
-The following attributes are set under the `nexus` namespace:
+Most attributes under nexus are basic attributes needed for correctly installing the server. You can define things like the url to download the Nexus zip from, the install location, and other similar things here.
 
-* version - sets the version inside the nexus package
-* base_dir - sets the base directory under which to place the nexus user's home directory.
-* user - sets the user to install nexus under
-* group - sets the group to install nexus under
-* external_version - the version used on the downloads page for nexus
-* url - sets the URL where the nexus package is located
-* checksum - The SHA256 checksum of the Nexus installation package
-* port - the port to run nexus on
-* host - the hostname to use for nexus
-* context_path - the context path under which Nexus is running under. ie. "/nexus" #=> "http://localhost:8081/nexus"
-* name - the name of the Nexus
-* bundle_name - the name of the internal folder of the Nexus tar. Usually nexus-{professional or nothing}-{VERSION}
-* home - the installation directory for the nexus application. Uses name.
-* current_path - the above home/current/bundle_name. The artifact_deploy resource uses the `current` symlink to denote the currently installed version.
-* pid_dir - the pid directory defined in the nexus.erb template. Saves a pid in the `pids` directory created by the artifact_deploy resource.
-* conf_dir - the above home/conf
-* bin_dir - the above home/bin
-* work_dir - the above path/sonatype-work/nexus
-* plugins - an Array of Nexus plugins that will be installed by the default recipe.
-* logs::logs_to_keep - a fixnum value for the maximum number of logs the Nexus should keep.
+* nexus.version - sets the version inside the nexus package
+* nexus.base_dir - sets the base directory under which to place the nexus user's home directory.
+* nexus.user - sets the user to install nexus under
+* nexus.group - sets the group to install nexus under
+* nexus.external_version - the version used on the downloads page for nexus
+* nexus.url - sets the URL where the nexus package is located
+* nexus.checksum - The SHA256 checksum of the Nexus installation package
+* nexus.port - the port to run nexus on
+* nexus.host - the hostname to use for nexus
+* nexus.context_path - the context path under which Nexus is running under. ie. "/nexus" #=> "http://localhost:8081/nexus"
+* nexus.name - the name of the Nexus
+* nexus.bundle_name - the name of the internal folder of the Nexus tar. Usually nexus-{professional or nothing}-{VERSION}
+* nexus.home - the installation directory for the nexus application. Uses name.
+* nexus.current_path - the above home/current/bundle_name. The artifact_deploy resource uses the `current` symlink to denote the currently installed version.
+* nexus.pid_dir - the pid directory defined in the nexus.erb template. Saves a pid in the `pids` directory created by the artifact_deploy resource.
+* nexus.conf_dir - the above home/conf
+* nexus.bin_dir - the above home/bin
+* nexus.work_dir - the above path/sonatype-work/nexus
+* nexus.plugins - an Array of Nexus plugins that will be installed by the default recipe.
+* nexus.hosted\_repositories - an Array of Hashes that contain the following structure: `{ name: "My Hosted Repo", publisher: true }`
+* nexus.proxy\_repositories - an Array of Hashes that contain the following structure: `{ name: "My Proxy Repo", subscriber: true, publisher: false, url: "http://some-other-nexus/repo" }`
+* nexus.group\_repositories - an Array of Hashes that contain the following structure: `{ name: "My Group Repo", add: ["My Hosted Repo"], remote: ["My Proxy Repo"] }`
+* nexus.logs.logs\_to\_keep - a fixnum value for the maximum number of logs the Nexus should keep.
 
-The following attribute is set under the `nexus::jetty` namespace:
+Attributes under app\_server\_proxy help when you want to install an proxy in front of the running Nexus Jetty container. At the moment, the only supported alternative is nginx. Also, here is where you can configure SSL for either nginx or Jetty.
 
-* loopback - if true, the jetty.xml.erb will be written to disable access to anything but localhost. Useful for enabling access to Nexus via Jetty's HTTP connection.
+* nexus.app\_server\_proxy.nginx.enabled - true if we want to install nginx.
+* nexus.app\_server\_proxy.nginx.server_name - the name to be configured in the nginx.conf server element.
+* nexus.app\_server\_proxy.jetty.enabled - true if Jetty should be used. This defaults to true and will only have lasting effects when nexus.
+* nexus.app\_server\_proxy.jetty.loopback - true if you want to loop back on the default port (useful if you want to disable HTTP access).
+* nexus.app\_server\_proxy.jetty.keystore_path - the path on the node where a Java keystore will be saved.
+* nexus.app\_server\_proxy.ssl.enabled - true if SSL should be enabled. Use it in conjunction with nexus.app\_server\_proxy.nginx.enabled or nexus.app\_server\_proxy.jetty.enabled.
+* nexus.app\_server\_proxy.ssl.port - the port to use for SSL connections.
+* nexus.app\_server\_proxy.ssl.key - defines where to look in the credentials data bag for the SSL certificate and key information.
+* nexus.app\_server\_proxy.nginx.server.options - used to generate options in the `server` section of the nginx conf file.
+* nexus.app\_server\_proxy.nginx.proxy.options - used to generate proxy options in the `location` section of the nginx conf file.
 
-The following attributes are set under the `nexus::ssl` namespace and are related to the SSL settings of Nexus:
+Attributes under cli are used for configuring how the nexus_cli should behave. Most LWRPs in this cookboo use the nexus_cli gem for configuring a running Nexus server. Here you can configure how many attempts the gem should make before raising an exception about the Nexus server not being reachable (useful when you start or restart the server).
 
-* jetty - if true, the default recipe will configure Nexus to use Jetty's SSL connection.
-* nginx - if true, the default recipe will include the `nexus::nginx` recipe, installing and configuring an nginx SSL proxy server.
-* jetty_keystore_path - used for configuring where on the machine the keystore file will be that Jetty will use for its SSL configuration.
-* verify - if true, the calls in the chef_nexus.rb library will verify SSL connections. This is useful to disable when working with a self-signed certificate.
-* port - the default port for either Jetty or nginx SSL connections.
-
-* ssl\_certificate::key - the key to look for in the `nexus::ssl_certificate` encrypted data bag.
-
-The following attributes are set under `nexus::nginx` namespace:
-
-* server\_name - the name of the nginx server.
-* server::options - used to generate options in the `server` section of the nginx conf file.
-* proxy::options - used to generate proxy options in the `location` section of the nginx conf file.
-
-The following attributes are set under the `nexus::cli` namespace:
-
-* url - The url that the nexus_cli gem will connect to. The default recipe uses this to configure itself, so localhost.
-* repository - The repository that nexus_cli gem will use for push / pull operations. A requirement of nexus_cli, not used by this cookbook.
-* packages - required packages to install for using the `chef_gem "nexus_cli"`
-
-The following attributes are not fully supported but are under the `nexus::mount` namespace:
-
-* nfs::enable - enables an NFS mount.
-* nfs::mount\_point - the local path to mount an NFS drive to.
-* nfs::device\_path - the remote server where the NFS drive is located.
+* nexus.cli.ssl.verify - true if we want to verify SSL connections. false if you have bad SSL certificates on your servers. If you are testing local nginx and SSL, you'll want this value to be false, because the certificate is self-signed.
+* nexus.cli.repository - The repository that nexus_cli gem will use for push / pull operations. A requirement of nexus_cli, not used by this cookbook.
+* nexus.cli.default\_admin\_credentials\_updated - this attribute is used for setting chosing what credentials the nexus_cli will use. This attribute will be set on the node after the nexus\_user resource changes the Nexus server's password.
+* nexus.cli.retries - the number of attempts to make when connecting to a Nexus server. Most LWRPs in this cookbook require the Nexus server to be running.
+* nexus.cli.retry\_delay - the time to wait in between attempts to connect to the Nexus server.
 
 License and Author
 ==================
