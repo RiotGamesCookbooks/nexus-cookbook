@@ -17,9 +17,9 @@
 # limitations under the License.
 #
 #
-data_bag_for_node = Chef::Nexus.get_group_repositories(node)
+group_repositories = Chef::Nexus.get_group_repositories(node)
 
-data_bag_for_node[:repositories].each do |repository|
+group_repositories.each do |repository|
   
   nexus_group_repository repository[:name]
 

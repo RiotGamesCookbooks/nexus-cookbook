@@ -17,9 +17,9 @@
 # limitations under the License.
 #
 #
-data_bag_for_node = Chef::Nexus.get_hosted_repositories(node)
+hosted_repositories = Chef::Nexus.get_hosted_repositories(node)
  
-data_bag_for_node[:repositories].each do |repository|
+hosted_repositories.each do |repository|
   
   nexus_hosted_repository repository[:name]
 
