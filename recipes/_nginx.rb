@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: nexus
-# Recipe:: nginx
+# Recipe:: _nginx
 #
 # Author:: Kyle Allan (<kallan@riotgames.com>)
 # Copyright 2013, Riot Games
@@ -28,13 +28,13 @@ end
 
 data_bag_item = Chef::Nexus.get_ssl_files_data_bag(node)
 
-if data_bag_item && data_bag_item[node[:nexus][:ssl_certificate][:key]]
+if data_bag_item && data_bag_item[node[:nexus][:app_server_proxy][:ssl][:key]]
 
-  log "Using nexus_ssl_files data bag entry for #{node[:nexus][:ssl_certificate][:key]}" do
+  log "Using nexus_ssl_files data bag entry for #{node[:nexus][:app_server_proxy][:ssl][:key]}" do
     level :info
   end
 
-  data_bag_item = data_bag_item[node[:nexus][:ssl_certificate][:key]]
+  data_bag_item = data_bag_item[[:nexus][:app_server_proxy][:ssl][:key]]
   certificate   = Chef::Nexus.decode(data_bag_item[:crt])
   key           = Chef::Nexus.decode(data_bag_item[:key])
 
@@ -75,8 +75,8 @@ template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
   variables(
     :ssl_certificate => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt",
     :ssl_key         => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key",
-    :listen_port     => node[:nexus][:ssl][:port],
-    :server_name     => node[:nexus][:nginx_proxy][:server_name],
+    :listen_port     => node[:nexus][:app_server_proxy][:ssl][:port],
+    :server_name     => node[:nexus][:app_server_proxy][:nginx][:server_name],
     :fqdn            => node[:fqdn],
     :server_options  => node[:nexus][:nginx][:server][:options],
     :proxy_options   => node[:nexus][:nginx][:proxy][:options]

@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: nexus
-# Recipe:: jetty
+# Recipe:: _jetty
 #
 # Author:: Kyle Allan (<kallan@riotgames.com>)
 # Copyright 2013, Riot Games
@@ -20,7 +20,7 @@
 ssl_files = Chef::Nexus.get_ssl_files_data_bag(node)
 
 if ssl_files && ssl_files[node[:nexus][:jetty_keystore][:key]]
-  ssl_files_for_node = ssl_files[node[:nexus][:jetty_keystore][:key]]
+  ssl_files_for_node = ssl_files[node[:nexus][:app_server_proxy][:ssl][:key]]
   keystore_value = ssl_files_for_node[:keystore]
   
   log "Using nexus_ssl_files data bag entry for #{node[:nexus][:ssl_certificate][:key]}" do

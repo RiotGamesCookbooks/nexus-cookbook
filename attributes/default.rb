@@ -38,18 +38,18 @@ default[:nexus][:work_dir]                                     = "/nexus/sonatyp
 
 default[:nexus][:plugins]                                      = []
 
-default[:nexus][:jetty][:loopback]                             = false
+default[:nexus][:app_server_proxy][:nginx][:enabled]           = false
+default[:nexus][:app_server_proxy][:nginx][:server_name]       = node[:fqdn]
 
-default[:nexus][:ssl][:jetty]                                  = false
-default[:nexus][:ssl][:nginx]                                  = false
-default[:nexus][:ssl][:jetty_keystore_path]                    = "#{node[:nexus][:home]}/shared/certs"
+default[:nexus][:app_server_proxy][:jetty][:enabled]                     = false
+default[:nexus][:app_server_proxy][:jetty][:loopback]          = false
+default[:nexus][:app_server_proxy][:jetty][:keystore_path]     = "#{node[:nexus][:home]}/shared/certs"
+
+default[:nexus][:app_server_proxy][:ssl][:enabled]             = false
+default[:nexus][:app_server_proxy][:ssl][:port]                = 8443
+default[:nexus][:app_server_proxy][:ssl][:key]                 = node[:fqdn]
+
 default[:nexus][:ssl][:verify]                                 = true
-default[:nexus][:ssl][:port]                                   = 8443
-
-default[:nexus][:ssl_certificate][:key]                        = node[:fqdn]
-default[:nexus][:jetty_keystore][:key]                         = node[:fqdn]
-
-default[:nexus][:nginx_proxy][:server_name]                    = node[:fqdn]
 
 default[:nexus][:nginx][:server][:options]                     = {
   :client_max_body_size    => '200M',

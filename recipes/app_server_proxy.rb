@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: nexus
-# Recipe:: default
+# Recipe:: app_server_proxy
 #
 # Author:: Kyle Allan (<kallan@riotgames.com>)
 # Copyright 2013, Riot Games
@@ -17,23 +17,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-include_recipe "nexus::_common_system"
-include_recipe "nexus::cli"
-include_recipe "nexus::app_server_proxy"
-include_recipe "nexus::app"
-
-data_bag_item = Chef::Nexus.get_credentials(node)
-default_credentials = data_bag_item["default_admin"]
-updated_credentials = data_bag_item["updated_admin"]
-
-nexus_user "admin" do
-  old_password default_credentials["password"]
-  password     updated_credentials["password"]
-  action       :change_password
-end
-
-ruby_block "set flag that default admin credentials were changed" do
-  block do
-    node.set[:nexus][:cli][:default_admin_credentials_updated] = true
-  end
+if node[:nexus][:app_server_proxy][:nginx][:enabled]
+  include_recipe "nexus::_nginx"
+elsif node[:nexus][:app_server_proxy][:jetty][:enabled]
+  include_recipe "nexus::_jetty"
 end

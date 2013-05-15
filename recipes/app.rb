@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: nexus
-# Recipe:: default
+# Recipe:: app
 #
 # Author:: Kyle Allan (<kallan@riotgames.com>)
 # Copyright 2013, Riot Games
@@ -23,6 +23,20 @@ platform = ""
 case node[:platform]
 when "centos", "redhat", "debian", "ubuntu", "amazon", "scientific"
   platform = "linux-x86-64"
+end
+
+jetty_ssl = nil
+
+if node[:nexus][:app_server_proxy][:jetty] && node[:nexus][:app_server_proxy][:ssl][:enabled]
+  credentials = Chef::Nexus.get_credentials(node)
+
+  jetty_ssl = {
+    :keystore_path  => [node:nexus][:app_server_proxy][:jetty][:keystore_path],
+    :ssl_port       => node[:nexus][:app_server_proxy][:ssl][:port],
+    :password       => credentials[:keystore][:password],
+    :key_password   => credentials[:keystore][:key_password],
+    :trust_password => credentials[:keystore][:trust_password]
+  }
 end
 
 artifact_deploy node[:nexus][:name] do
@@ -92,7 +106,7 @@ artifact_deploy node[:nexus][:name] do
       mode   "0775"
       variables(
         :jetty_ssl => jetty_ssl,
-        :loopback  => node[:nexus][:jetty][:loopback]
+        :loopback  => node[:nexus][:app_server_proxy][:jetty][:loopback]
       )
     end
 
@@ -111,4 +125,21 @@ end
 
 service "nexus" do
   action   [:enable, :start]
+end
+
+template ::File.join(node[:nexus][:work_dir], "conf", "logback-nexus.xml") do
+  source "logback-nexus.xml.erb"
+  owner  node[:nexus][:user]
+  group  node[:nexus][:group]
+  mode "0664"
+  variables(
+    :logs_to_keep => node[:nexus][:logs][:logs_to_keep]
+  )
+  only_if { Chef::Nexus.nexus_available?(node) }
+end
+
+if node[:nexus][:app_server_proxy][:nginx][:enabled]
+  service "nginx" do
+    action :restart
+  end
 end
