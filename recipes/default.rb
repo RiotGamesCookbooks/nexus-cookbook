@@ -17,7 +17,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-include_recipe "nexus::_common_system"
 include_recipe "nexus::cli"
 include_recipe "nexus::_ssl"
 include_recipe "nexus::app"

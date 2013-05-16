@@ -17,10 +17,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+include_recipe "nexus::_common_system"
 ssl_setup_type = Chef::Nexus.validate_ssl_setup(node[:nexus][:app_server_proxy][:ssl][:setup])
 ssl_files = Chef::Nexus.get_ssl_files_data_bag(node)
-
-log "~> HI #{ssl_setup_type.class} and #{ssl_setup_type}"
 
 case ssl_setup_type
 when :jetty
