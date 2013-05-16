@@ -19,7 +19,7 @@
 #
 include_recipe "nexus::_common_system"
 include_recipe "nexus::cli"
-include_recipe "nexus::app_server_proxy"
+include_recipe "nexus::_ssl"
 include_recipe "nexus::app"
 
 data_bag_item = Chef::Nexus.get_credentials(node)

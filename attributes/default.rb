@@ -40,14 +40,12 @@ default[:nexus][:plugins]                                      = []
 
 default[:nexus][:logs][:logs_to_keep]                          = 30
 
-default[:nexus][:app_server_proxy][:nginx][:enabled]           = false
 default[:nexus][:app_server_proxy][:nginx][:server_name]       = node[:fqdn]
 
-default[:nexus][:app_server_proxy][:jetty][:enabled]           = true
-default[:nexus][:app_server_proxy][:jetty][:loopback]          = false
-default[:nexus][:app_server_proxy][:jetty][:keystore_path]     = "#{node[:nexus][:home]}/shared/certs"
+default[:nexus][:app_server][:jetty][:loopback]                = false
+default[:nexus][:app_server][:jetty][:keystore_path]           = "#{node[:nexus][:home]}/shared/certs"
 
-default[:nexus][:app_server_proxy][:ssl][:enabled]             = false
+default[:nexus][:app_server_proxy][:ssl][:setup]               = :none
 default[:nexus][:app_server_proxy][:ssl][:port]                = 8443
 default[:nexus][:app_server_proxy][:ssl][:key]                 = node[:fqdn]
 

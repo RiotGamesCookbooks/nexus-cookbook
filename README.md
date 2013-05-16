@@ -24,7 +24,7 @@ Recipes
 
 * default - the recipe you want in your run-list. Configures a system and installs a Nexus server.
 * app - the core recipe used for installing the Nexus server.
-* app\_server\_proxy - wraps some logic for whether or not an nginx installation is needed or if directories for SSL support are needed.
+* nginx - add this recipe to your run-list when you want nginx installed and configured to proxy the Nexus server.
 * cli - installs packages at compilation time and uses `chef_gem` to instal the nexus_cli gem. Primarily used by the LWRPs of this cookbook.
 
 
@@ -240,12 +240,10 @@ Most attributes under nexus are basic attributes needed for correctly installing
 
 Attributes under app\_server\_proxy help when you want to install an proxy in front of the running Nexus Jetty container. At the moment, the only supported alternative is nginx. Also, here is where you can configure SSL for either nginx or Jetty.
 
-* nexus.app\_server\_proxy.nginx.enabled - true if we want to install nginx.
 * nexus.app\_server\_proxy.nginx.server_name - the name to be configured in the nginx.conf server element.
-* nexus.app\_server\_proxy.jetty.enabled - true if Jetty should be used. This defaults to true and will only have lasting effects when nexus.
-* nexus.app\_server\_proxy.jetty.loopback - true if you want to loop back on the default port (useful if you want to disable HTTP access).
-* nexus.app\_server\_proxy.jetty.keystore_path - the path on the node where a Java keystore will be saved.
-* nexus.app\_server\_proxy.ssl.enabled - true if SSL should be enabled. Use it in conjunction with nexus.app\_server\_proxy.nginx.enabled or nexus.app\_server\_proxy.jetty.enabled.
+* nexus.app\_server.jetty.loopback - true if you want to loop back on the default port (useful if you want to disable HTTP access).
+* nexus.app\_server.jetty.keystore_path - the path on the node where a Java keystore will be saved.
+* nexus.app\_server\_proxy.ssl.setup - set this attribute when you want SSL configured. Valid values are :none, :nginx, or :jetty.
 * nexus.app\_server\_proxy.ssl.port - the port to use for SSL connections.
 * nexus.app\_server\_proxy.ssl.key - defines where to look in the credentials data bag for the SSL certificate and key information.
 * nexus.app\_server\_proxy.nginx.server.options - used to generate options in the `server` section of the nginx conf file.
