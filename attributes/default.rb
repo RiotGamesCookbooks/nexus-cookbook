@@ -40,10 +40,6 @@ default[:nexus][:plugins]                                      = []
 
 default[:nexus][:logs][:logs_to_keep]                          = 30
 
-default[:nexus][:hosted_repositories] = []
-default[:nexus][:proxy_repositories]  = []
-default[:nexus][:group_repositories]  = []
-
 default[:nexus][:app_server_proxy][:nginx][:enabled]           = false
 default[:nexus][:app_server_proxy][:nginx][:server_name]       = node[:fqdn]
 
