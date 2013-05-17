@@ -38,36 +38,25 @@ default[:nexus][:work_dir]                                     = "/nexus/sonatyp
 
 default[:nexus][:plugins]                                      = []
 
-default[:nexus][:jetty][:loopback]                             = false
+default[:nexus][:logs][:logs_to_keep]                          = 30
 
-default[:nexus][:ssl][:jetty]                                  = false
-default[:nexus][:ssl][:nginx]                                  = false
-default[:nexus][:ssl][:jetty_keystore_path]                    = "#{node[:nexus][:home]}/shared/certs"
-default[:nexus][:ssl][:verify]                                 = true
-default[:nexus][:ssl][:port]                                   = 8443
+default[:nexus][:app_server][:jetty][:loopback]                = false
 
-default[:nexus][:ssl_certificate][:key]                        = node[:fqdn]
-default[:nexus][:jetty_keystore][:key]                         = node[:fqdn]
+default[:nexus][:app_server_proxy][:ssl][:port]                = 8443
+default[:nexus][:app_server_proxy][:ssl][:key]                 = node[:fqdn]
 
-default[:nexus][:nginx_proxy][:server_name]                    = node[:fqdn]
-
-default[:nexus][:nginx][:server][:options]                     = {
+default[:nexus][:app_server_proxy][:nginx][:server_name]       = node[:fqdn]
+default[:nexus][:app_server_proxy][:nginx][:server][:options]  = {
   :client_max_body_size    => '200M',
   :client_body_buffer_size => '512k',
   :keepalive_timeout       => '0'
 }
-
-default[:nexus][:nginx][:proxy][:options]                      = {
+default[:nexus][:app_server_proxy][:nginx][:proxy][:options]   = {
   
 }
 
+default[:nexus][:cli][:ssl][:verify]                           = true
 default[:nexus][:cli][:repository]                             = "releases"
 default[:nexus][:cli][:default_admin_credentials_updated]      = false
 default[:nexus][:cli][:retries]                                = 3
 default[:nexus][:cli][:retry_delay]                            = 10
-
-default[:nexus][:mount][:nfs][:enable]                         = false
-default[:nexus][:mount][:nfs][:mount_point]                    = "/mnt/nexus"
-default[:nexus][:mount][:nfs][:device_path]                    = nil
-
-default[:nexus][:logs][:logs_to_keep]                          = 30
