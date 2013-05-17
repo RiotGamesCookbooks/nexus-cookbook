@@ -17,165 +17,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-include_recipe "java"
-include_recipe "build-essential"
-
-user_home = ::File.join(node[:nexus][:base_dir], node[:nexus][:user])
-
-platform = ""
-case node[:platform]
-when "centos", "redhat", "debian", "ubuntu", "amazon", "scientific"
-  platform = "linux-x86-64"
-end
-
-group node[:nexus][:group] do
-  system true
-end
-
-user node[:nexus][:group] do
-  gid    node[:nexus][:group]
-  shell  "/bin/bash"
-  home   user_home
-  system true
-end
-
-directory user_home do
-  owner  node[:nexus][:user]
-  group  node[:nexus][:group]
-  mode   "0755"
-  action :create
-end
-
-directory node[:nexus][:mount][:nfs][:mount_point] do
-  owner     node[:nexus][:user]
-  group     node[:nexus][:group]
-  mode      "0755"
-  action    :create
-  recursive true
-  only_if   {node[:nexus][:mount][:nfs][:enable]}
-end
-
-mount "#{node[:nexus][:mount][:nfs][:mount_point]}" do
-  action  [:mount, :enable]
-  device  node[:nexus][:mount][:nfs][:device_path]
-  fstype  "nfs"
-  options "rw"
-  only_if {node[:nexus][:mount][:nfs][:enable]}
-end
-
-jetty_ssl = nil
-
-if node[:nexus][:ssl][:nginx] && node[:nexus][:ssl][:jetty]
-  Chef::Application.fatal! "Cannot have both nginx and Jetty configured to use SSL for Nexus."
-elsif node[:nexus][:ssl][:nginx]
-  include_recipe "nexus::nginx"
-elsif node[:nexus][:ssl][:jetty]
-  credentials = Chef::Nexus.get_credentials(node)
-
-  jetty_ssl = {
-    :keystore_path  => node[:nexus][:ssl][:jetty_keystore_path],
-    :ssl_port       => node[:nexus][:ssl][:port],
-    :password       => credentials[:keystore][:password],
-    :key_password   => credentials[:keystore][:key_password],
-    :trust_password => credentials[:keystore][:trust_password]
-  }
-
-  include_recipe "nexus::jetty"
-end
-
-artifact_deploy node[:nexus][:name] do
-  version           node[:nexus][:version]
-  artifact_location node[:nexus][:url]
-  artifact_checksum node[:nexus][:checksum]
-  deploy_to         node[:nexus][:home]
-  owner             node[:nexus][:user]
-  group             node[:nexus][:group]
-  symlinks({
-    "log" => "#{node[:nexus][:bundle_name]}/logs"
-  })
-
-  before_extract Proc.new {
-    service "nexus" do
-      action :stop
-      only_if do File.exist?("/etc/init.d/nexus") end
-    end
-  }
-
-  before_symlink Proc.new {
-    nexus_home = ::File.join(release_path, node[:nexus][:bundle_name])
-
-    directory "#{nexus_home}/logs" do
-      recursive true
-      action :delete
-    end
-  }
-
-  configure Proc.new {
-
-    nexus_home = ::File.join(release_path, node[:nexus][:bundle_name])
-    conf_dir   = ::File.join(nexus_home, "conf")
-    bin_dir    = ::File.join(nexus_home, "bin")
-
-    template "#{bin_dir}/#{node[:nexus][:name]}" do
-      source "nexus.erb"
-      owner  node[:nexus][:user]
-      group  node[:nexus][:group]
-      mode   "0775"
-      variables(
-        :platform   => platform,
-        :nexus_home => nexus_home,
-        :nexus_user => node[:nexus][:user],
-        :nexus_pid  => node[:nexus][:pid_dir]
-      )
-    end
-    
-    template "#{conf_dir}/nexus.properties" do
-      source "nexus.properties.erb"
-      owner  node[:nexus][:user]
-      group  node[:nexus][:group]
-      mode   "0775"
-      variables(
-        :nexus_port         => node[:nexus][:port],
-        :nexus_host         => node[:nexus][:host],
-        :nexus_context_path => node[:nexus][:context_path],
-        :work_dir           => node[:nexus][:work_dir],
-        :fqdn               => node[:fqdn]
-      )
-    end
-
-    template "#{conf_dir}/jetty.xml" do
-      source "jetty.xml.erb"
-      owner  node[:nexus][:user]
-      group  node[:nexus][:group]
-      mode   "0775"
-      variables(
-        :jetty_ssl => jetty_ssl,
-        :loopback  => node[:nexus][:jetty][:loopback]
-      )
-    end
-
-    node[:nexus][:plugins].each do |plugin| 
-      nexus_plugin plugin do
-        plugin_path ::File.join(release_path, node[:nexus][:bundle_name], "nexus/WEB-INF/optional-plugins")
-        nexus_path  release_path
-      end
-    end
-
-    link "/etc/init.d/nexus" do
-      to "#{bin_dir}/nexus"
-    end
-  }
-end
-
-service "nexus" do
-  action   [:enable, :start]
-end
-
-if node[:nexus][:ssl][:nginx]
-  service "nginx" do
-    action :restart
-  end
-end
+include_recipe "nexus::cli"
+include_recipe "nexus::app"
+include_recipe "nexus::app_server_proxy"
 
 data_bag_item = Chef::Nexus.get_credentials(node)
 default_credentials = data_bag_item["default_admin"]
@@ -185,21 +29,13 @@ nexus_user "admin" do
   old_password default_credentials["password"]
   password     updated_credentials["password"]
   action       :change_password
+  notifies :create, "ruby_block[set flag that default admin credentials were changed]", :immediately
+  only_if { updated_credentials }
 end
 
 ruby_block "set flag that default admin credentials were changed" do
   block do
     node.set[:nexus][:cli][:default_admin_credentials_updated] = true
   end
-end
-
-template ::File.join(node[:nexus][:work_dir], "conf", "logback-nexus.xml") do
-  source "logback-nexus.xml.erb"
-  owner  node[:nexus][:user]
-  group  node[:nexus][:group]
-  mode "0664"
-  variables(
-    :logs_to_keep => node[:nexus][:logs][:logs_to_keep]
-  )
-  only_if { Chef::Nexus.nexus_available?(node) }
+  action :nothing
 end

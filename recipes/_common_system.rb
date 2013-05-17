@@ -1,7 +1,8 @@
 #
 # Cookbook Name:: nexus
-# Recipe:: group
+# Recipe:: _common_system
 #
+# Author:: Kyle Allan (<kallan@riotgames.com>)
 # Copyright 2013, Riot Games
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,26 +17,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-#
-data_bag_for_node = Chef::Nexus.get_group_repositories(node)
+user_home = ::File.join(node[:nexus][:base_dir], node[:nexus][:user])
 
-data_bag_for_node[:repositories].each do |repository|
-  
-  nexus_group_repository repository[:name]
+group node[:nexus][:group] do
+  system true
+end
 
-  repository[:add].each do |repository_to_add|
-    nexus_group_repository repository[:name] do
-      action     :add_to
-      repository repository_to_add
-    end
-  end
+user node[:nexus][:group] do
+  gid    node[:nexus][:group]
+  shell  "/bin/bash"
+  home   user_home
+  system true
+end
 
-  if repository[:remove]
-    repository[:remove].each do |repository_to_remove|
-      nexus_group_repository repository[:name] do
-        action     :remove_from
-        repository repository_to_remove
-      end
-    end
-  end
+directory user_home do
+  owner  node[:nexus][:user]
+  group  node[:nexus][:group]
+  mode   "0755"
+  action :create
 end
