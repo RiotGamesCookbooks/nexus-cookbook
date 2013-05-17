@@ -62,18 +62,11 @@ Below is how you should create your data bags for using this cookbook:
           "username": "admin",
           "password": "new_password"
         },
-        "keystore": {
-          "password": "some_password",
-          "key_password": "some_password",
-          "trust_password": "some_password"
-        }
       },
       "license": {
         "file": "base64d license file"
       }
     }
-
-The keystore element is only important when configuring SSL and using Jetty as the primary application server.
 
 When you want to configure the Nexus to be served via SSL, you will need to set the nexus.app\_server\_proxy.ssl.enabled attribtue and configure an
 encrypted data bag.
@@ -87,9 +80,6 @@ Your data bag items should look like the following:
       "fully-qualified-domain-name": {
         "crt": "base64-encoded-ssl-certificate",
         "key": "base64-encoded-private-key"
-      },
-      "another-fully-qualified-domain-name": {
-        "keystore": "base64-encoded-keystore-file"
       }
     }
 
@@ -242,7 +232,6 @@ Attributes under app\_server\_proxy help when you want to install an proxy in fr
 
 * nexus.app\_server\_proxy.nginx.server_name - the name to be configured in the nginx.conf server element.
 * nexus.app\_server.jetty.loopback - true if you want to loop back on the default port (useful if you want to disable HTTP access).
-* nexus.app\_server.jetty.keystore_path - the path on the node where a Java keystore will be saved.
 * nexus.app\_server\_proxy.ssl.setup - set this attribute when you want SSL configured. Valid values are :none, :nginx, or :jetty.
 * nexus.app\_server\_proxy.ssl.port - the port to use for SSL connections.
 * nexus.app\_server\_proxy.ssl.key - defines where to look in the credentials data bag for the SSL certificate and key information.

@@ -26,8 +26,6 @@ when "centos", "redhat", "debian", "ubuntu", "amazon", "scientific"
   platform = "linux-x86-64"
 end
 
-jetty_ssl_config = Chef::Nexus.get_jetty_ssl_config(node)
-
 artifact_deploy node[:nexus][:name] do
   version           node[:nexus][:version]
   artifact_location node[:nexus][:url]
@@ -94,7 +92,6 @@ artifact_deploy node[:nexus][:name] do
       group  node[:nexus][:group]
       mode   "0775"
       variables(
-        :jetty_ssl => jetty_ssl_config,
         :loopback  => node[:nexus][:app_server][:jetty][:loopback]
       )
     end

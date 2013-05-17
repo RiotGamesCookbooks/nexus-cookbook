@@ -18,8 +18,8 @@
 # limitations under the License.
 #
 include_recipe "nexus::cli"
-include_recipe "nexus::_ssl"
 include_recipe "nexus::app"
+include_recipe "nexus::app_server_proxy"
 
 data_bag_item = Chef::Nexus.get_credentials(node)
 default_credentials = data_bag_item["default_admin"]

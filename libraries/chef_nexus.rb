@@ -201,40 +201,6 @@ class Chef
         Base64.decode64(value)
       end
 
-      # Validates the input is one of the available options for enabling
-      # SSL for a Nexus server. If the input was something unexpected, don't
-      # configure SSL.
-      # 
-      # @param  ssl_setup [String]
-      # 
-      # @return [Symbol] either ssl_setup or :none
-      def validate_ssl_setup(ssl_setup)
-        return ssl_setup.to_sym if [:none, :nginx, :jetty].one? { |setup_type| ssl_setup.to_sym == setup_type }
-        Chef::Log.warn "Attribute nexus.app_server_proxy.ssl.setup was not one of :none, :nginx, or :jetty. Returning :none."
-        :none
-      end
-
-      # Generates a Hash from some attributes and the credentials data bag
-      # that is used for configuring a jetty.xml that enables SSL.
-      #
-      #
-      # [get_jetty_ssl_config description]
-      # @param  node [Chef::Node] the Chef node
-      # 
-      # @return [Hash]
-      def get_jetty_ssl_config(node)
-        if validate_ssl_setup(node[:nexus][:app_server_proxy][:ssl][:setup]) == :jetty
-          credentials = get_credentials(node)
-          {
-            :keystore_path  => node[:nexus][:app_server][:jetty][:keystore_path],
-            :ssl_port       => node[:nexus][:app_server_proxy][:ssl][:port],
-            :password       => credentials[:keystore][:password],
-            :key_password   => credentials[:keystore][:key_password],
-            :trust_password => credentials[:keystore][:trust_password]
-          }
-        end 
-      end
-
       private
 
         def generate_nexus_url(node)
