@@ -1,3 +1,13 @@
+## v2.1.0
+
+* Change nginx config attributes to an Array of Strings instead of a Hash. See #33.
+
+## v2.0.0
+
+* Remove many of the recipes and attempt to follow the "Application Cookbook Pattern" a bit more.
+* Removed the usage of many of the LWRPs. Those calls belong in a wrapper cookbook.
+* Remove the ability to configure Jetty with SSL.
+
 ## v1.2.1
 
 * The proxy recipe should no longer causes failures on chef-solo runs.
