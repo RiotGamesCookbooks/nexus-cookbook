@@ -11,8 +11,8 @@ server {
   error_log /var/log/nginx/repository.sonatype.org.ssl.error.log;
 
   #These come from node['nexus']['nginx']['server']['options']
-  <% @server_options.each do |option, value|%>
-  <%= option %> <%= value %>;
+  <% @server_options.each do |option|%>
+  <%= option %>;
   <% end %>
 
   ssl_session_timeout 5m;
@@ -30,8 +30,8 @@ server {
     proxy_redirect     default;
 
     #These come from node['nexus']['nginx']['proxy']['options']
-    <% @proxy_options.each do |option, value|%>
-    <%= option %> <%= value %>;
+    <% @proxy_options.each do |option|%>
+    <%= option %>;
     <% end %>
   }
 }
