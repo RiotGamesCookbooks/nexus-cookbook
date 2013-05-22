@@ -79,7 +79,18 @@ template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
     :server_name     => node[:nexus][:app_server_proxy][:nginx][:server_name],
     :fqdn            => node[:fqdn],
     :server_options  => node[:nexus][:app_server_proxy][:nginx][:server][:options],
-    :proxy_options   => node[:nexus][:app_server_proxy][:nginx][:proxy][:options]
+    :proxy_options   => node[:nexus][:app_server_proxy][:nginx][:proxy][:options],
+    :proxy_pass      => "http://localhost:#{node[:nexus][:port]}"
+  )
+end
+
+template ::File.join(node[:nginx][:dir], "conf.d", "upstream.conf") do
+  source "upstream.conf.erb"
+  owner "root"
+  group "root"
+  mode "0644"
+  variables(
+    :servers => node[:nexus][:app_server_proxy][:nginx][:upstream_servers]
   )
 end
 

@@ -1,0 +1,5 @@
+upstream nexii {
+  <% @servers.each do |server|%>
+  server <%= server %>;
+  <% end %>
+}
