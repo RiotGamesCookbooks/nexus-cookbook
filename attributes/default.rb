@@ -45,11 +45,16 @@ default[:nexus][:app_server][:jetty][:loopback]                = false
 default[:nexus][:app_server_proxy][:ssl][:port]                = 8443
 default[:nexus][:app_server_proxy][:ssl][:key]                 = node[:fqdn]
 
-default[:nexus][:app_server_proxy][:nginx][:server_name]       = node[:fqdn]
-default[:nexus][:app_server_proxy][:nginx][:server][:options]  = ["client_max_body_size 200M", "client_body_buffer_size 512k", "keepalive_timeout 0"]
-default[:nexus][:app_server_proxy][:nginx][:upstream_servers]         = []
+default[:nexus][:app_server_proxy][:server_name]      = node[:fqdn]
+default[:nexus][:app_server_proxy][:port]             = "http://localhost:#{node[:nexus][:port]}"
+default[:nexus][:app_server_proxy][:server][:options] = [
+  "client_max_body_size 200M",
+  "client_body_buffer_size 512k",
+  "keepalive_timeout 0"
+]
+default[:nexus][:app_server_proxy][:proxy][:options]  = []
 
-default[:nexus][:app_server_proxy][:nginx][:proxy][:options]   = []
+default[:nexus][:load_balancer][:upstream_servers] = []
 
 default[:nexus][:cli][:ssl][:verify]                           = true
 default[:nexus][:cli][:repository]                             = "releases"

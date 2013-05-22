@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: nexus
-# Recipe:: app_server_upstream
+# Recipe:: load_balancer
 #
 # Author:: Kyle Allan (<kallan@riotgames.com>)
 # Copyright 2013, Riot Games
@@ -17,12 +17,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+include_recipe "nexus::app_server_proxy"
+
 template ::File.join(node[:nginx][:dir], "conf.d", "upstream.conf") do
   source "upstream.conf.erb"
   owner "root"
   group "root"
   mode "0644"
   variables(
-    :servers => node[:nexus][:app_server_proxy][:nginx][:upstream_servers]
+    :servers => node[:nexus][:load_balancer][:upstream_servers]
   )
 end
