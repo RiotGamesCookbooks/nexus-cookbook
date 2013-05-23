@@ -34,7 +34,7 @@ if ssl_files && ssl_files[node[:nexus][:app_server_proxy][:ssl][:key]]
     level :info
   end
 
-  entry = ssl_files[[:nexus][:app_server_proxy][:ssl][:key]]
+  entry = ssl_files[node[:nexus][:app_server_proxy][:ssl][:key]]
   certificate = Chef::Nexus.decode(entry[:crt])
   key = Chef::Nexus.decode(entry[:key])
 
