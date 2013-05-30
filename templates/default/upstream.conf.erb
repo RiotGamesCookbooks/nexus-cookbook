@@ -1,0 +1,5 @@
+upstream <%= @upstream_name %> {
+  <% @servers.each do |server|%>
+  server <%= server %>;
+  <% end %>
+}
