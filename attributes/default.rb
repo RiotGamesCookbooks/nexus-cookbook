@@ -54,6 +54,7 @@ default[:nexus][:app_server_proxy][:server][:options] = [
 ]
 default[:nexus][:app_server_proxy][:proxy][:options]  = []
 
+default[:nexus][:load_balancer][:upstream_name] = "nexii"
 default[:nexus][:load_balancer][:upstream_servers] = []
 
 default[:nexus][:cli][:ssl][:verify]                           = true
