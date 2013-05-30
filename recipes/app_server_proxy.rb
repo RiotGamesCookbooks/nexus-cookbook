@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: nexus
-# Recipe:: _nginx
+# Recipe:: app_server_proxy
 #
 # Author:: Kyle Allan (<kallan@riotgames.com>)
 # Copyright 2013, Riot Games
@@ -76,10 +76,11 @@ template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
     :ssl_certificate => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt",
     :ssl_key         => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key",
     :listen_port     => node[:nexus][:app_server_proxy][:ssl][:port],
-    :server_name     => node[:nexus][:app_server_proxy][:nginx][:server_name],
+    :server_name     => node[:nexus][:app_server_proxy][:server_name],
     :fqdn            => node[:fqdn],
-    :server_options  => node[:nexus][:app_server_proxy][:nginx][:server][:options],
-    :proxy_options   => node[:nexus][:app_server_proxy][:nginx][:proxy][:options]
+    :server_options  => node[:nexus][:app_server_proxy][:server][:options],
+    :proxy_options   => node[:nexus][:app_server_proxy][:proxy][:options],
+    :proxy_pass      => node[:nexus][:app_server_proxy][:port]
   )
 end
 
