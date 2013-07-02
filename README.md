@@ -15,7 +15,6 @@ Platform:
 The following cookbooks are dependencies:
 
 * java
-* ark
 * nginx
 * artifact
 
