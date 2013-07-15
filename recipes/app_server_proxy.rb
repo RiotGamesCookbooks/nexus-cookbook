@@ -27,7 +27,7 @@ directory "#{node[:nginx][:dir]}/shared/certificates" do
   recursive true
 end
 
-ssl_files = Chef::Nexus.get_ssl_files_data_bag(node) if node[:nexus][:app_server_proxy][:ssl_enabled]
+ssl_files = Chef::Nexus.get_ssl_files_data_bag(node) if node[:nexus][:app_server_proxy][:ssl][:enabled]
 if ssl_files && ssl_files[node[:nexus][:app_server_proxy][:ssl][:key]]
 
   log "Using nexus_ssl_files data bag entry for #{node[:nexus][:app_server_proxy][:ssl][:key]}" do
