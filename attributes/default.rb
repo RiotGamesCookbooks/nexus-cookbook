@@ -42,7 +42,7 @@ default[:nexus][:logs][:logs_to_keep]                          = 30
 
 default[:nexus][:app_server][:jetty][:loopback]                = false
 
-default[:nexus][:app_server_proxy][:ssl][:enabled]             = true
+default[:nexus][:app_server_proxy][:ssl][:from_data_bag]       = true
 default[:nexus][:app_server_proxy][:ssl][:port]                = 8443
 default[:nexus][:app_server_proxy][:ssl][:key]                 = node[:fqdn]
 

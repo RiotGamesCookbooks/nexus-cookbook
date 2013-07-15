@@ -231,6 +231,7 @@ Attributes under app\_server\_proxy help when you want to install an proxy in fr
 
 * nexus.app\_server\_proxy.nginx.server_name - the name to be configured in the nginx.conf server element.
 * nexus.app\_server.jetty.loopback - true if you want to loop back on the default port (useful if you want to disable HTTP access).
+* nexus.app\_server\_proxy.ssl.from_data_bag - set this attribute when you want SSL keys from data bag. 
 * nexus.app\_server\_proxy.ssl.setup - set this attribute when you want SSL configured. Valid values are :none, :nginx, or :jetty.
 * nexus.app\_server\_proxy.ssl.port - the port to use for SSL connections.
 * nexus.app\_server\_proxy.ssl.key - defines where to look in the credentials data bag for the SSL certificate and key information.
