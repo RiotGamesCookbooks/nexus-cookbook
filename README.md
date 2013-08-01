@@ -35,7 +35,8 @@ Simply add the `nexus::default` recipe to the node where you want Sonatype Nexus
 Due to a recent change on Sonatypes website, the downloads got a bit weird. Each time you download a tar.gz from Sonatype's site, it has two version
 numbers. One that is an internal folder inside the tar (ex: 2.3.1-01) and one that they use on their website's downloads page (ex: 2.3, latest). I have
 recently added a new attribute to reflect this change - `node.nexus.version` will be used to reflect the inner version, and `node.nexus.external_version`
-will be used to reflect the version in the downloads URL.
+will be used to reflect the version in the downloads URL. This cookbook defaults to using version 4.9. To use a newer release, be sure to modify
+`node.nexus.version`, `node.nexus.external_version`, and `node.nexus.checksum`.
 
 Data Bags
 =========
@@ -207,7 +208,7 @@ Most attributes under nexus are basic attributes needed for correctly installing
 * nexus.base_dir - sets the base directory under which to place the nexus user's home directory.
 * nexus.user - sets the user to install nexus under
 * nexus.group - sets the group to install nexus under
-* nexus.external_version - the version used on the downloads page for nexus
+* nexus.external_version - the version used on the downloads page for nexus. Defaults to `'4.9'`, can also be set to `'latest'`
 * nexus.url - sets the URL where the nexus package is located
 * nexus.checksum - The SHA256 checksum of the Nexus installation package
 * nexus.port - the port to run nexus on

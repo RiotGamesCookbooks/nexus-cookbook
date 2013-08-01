@@ -22,7 +22,7 @@ default[:nexus][:version]                                      = '2.4.0-09'
 default[:nexus][:base_dir]                                      = '/'
 default[:nexus][:user]                                         = 'nexus'
 default[:nexus][:group]                                        = 'nexus'
-default[:nexus][:external_version]                             = 'latest'
+default[:nexus][:external_version]                             = '4.9'
 default[:nexus][:url]                                          = "http://www.sonatype.org/downloads/nexus-#{node[:nexus][:external_version]}-bundle.tar.gz"
 default[:nexus][:checksum]                                     = 'c680006f7a25be4261c58496fc27ed7f3efbd2cc6724a2fc6f3f0a195ba4d673'
 
