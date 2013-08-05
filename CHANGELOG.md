@@ -1,3 +1,13 @@
+## v2.3.0
+
+* Default to Nexus 2.6
+  * Deprecates Java 6 in favor of Java 7
+* Cookbook dependency updated to java 1.12.0
+
+## v2.2.0
+
+* Functionality for the nginx Upstream module
+
 ## v2.1.0
 
 * Change nginx config attributes to an Array of Strings instead of a Hash. See #33.
