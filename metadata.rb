@@ -10,6 +10,6 @@ version          "2.2.0"
   supports os
 end
 
-depends "java", "~> 1.9.0"
+depends "java", "~> 1.12.0"
 depends "nginx", "~> 1.6.0"
 depends "artifact", "~> 1.6.0"

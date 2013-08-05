@@ -18,13 +18,29 @@
 # limitations under the License.
 #
 #
-default[:nexus][:version]                                      = '2.4.0-09'
+
+default[:java][:jdk_version] = '7'
+# this duplicates logic from the java cookbook's attributes because
+# we can't work around the attribute file load ordering
+case node['platform_family']
+when "rhel", "fedora"
+  default['java']['java_home'] = "/usr/lib/jvm/java"
+  default['java']['openjdk_packages'] = ["java-1.#{node['java']['jdk_version']}.0-openjdk", "java-1.#{node['java']['jdk_version']}.0-openjdk-devel"]
+when "debian"
+  default['java']['java_home'] = "/usr/lib/jvm/default-java"
+  default['java']['openjdk_packages'] = ["openjdk-#{node['java']['jdk_version']}-jdk", "default-jre-headless"]
+else
+  default['java']['java_home'] = "/usr/lib/jvm/default-java"
+  default['java']['openjdk_packages'] = ["openjdk-#{node['java']['jdk_version']}-jdk"]
+end
+
+default[:nexus][:version]                                      = '2.6.0-05'
 default[:nexus][:base_dir]                                      = '/'
 default[:nexus][:user]                                         = 'nexus'
 default[:nexus][:group]                                        = 'nexus'
-default[:nexus][:external_version]                             = 'latest'
+default[:nexus][:external_version]                             = '2.6.0-05'
 default[:nexus][:url]                                          = "http://www.sonatype.org/downloads/nexus-#{node[:nexus][:external_version]}-bundle.tar.gz"
-default[:nexus][:checksum]                                     = 'c680006f7a25be4261c58496fc27ed7f3efbd2cc6724a2fc6f3f0a195ba4d673'
+default[:nexus][:checksum]                                     = '9723a219c38afa30576dad0b62840ff56bb31f4542dab7d24d6e1a4d359763c9'
 
 default[:nexus][:port]                                         = '8081'
 default[:nexus][:host]                                         = '0.0.0.0'
