@@ -43,22 +43,7 @@ class Chef
       # 
       # @return [Chef::Mash] the credentials entry in the data bag item
       def get_credentials(node)
-        if Chef::Config[:solo]
-          Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
-          Chef::Log.info "Returning default values in a Hash."
-          {
-            "default_admin" => {
-              "username" => "admin",
-              "password" => "admin123"
-            },
-            "updated_admin" => {
-              "username" => "admin",
-              "password" => "password1"
-            }
-          }
-        else
-          get_nexus_data_bag(node)[:credentials]
-        end
+        get_nexus_data_bag(node)[:credentials]
       end
 
       # Loads the license entry from the nexus data bag item
@@ -67,13 +52,7 @@ class Chef
       # 
       # @return [Chef::Mash] the license entry in the data bag item
       def get_license(node)
-        if Chef::Config[:solo]
-          Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
-          Chef::Log.info "Returning default values in a Hash."
-          nil
-        else
-          get_nexus_data_bag(node)[:license]
-        end
+        get_nexus_data_bag(node)[:license]
       end
 
       # Loads the nexus_ssl_files encrypted data bag item for this node.
@@ -85,13 +64,7 @@ class Chef
       # 
       # @return [Chef::Mash] the loaded data bag item
       def get_ssl_files_data_bag(node)
-        if Chef::Config[:solo]
-          Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
-          Chef::Log.info "Returning default values in a Hash."
-          nil
-        else
-          encrypted_data_bag_for(node, SSL_FILES_DATABAG)
-        end
+        encrypted_data_bag_for(node, SSL_FILES_DATABAG)
       end
 
       # Creates and returns an instance of a NexusCli::RemoteFactory that
@@ -110,23 +83,13 @@ class Chef
         url = generate_nexus_url(node)
 
         overrides = {"url" => url, "repository" => node[:nexus][:cli][:repository]}
-        if Chef::Config[:solo]
-          begin
-            merged_credentials = overrides.merge(default_credentials)
-            NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:cli][:ssl][:verify])
-          rescue NexusCli::PermissionsException, NexusCli::CouldNotConnectToNexusException, NexusCli::UnexpectedStatusCodeException => e
-            merged_credentials = overrides.merge(updated_credentials)
-            NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:cli][:ssl][:verify])
-          end
+        if node[:nexus][:cli][:default_admin_credentials_updated]
+          credentials = credentials_entry["updated_admin"]
         else
-          if node[:nexus][:cli][:default_admin_credentials_updated]
-            credentials = credentials_entry["updated_admin"]
-          else
-            credentials = credentials_entry["default_admin"]
-          end
-          merged_credentials = overrides.merge(credentials)
-          NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:cli][:ssl][:verify])
+          credentials = credentials_entry["default_admin"]
         end
+        merged_credentials = overrides.merge(credentials)
+        NexusCli::RemoteFactory.create(merged_credentials, node[:nexus][:cli][:ssl][:verify])
       end
 
       # Checks to ensure the Nexus server is available. When

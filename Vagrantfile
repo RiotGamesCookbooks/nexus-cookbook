@@ -15,6 +15,9 @@ Vagrant.configure("2") do |config|
   config.ssh.timeout   = 120
 
   config.vm.provision :chef_solo do |chef|
+    chef.data_bags_path = "~/.chef/data_bags"
+    chef.encrypted_data_bag_secret_key_path = "~/.chef/encrypted_data_bag_secret"
+
     chef.json = {
       :nexus => {
         :cli => {
