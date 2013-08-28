@@ -245,6 +245,11 @@ Attributes under cli are used for configuring how the nexus_cli should behave. M
 * nexus.cli.retries - the number of attempts to make when connecting to a Nexus server. Most LWRPs in this cookbook require the Nexus server to be running.
 * nexus.cli.retry\_delay - the time to wait in between attempts to connect to the Nexus server.
 
+Local Development
+=================
+
+In order to run this cookbook locally in Vagrant, you need to configure data bags in `~/.chef/data_bags` and place your encrypted data bag secret key in `~/.chef/encrypted_data_bag_secret`.
+
 License and Author
 ==================
 
