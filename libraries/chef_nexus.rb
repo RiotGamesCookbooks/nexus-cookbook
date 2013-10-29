@@ -43,22 +43,7 @@ class Chef
       # 
       # @return [Chef::Mash] the credentials entry in the data bag item
       def get_credentials(node)
-        if Chef::Config[:solo]
-          Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
-          Chef::Log.info "Returning default values in a Hash."
-          {
-            "default_admin" => {
-              "username" => "admin",
-              "password" => "admin123"
-            },
-            "updated_admin" => {
-              "username" => "admin",
-              "password" => "password1"
-            }
-          }
-        else
-          get_nexus_data_bag(node)[:credentials]
-        end
+        get_nexus_data_bag(node)[:credentials]
       end
 
       # Loads the license entry from the nexus data bag item
@@ -67,13 +52,7 @@ class Chef
       # 
       # @return [Chef::Mash] the license entry in the data bag item
       def get_license(node)
-        if Chef::Config[:solo]
-          Chef::Log.info "Chef Solo does not work well with Encrypted Data Bags."
-          Chef::Log.info "Returning default values in a Hash."
-          nil
-        else
-          get_nexus_data_bag(node)[:license]
-        end
+        get_nexus_data_bag(node)[:license]
       end
 
       # Loads the nexus_ssl_files encrypted data bag item for this node.
