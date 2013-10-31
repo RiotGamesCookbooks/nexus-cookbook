@@ -25,9 +25,17 @@ data_bag_item = Chef::Nexus.get_credentials(node)
 default_credentials = data_bag_item["default_admin"]
 updated_credentials = data_bag_item["updated_admin"]
 
+#need to extract out the password before going onto the next step
+#to prevent a compiliation error when the updated credentials aren't supplied
+if(!updated_credentials)
+	updated_password =  default_credentials["password"]
+else
+	updated_password = updated_credentials["password"]
+end
+
 nexus_user "admin" do
   old_password default_credentials["password"]
-  password     updated_credentials["password"]
+  password     updated_password
   action       :change_password
   notifies :create, "ruby_block[set flag that default admin credentials were changed]", :immediately
   only_if { updated_credentials }
