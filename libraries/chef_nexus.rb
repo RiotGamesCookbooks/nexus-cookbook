@@ -178,9 +178,9 @@ class Chef
 
         def generate_nexus_url(node)
           if node[:nexus][:app_server_proxy][:ssl][:enabled]
-            "https://localhost:#{node[:nexus][:ssl][:port]}/nexus"
+            "https://localhost:#{node[:nexus][:ssl][:port]}#{node[:nexus][:context_path]}"
           else
-            "http://localhost:#{node[:nexus][:port]}/nexus"
+            "http://localhost:#{node[:nexus][:port]}#{node[:nexus][:context_path]}"
           end
         end
 
