@@ -1,3 +1,10 @@
+## v2.4.0
+
+* [#52](https://github.com/RiotGames/nexus-cookbook/pull/52) Fixed a compilation bug for credentials data bag.
+* [#50](https://github.com/RiotGames/nexus-cookbook/pull/50) Fixed a bug where we couldn't communicate with Nexus servers using a modified context path.
+* Some less vulnerable SSL options have been added to the nginx config
+* Removed chef-solo specific portions of code
+
 ## v2.3.0
 
 * Default to Nexus 2.6
