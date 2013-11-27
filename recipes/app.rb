@@ -20,12 +20,6 @@
 include_recipe "nexus::_common_system"
 include_recipe "java"
 
-platform = ""
-case node[:platform]
-when "centos", "redhat", "debian", "ubuntu", "amazon", "scientific"
-  platform = "linux-x86-64"
-end
-
 artifact_deploy node[:nexus][:name] do
   version           node[:nexus][:version]
   artifact_location node[:nexus][:url]
@@ -65,8 +59,6 @@ artifact_deploy node[:nexus][:name] do
       group  node[:nexus][:group]
       mode   "0775"
       variables(
-        :platform   => platform,
-        :nexus_home => nexus_home,
         :nexus_user => node[:nexus][:user],
         :nexus_pid  => node[:nexus][:pid_dir]
       )
@@ -94,13 +86,6 @@ artifact_deploy node[:nexus][:name] do
       variables(
         :loopback  => node[:nexus][:app_server][:jetty][:loopback]
       )
-    end
-
-    node[:nexus][:plugins].each do |plugin| 
-      nexus_plugin plugin do
-        plugin_path ::File.join(release_path, node[:nexus][:bundle_name], "nexus/WEB-INF/optional-plugins")
-        nexus_path  release_path
-      end
     end
 
     link "/etc/init.d/nexus" do

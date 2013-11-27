@@ -34,13 +34,13 @@ else
   default['java']['openjdk_packages'] = ["openjdk-#{node['java']['jdk_version']}-jdk"]
 end
 
-default[:nexus][:version]                                      = '2.6.0-05'
+default[:nexus][:version]                                      = '2.7.0-03'
 default[:nexus][:base_dir]                                      = '/'
 default[:nexus][:user]                                         = 'nexus'
 default[:nexus][:group]                                        = 'nexus'
-default[:nexus][:external_version]                             = '2.6.0-05'
+default[:nexus][:external_version]                             = '2.7.0-03'
 default[:nexus][:url]                                          = "http://www.sonatype.org/downloads/nexus-#{node[:nexus][:external_version]}-bundle.tar.gz"
-default[:nexus][:checksum]                                     = '9723a219c38afa30576dad0b62840ff56bb31f4542dab7d24d6e1a4d359763c9'
+default[:nexus][:checksum]                                     = 'fbcc4d9da98e5cf70d728587d9c7c4b17d0205e7ebeb262eb4f4089e28d3a766'
 
 default[:nexus][:port]                                         = '8081'
 default[:nexus][:host]                                         = '0.0.0.0'
@@ -51,8 +51,6 @@ default[:nexus][:bundle_name]                                  = "#{node[:nexus]
 default[:nexus][:home]                                         = "/usr/local/#{node[:nexus][:name]}"
 default[:nexus][:pid_dir]                                      = "#{node[:nexus][:home]}/shared/pids"
 default[:nexus][:work_dir]                                     = "/nexus/sonatype-work/nexus"
-
-default[:nexus][:plugins]                                      = []
 
 default[:nexus][:logs][:logs_to_keep]                          = 30
 
