@@ -28,7 +28,7 @@ directory "#{node[:nginx][:dir]}/shared/certificates" do
 end
 
 if node[:nexus][:app_server_proxy][:use_self_signed]
-  log "Using default certificate." do
+  log "Using default (self signed) certificate." do
     level :warn
   end
 
