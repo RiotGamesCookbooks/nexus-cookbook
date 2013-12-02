@@ -22,6 +22,9 @@ Vagrant.configure("2") do |config|
           :ssl => {
             :verify => false
           }
+        },
+        :app_server_proxy => {
+          :use_self_signed => true
         }
       }
     }

@@ -27,8 +27,25 @@ directory "#{node[:nginx][:dir]}/shared/certificates" do
   recursive true
 end
 
-ssl_files = Chef::Nexus.get_ssl_files_data_bag(node)
-if ssl_files && ssl_files[node[:nexus][:app_server_proxy][:ssl][:key]]
+if node[:nexus][:app_server_proxy][:use_self_signed]
+  log "Using default certificate." do
+    level :warn
+  end
+
+  cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt" do
+    source "self_signed_cert.crt"
+    mode   "077"
+    action :create
+  end
+
+  cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key" do
+    source "self_signed_key.key"
+    mode   "077"
+    action :create
+  end
+else
+  ssl_files = Chef::Nexus.get_ssl_files_data_bag(node)
+  Chef::Application.fatal!("No entry found in nexus_ssl_files data bag for key #{node[:nexus][:app_server_proxy][:ssl][:key]}") unless ssl_files[node[:nexus][:app_server_proxy][:ssl][:key]]
 
   log "Using nexus_ssl_files data bag entry for #{node[:nexus][:app_server_proxy][:ssl][:key]}" do
     level :info
@@ -48,22 +65,6 @@ if ssl_files && ssl_files[node[:nexus][:app_server_proxy][:ssl][:key]]
     content key
     mode    "077"
     action  :create
-  end
-else
-  log "Could not find ssl_certificate data bag, using default certificate." do
-    level :warn
-  end
-
-  cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt" do
-    source "self_signed_cert.crt"
-    mode   "077"
-    action :create
-  end
-
-  cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key" do
-    source "self_signed_key.key"
-    mode   "077"
-    action :create
   end
 end
 

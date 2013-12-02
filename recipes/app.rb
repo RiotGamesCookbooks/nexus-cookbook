@@ -97,14 +97,3 @@ end
 service "nexus" do
   action   [:enable, :start]
 end
-
-template ::File.join(node[:nexus][:work_dir], "conf", "logback-nexus.xml") do
-  source "logback-nexus.xml.erb"
-  owner  node[:nexus][:user]
-  group  node[:nexus][:group]
-  mode "0664"
-  variables(
-    :logs_to_keep => node[:nexus][:logs][:logs_to_keep]
-  )
-  only_if { Chef::Nexus.nexus_available?(node) }
-end
