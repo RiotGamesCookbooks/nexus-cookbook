@@ -1,3 +1,10 @@
+## v3.0.0
+
+Backwards incompatible release supporting Nexus 2.7.
+
+* [#57](https://github.com/RiotGames/nexus-cookbook/pull/57) Support for Nexus 2.7
+* Data bags are no longer required for the basic default recipe workflow.
+
 ## v2.4.0
 
 * [#52](https://github.com/RiotGames/nexus-cookbook/pull/52) Fixed a compilation bug for credentials data bag.
