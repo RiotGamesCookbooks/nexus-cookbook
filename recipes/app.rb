@@ -20,12 +20,6 @@
 include_recipe "nexus::_common_system"
 include_recipe "java"
 
-platform = ""
-case node[:platform]
-when "centos", "redhat", "debian", "ubuntu", "amazon", "scientific"
-  platform = "linux-x86-64"
-end
-
 artifact_deploy node[:nexus][:name] do
   version           node[:nexus][:version]
   artifact_location node[:nexus][:url]
@@ -65,8 +59,6 @@ artifact_deploy node[:nexus][:name] do
       group  node[:nexus][:group]
       mode   "0775"
       variables(
-        :platform   => platform,
-        :nexus_home => nexus_home,
         :nexus_user => node[:nexus][:user],
         :nexus_pid  => node[:nexus][:pid_dir]
       )
@@ -96,13 +88,6 @@ artifact_deploy node[:nexus][:name] do
       )
     end
 
-    node[:nexus][:plugins].each do |plugin| 
-      nexus_plugin plugin do
-        plugin_path ::File.join(release_path, node[:nexus][:bundle_name], "nexus/WEB-INF/optional-plugins")
-        nexus_path  release_path
-      end
-    end
-
     link "/etc/init.d/nexus" do
       to "#{bin_dir}/nexus"
     end
@@ -111,15 +96,4 @@ end
 
 service "nexus" do
   action   [:enable, :start]
-end
-
-template ::File.join(node[:nexus][:work_dir], "conf", "logback-nexus.xml") do
-  source "logback-nexus.xml.erb"
-  owner  node[:nexus][:user]
-  group  node[:nexus][:group]
-  mode "0664"
-  variables(
-    :logs_to_keep => node[:nexus][:logs][:logs_to_keep]
-  )
-  only_if { Chef::Nexus.nexus_available?(node) }
 end
