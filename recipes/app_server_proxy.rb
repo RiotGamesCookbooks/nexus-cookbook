@@ -34,13 +34,13 @@ if node[:nexus][:app_server_proxy][:use_self_signed]
 
   cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt" do
     source "self_signed_cert.crt"
-    mode   "077"
+    mode   "600"
     action :create
   end
 
   cookbook_file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key" do
     source "self_signed_key.key"
-    mode   "077"
+    mode   "600"
     action :create
   end
 else
@@ -57,13 +57,13 @@ else
 
   file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.crt" do
     content certificate
-    mode    "077"
+    mode    "600"
     action :create
   end
 
   file "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key" do
     content key
-    mode    "077"
+    mode    "600"
     action  :create
   end
 end
