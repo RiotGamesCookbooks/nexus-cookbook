@@ -1,3 +1,9 @@
+## v3.0.1
+
+* [#59](https://github.com/RiotGames/nexus-cookbook/pull/59) Bump Nexus 2.7 dependency, because a bad version was released.
+* [#56](https://github.com/RiotGames/nexus-cookbook/pull/56) Fixed a security bug with the file mode on SSL certs.
+* [#60](https://github.com/RiotGames/nexus-cookbook/pull/60) Bump java and artifact cookbook dependencies.
+
 ## v3.0.0
 
 Backwards incompatible release supporting Nexus 2.7.
