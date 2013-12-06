@@ -122,8 +122,8 @@ class Chef
       def nexus_available?(node)
         retries = node[:nexus][:cli][:retries]
         begin
-          nexus(node)
-          return true
+          remote = anonymous_nexus_remote(node)
+          return remote.status['state'] == 'STARTED'
         rescue Errno::ECONNREFUSED, NexusCli::CouldNotConnectToNexusException, NexusCli::UnexpectedStatusCodeException => e
           if retries > 0
             retries -= 1
@@ -175,6 +175,18 @@ class Chef
       end
 
       private
+
+
+        # Creates a new instance of a Nexus connection using only
+        # the URL to the local server. This connection is anonymous.
+        #
+        # @param  node [Chef::Node] the Chef node
+        #
+        # @return [NexusCli::BaseRemote] a NexusCli remote class
+        def anonymous_nexus_remote(node)
+          require 'nexus_cli'
+          NexusCli::RemoteFactory.create({'url' => generate_nexus_url(node)}, node[:nexus][:cli][:ssl][:verify])
+        end
 
         def generate_nexus_url(node)
           if node[:nexus][:app_server_proxy][:ssl][:enabled]
