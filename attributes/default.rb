@@ -52,8 +52,6 @@ default[:nexus][:home]                                         = "/usr/local/#{n
 default[:nexus][:pid_dir]                                      = "#{node[:nexus][:home]}/shared/pids"
 default[:nexus][:work_dir]                                     = "/nexus/sonatype-work/nexus"
 
-default[:nexus][:logs][:logs_to_keep]                          = 30
-
 default[:nexus][:app_server][:jetty][:loopback]                = false
 
 default[:nexus][:app_server_proxy][:ssl][:port]                = 8443
