@@ -86,3 +86,8 @@ template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
 end
 
 nginx_site 'nexus_proxy.conf'
+
+# Remove nginx default site
+nginx_site "default" do
+  enable false
+end
