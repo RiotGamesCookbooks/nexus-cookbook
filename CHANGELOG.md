@@ -1,3 +1,7 @@
+## v.3.1.0
+
+* [#67](https://github.com/RiotGames/nexus-cookbook/pull/67) Get a bit more up-to-date on nginx for COOK-3030
+
 ## v3.0.1
 
 * [#59](https://github.com/RiotGames/nexus-cookbook/pull/59) Bump Nexus 2.7 dependency, because a bad version was released.
