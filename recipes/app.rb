@@ -53,7 +53,7 @@ artifact_deploy node[:nexus][:name] do
     conf_dir   = ::File.join(nexus_home, "conf")
     bin_dir    = ::File.join(nexus_home, "bin")
 
-    [ node[:nexus][:pid_dir]}, node[:nexus][:work_dir] ].each do |dir|
+    [ node[:nexus][:pid_dir], node[:nexus][:work_dir] ].each do |dir|
       directory dir do
         owner     node[:nexus][:user]
         group     node[:nexus][:user]
