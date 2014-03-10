@@ -1,3 +1,12 @@
+## v.3.2.0
+
+* [#69](https://github.com/RiotGames/nexus-cookbook/pull/69) Create pid and work dirs.
+* [#70](https://github.com/RiotGames/nexus-cookbook/pull/70) Default to using Nexus 2.7.2.
+* [#71](https://github.com/RiotGames/nexus-cookbook/pull/71) Nginx should redirect to https when hit on http/80.
+* [#68](https://github.com/RiotGames/nexus-cookbook/pull/68) Be more lax on dependencies and shoot for newer ones in java, nginx, and artifact.
+* [#73](https://github.com/RiotGames/nexus-cookbook/pull/73) Add new 'policy' attribute to hosted_repository and proxy_repository.
+* [#72](https://github.com/RiotGames/nexus-cookbook/pull/72) Replace localhost with 127.0.0.1 in nginx config.
+
 ## v.3.1.0
 
 * [#67](https://github.com/RiotGames/nexus-cookbook/pull/67) Get a bit more up-to-date on nginx for COOK-3030

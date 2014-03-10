@@ -117,6 +117,7 @@ Attribute        | Description                                                  
 name             | Name of the repository to create/delete                             | String                | name
 type             | The type of repository - either "hosted" or "proxy".                | String                |
 url              | The url used for a proxy repository.                                | String                |
+policy           | Either "HOSTED" or "SNAPSHOT" repository policy for artifacts       | String                |
 publisher        | Whether this repository is a publisher of artifacts.                | TrueClass, FalseClass |
 subscriber       | Whether this repository is a subscriber to artifacts.               | TrueClass, FalseClass |
 preemptive_fetch | Whether this (proxy) repository should preemptively fetch artifacts | TrueClass, FalseClass |
