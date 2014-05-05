@@ -97,7 +97,7 @@ artifact_deploy node[:nexus][:name] do
     end
 
     link "/etc/init.d/nexus" do
-      to "#{bin_dir}/nexus"
+      to "#{bin_dir}/#{node[:nexus][:name]}"
     end
   }
 end
