@@ -38,7 +38,7 @@ default[:nexus][:version]                                      = '2.8.0-05'
 default[:nexus][:base_dir]                                      = '/'
 default[:nexus][:user]                                         = 'nexus'
 default[:nexus][:group]                                        = 'nexus'
-default[:nexus][:external_version]                             = '2.7.2'
+default[:nexus][:external_version]                             = '2.8.0'
 default[:nexus][:url]                                          = "http://www.sonatype.org/downloads/nexus-#{node[:nexus][:external_version]}-bundle.tar.gz"
 default[:nexus][:checksum] =
     case node[:nexus][:version]
