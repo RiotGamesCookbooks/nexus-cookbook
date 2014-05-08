@@ -40,7 +40,7 @@ default[:nexus][:user]                                         = 'nexus'
 default[:nexus][:group]                                        = 'nexus'
 default[:nexus][:external_version]                             = '2.8.0'
 default[:nexus][:url]                                          = "http://www.sonatype.org/downloads/nexus-#{node[:nexus][:external_version]}-bundle.tar.gz"
-default[:nexus][:checksum]                                     ='9ccec9856922d2e5d4942feb9f7cdc8f73e75c79583e50b816650a02eff7045d'
+default[:nexus][:checksum]                                     = '9ccec9856922d2e5d4942feb9f7cdc8f73e75c79583e50b816650a02eff7045d'
 
 default[:nexus][:port]                                         = '8081'
 default[:nexus][:host]                                         = '0.0.0.0'
