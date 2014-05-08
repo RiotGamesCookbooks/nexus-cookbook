@@ -40,11 +40,7 @@ default[:nexus][:user]                                         = 'nexus'
 default[:nexus][:group]                                        = 'nexus'
 default[:nexus][:external_version]                             = '2.8.0'
 default[:nexus][:url]                                          = "http://www.sonatype.org/downloads/nexus-#{node[:nexus][:external_version]}-bundle.tar.gz"
-default[:nexus][:checksum] =
-    case node[:nexus][:version]
-      when '2.7.2-03' then '36e1b3a4d357d489f15a276a1339917a85c0fe1035631354e07a2f9946c0e6eb'
-      when '2.8.0-05' then '9ccec9856922d2e5d4942feb9f7cdc8f73e75c79583e50b816650a02eff7045d'
-    end
+default[:nexus][:checksum]                                     ='9ccec9856922d2e5d4942feb9f7cdc8f73e75c79583e50b816650a02eff7045d'
 
 default[:nexus][:port]                                         = '8081'
 default[:nexus][:host]                                         = '0.0.0.0'
