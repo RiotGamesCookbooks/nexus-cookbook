@@ -75,3 +75,5 @@ default[:nexus][:cli][:repository]                             = "releases"
 default[:nexus][:cli][:default_admin_credentials_updated]      = false
 default[:nexus][:cli][:retries]                                = 3
 default[:nexus][:cli][:retry_delay]                            = 10
+  
+default[:nexus]['use-chef-vault']                              = false
