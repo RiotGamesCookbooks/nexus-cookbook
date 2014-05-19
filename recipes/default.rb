@@ -18,7 +18,7 @@
 # limitations under the License.
 #
 
-if node[:nexus]['use-chef-vault']
+if node[:nexus]['use_chef_vault']
   chef_gem "chef-vault"
   require 'chef-vault'
 end

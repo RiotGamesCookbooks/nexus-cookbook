@@ -212,7 +212,7 @@ class Chef
         end
 
         def encrypted_data_bag_item(node, data_bag, data_bag_item)
-          if node[:nexus]['use-chef-vault']
+          if node[:nexus]['use_chef_vault']
             item = ChefVault::Item.load(data_bag, data_bag_item)
           else
             item = Chef::EncryptedDataBagItem.load(data_bag, data_bag_item)
