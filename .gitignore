@@ -6,3 +6,4 @@ cookbooks/
 data_bags/
 *.sw[op]
 VERSION
+/.project
