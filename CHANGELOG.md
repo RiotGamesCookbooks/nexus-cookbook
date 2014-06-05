@@ -1,3 +1,7 @@
+## v.3.3.0
+
+* [#64](https://github.com/RiotGames/nexus-cookbook/issues/64) Add a feature to allow for the usage of Chef Vault
+
 ## v.3.2.0
 
 * [#69](https://github.com/RiotGames/nexus-cookbook/pull/69) Create pid and work dirs.

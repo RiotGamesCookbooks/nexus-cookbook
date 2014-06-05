@@ -223,9 +223,6 @@ Most attributes under nexus are basic attributes needed for correctly installing
 * nexus.bin_dir - the above home/bin
 * nexus.work_dir - the above path/sonatype-work/nexus
 * nexus.plugins - an Array of Nexus plugins that will be installed by the default recipe.
-* nexus.hosted\_repositories - an Array of Hashes that contain the following structure: `{ name: "My Hosted Repo", publisher: true }`
-* nexus.proxy\_repositories - an Array of Hashes that contain the following structure: `{ name: "My Proxy Repo", subscriber: true, publisher: false, url: "http://some-other-nexus/repo" }`
-* nexus.group\_repositories - an Array of Hashes that contain the following structure: `{ name: "My Group Repo", add: ["My Hosted Repo"], remote: ["My Proxy Repo"] }`
 * nexus.logs.logs\_to\_keep - a fixnum value for the maximum number of logs the Nexus should keep.
 
 Attributes under app\_server\_proxy help when you want to install an proxy in front of the running Nexus Jetty container. At the moment, the only supported alternative is nginx. Also, here is where you can configure SSL for either nginx or Jetty.
@@ -259,7 +256,7 @@ Author:: Kyle Allan (<kallan@riotgames.com>)
 Based on work by Joseph Holsten (<joseph@josephholsten.com>), Charles Scott (<connaryscott@gmail.com>),
 Greg Schueler (<greg.schueler@gmail.com>), and Seth Chisamore (<schisamo@opscode.com>)
 
-Copyright 2013, Riot Games
+Copyright 2014, Riot Games
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
