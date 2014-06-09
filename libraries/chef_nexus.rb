@@ -226,6 +226,10 @@ class Chef
         # Adding a different rescue block if things exception needs to be handled differently
         rescue Chef::Exceptions::ValidationFailed => e
           nil
+
+        # if you are using vault and if data bag it not present we need to handle that exception as well
+        rescue ChefVault::Exceptions::KeysNotFound
+          nil
         end
     end
   end
