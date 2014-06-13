@@ -220,6 +220,8 @@ class Chef
           Mash.from_hash(item.to_hash)
         rescue Net::HTTPServerException => e
           nil
+        rescue Chef::Exceptions::ValidationFailed => e
+          nil
         end
     end
   end
