@@ -105,10 +105,3 @@ end
 service "nexus" do
   action   [:enable, :start]
 end
-
-
-nexus_settings node[:nexus][:name] do
-
-  path "data.remoteProxySettings"
-  value ({"httpProxySettings" => {"proxyHostname" => "proxy.com", "proxyPort" => 81 }})
-end
