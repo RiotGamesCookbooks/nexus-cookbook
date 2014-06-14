@@ -50,7 +50,8 @@ private
 
   def update_nexus_settings_json
     require 'json'
-    json = JSON.parse(get_nexus_settings_json)
-    edited_json = JsonPath.for(json).gsub("$..#{new_resource.path}") {|value| new_resource.value}.to_hash
-    Chef::Nexus.nexus(node).upload_global_settings(JSON.dump(edited_json))
+    hashed_settings = JSON.parse(get_nexus_settings_json)
+    *path_elements, setting_to_update = new_resource.path.split(".")
+    path_elements.inject(hashed_settings, :fetch)[setting_to_update] = new_resource.value
+    Chef::Nexus.nexus(node).upload_global_settings(JSON.dump(hashed_settings))
   end
