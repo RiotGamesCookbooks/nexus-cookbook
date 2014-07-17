@@ -27,6 +27,7 @@ artifact_deploy node[:nexus][:name] do
   deploy_to         node[:nexus][:home]
   owner             node[:nexus][:user]
   group             node[:nexus][:group]
+  skip_manifest_check true
   symlinks({
     "log" => "#{node[:nexus][:bundle_name]}/logs"
   })
