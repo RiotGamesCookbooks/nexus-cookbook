@@ -220,6 +220,16 @@ class Chef
           Mash.from_hash(item.to_hash)
         rescue Net::HTTPServerException => e
           nil
+
+        # chef_data_bag_item.rb fails to handle scenario of missing data bag :-(,
+        # it reports this as Chef::Exceptions::ValidationFailed exception.
+        # Adding a different rescue block if things exception needs to be handled differently
+        rescue Chef::Exceptions::ValidationFailed => e
+          nil
+
+        # if you are using vault and if data bag it not present we need to handle that exception as well
+        rescue ChefVault::Exceptions::KeysNotFound
+          nil
         end
     end
   end

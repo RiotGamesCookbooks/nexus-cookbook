@@ -100,9 +100,9 @@ Attribute  | Description                   | Type    | Default
 ---------  |-------------                  |-----    |--------
 name       | Name of the plugin to install | String  | name
 
-## nexus\_repository
+## nexus\_hosted\_repository
 
-Resource provider for creating and deleting Neuxs repositories.
+Resource provider for creating and deleting hosted Neuxs repositories.
 
 ### Actions
 Action  | Description              | Default
@@ -114,11 +114,49 @@ update  | Updates a repository     |
 ### Attributes
 Attribute        | Description                                                         | Type                  | Default
 ---------        |-------------                                                        |-----                  |--------
-name             | Name of the repository to create/delete                             | String                | name
-type             | The type of repository - either "hosted" or "proxy".                | String                |
+name             | Name of the repository to create/delete/update                             | String                | name
+publisher             | The type of repository - either "hosted" or "proxy".                | String                |
+policy           | Either "HOSTED" or "SNAPSHOT" repository policy for artifacts       | String                |
+
+
+## nexus\_group\_repository
+
+Resource provider for creating and deleting group Neuxs repositories.
+
+### Actions
+Action  | Description              | Default
+------- |-------------             |---------
+create  | Creates a new repository | Yes
+delete  | Deletes a repository     |
+add_to  | Adds a repository to group repository     | 
+remove_from  | Removes a repository to group repository     | 
+
+
+### Attributes
+Attribute        | Description                                                         | Type                  | Default
+---------        |-------------                                                        |-----                  |--------
+name             | Name of the repository to create/delete/add_to /remove_from                            | String                | name
+repository             | Repository to add/remove from group repo                | String                |
+
+
+## nexus\_proxy\_repository
+
+Resource provider for creating and deleting proxy Neuxs repositories.
+
+### Actions
+Action  | Description              | Default
+------- |-------------             |---------
+create  | Creates a new repository | Yes
+delete  | Deletes a repository     |
+update  | Updates a repository     | 
+
+### Attributes
+Attribute        | Description                                                         | Type                  | Default
+---------        |-------------                                                        |-----                  |--------
+name             | Name of the repository to create/delete/update                             | String                | name
 url              | The url used for a proxy repository.                                | String                |
 policy           | Either "HOSTED" or "SNAPSHOT" repository policy for artifacts       | String                |
-publisher        | Whether this repository is a publisher of artifacts.                | TrueClass, FalseClass |
+publisher             | The type of repository - either "hosted" or "proxy".                | String                |
 subscriber       | Whether this repository is a subscriber to artifacts.               | TrueClass, FalseClass |
 preemptive_fetch | Whether this (proxy) repository should preemptively fetch artifacts | TrueClass, FalseClass |
 
@@ -134,8 +172,8 @@ update  | Updates a global Nexus setting to a new value. | Yes
 ### Attributes
 Attribute  | Description                                  | Type                          | Default
 ---------  |-------------                                 |-----                          |--------
-path       | The element of the settings that is going to be changed. | String                        | name
-value      | The new value to update the path to.                     | String, TrueClass, FalseClass |
+path       | Period '.' delimited path to element of the settings that is going to be changed. | String                        | name
+value      | The new value to update the path to.                     | String, TrueClass, FalseClass, Hash |
 
 ## nexus\_user
 
