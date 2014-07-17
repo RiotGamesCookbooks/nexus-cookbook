@@ -27,9 +27,9 @@ artifact_deploy node[:nexus][:name] do
   deploy_to         node[:nexus][:home]
   owner             node[:nexus][:user]
   group             node[:nexus][:group]
-  skip_manifest_check true
   symlinks({
-    "log" => "#{node[:nexus][:bundle_name]}/logs"
+    "log" => "#{node[:nexus][:bundle_name]}/logs",
+    "tmp" => "#{node[:nexus][:bundle_name]}/tmp"
   })
 
   before_extract Proc.new {
@@ -42,9 +42,11 @@ artifact_deploy node[:nexus][:name] do
   before_symlink Proc.new {
     nexus_home = ::File.join(release_path, node[:nexus][:bundle_name])
 
-    directory "#{nexus_home}/logs" do
-      recursive true
-      action :delete
+    [ "#{nexus_home}/logs", "#{nexus_home}/tmp" ].each do |dir|
+      directory dir do
+        recursive true
+        action :delete
+      end
     end
   }
 
