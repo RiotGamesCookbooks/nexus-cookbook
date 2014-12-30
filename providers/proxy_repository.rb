@@ -31,7 +31,18 @@ end
 
 action :create do
   unless repository_exists?(@current_resource.name)
-    Chef::Nexus.nexus(node).create_repository(new_resource.name, true, new_resource.url, nil, new_resource.policy, new_resource.repo_provider)
+    credentials_entry = Chef::Nexus.get_credentials(node)
+    Chef::Log.info "Looking for #{new_resource.name} user and password"
+    if credentials_entry[new_resource.name]
+      username = credentials_entry[new_resource.name]["username"]
+      password = credentials_entry[new_resource.name]["password"]
+      Chef::Log.info "#{new_resource.name} - found authentication data"
+    else
+      username = nil
+      password = nil
+      Chef::Log.info "#{new_resource.name} - no authentication data found"
+    end
+    Chef::Nexus.nexus(node).create_repository(new_resource.description, true, new_resource.url, new_resource.name, new_resource.policy, new_resource.repo_provider, username, password)
     set_publisher if new_resource.publisher
     set_subscriber if new_resource.subscriber
     new_resource.updated_by_last_action(true)
