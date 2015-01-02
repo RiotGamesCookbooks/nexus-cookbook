@@ -67,7 +67,7 @@ default[:nexus][:app_server_proxy][:server][:options] = [
   'ssl_session_cache shared:SSL:10m',
   'ssl_session_timeout 24h',
   'ssl_protocols TLSv1 TLSv1.1 TLSv1.2',
-  'ssl_ciphers AES256+EECDH:AES256+EDH:!aNULL',
+  'ssl_ciphers AES256+EECDH:AES256+EDH:AES128+EECDH!aNULL',
   'ssl_prefer_server_ciphers on',
   'add_header Strict-Transport-Security max-age=63072000',
   'add_header X-Frame-Options DENY',
