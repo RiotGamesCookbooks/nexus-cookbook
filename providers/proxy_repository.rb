@@ -35,6 +35,7 @@ action :create do
     set_publisher if new_resource.publisher
     set_subscriber if new_resource.subscriber
     new_resource.updated_by_last_action(true)
+    Chef::Log.info "Created nexus proxy repository #{new_resource.name}"
   end
 end
 
@@ -42,6 +43,7 @@ action :delete do
   if repository_exists?(@current_resource.name)
     Chef::Nexus.nexus(node).delete_repository(@parsed_id)
     new_resource.updated_by_last_action(true)
+    Chef::Log.info "Deleted nexus proxy repository #{new_resource.name}"
   end
 end
 
@@ -59,6 +61,7 @@ action :update do
       unset_subscriber
     end
     new_resource.updated_by_last_action(true)
+    Chef::Log.info "Updated nexus proxy repository #{new_resource.name}"
   end
 end
 

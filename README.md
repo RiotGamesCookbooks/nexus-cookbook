@@ -88,7 +88,7 @@ Resources/Providers
 ## nexus\_plugin
 
 Installs a Nexus plugin by creating a symlink of a named plugin from the Nexus' `optional-plugins` directory into the
-Nexus' `plugin-repositroy` directory.
+Nexus' `plugin-repository` directory.
 
 ### Actions
 Action  | Description         | Default
@@ -119,6 +119,16 @@ publisher             | The type of repository - either "hosted" or "proxy".    
 policy           | Either "HOSTED" or "SNAPSHOT" repository policy for artifacts       | String                |
 repo_provider   | 'rubygems-hosted', 'maven2', ...etc       | String                | nil will use 'maven2'
 
+### Example
+```ruby
+nexus_hosted_repository 'Internal-Releases' do
+  policy 'RELEASE'
+end
+
+nexus_hosted_repository 'Internal-Snapshots' do
+  policy 'SNAPSHOT'
+end
+```
 
 ## nexus\_group\_repository
 
@@ -163,6 +173,15 @@ subscriber       | Whether this repository is a subscriber to artifacts.        
 preemptive_fetch | Whether this (proxy) repository should preemptively fetch artifacts | TrueClass, FalseClass |
 repo_provider    | 'rubygems-proxy', 'maven2', ...etc       | String                | nil will use 'maven2'
 
+### Example
+
+```ruby
+nexus_proxy_repository 'Atlassian' do
+  url 'https://maven.atlassian.com/repository/public/'
+  policy 'RELEASE'
+end
+```
+
 ## nexus\_settings
 
 Resource provider for modifying the global Nexus settings.
@@ -177,6 +196,18 @@ Attribute  | Description                                  | Type                
 ---------  |-------------                                 |-----                          |--------
 path       | Period '.' delimited path to element of the settings that is going to be changed. | String                        | name
 value      | The new value to update the path to.                     | String, TrueClass, FalseClass, Hash |
+
+### Example
+
+```ruby
+nexus_settings 'data.smtpSettings.host' do
+  value 'localhost'
+end
+
+nexus_settings 'data.smtpSettings.port' do
+  value 25
+end
+```
 
 ## nexus\_user
 
@@ -239,6 +270,66 @@ port         | The port to use for Smart Proxy. Used for enable.                
 certificate  | The certificate of another Nexus to add. Used for add_trusted_key.             | String                |
 description  | The description of the other Nexus. Used for add_trusted_key.                  | String                |
 
+## nexus\_role\_mapping
+
+Resource provider for creating, deleting, and modifying Nexus external role mappings (linking LDAP groups to nexus roles).
+
+### Actions
+Action          | Description                                    | Default
+-------         |-------------                                   |---------
+create          | Creates a new Nexus role mapping.              | Yes
+delete          | Deletes a Nexus role mapping.                  | 
+update          | Updates a Nexus rike mapping with updated information  |
+
+### Attributes
+Attribute    | Description                                              | Type                  | Default
+---------    |-------------                                             |-----                  |--------
+name         | The name of the external role (LDAP group) to map.       | String                |
+roles        | Array of strings of nexus role ids.                      | Array                 | \[\]
+privileges   | Array of strings of nexus privilege ids.                 | Array                 | \[\]
+
+### Example
+
+```ruby
+nexus_role_mapping "Administrators" do
+  roles ['nx-admin']
+end
+
+nexus_role_mapping "Developers" do
+  roles ['nx-developer']
+end
+```
+
+## nexus\_task
+
+Resource provider for creating, deleting, and modifying Nexus scheduled tasks
+
+### Actions
+Action          | Description                                    | Default
+-------         |-------------                                   |---------
+create          | Creates a new Nexus scheduled task.            | Yes
+delete          | Deletes a Nexus role mapping.                  | 
+
+### Attributes
+Attribute       | Description                                              | Type                  | Default
+---------       |-------------                                             |-----                  |--------
+name            | The name of the Nexus task.                              | String                |
+type            | The type of the Nexus task.                              | Symbol                |
+schedule        | The schedule to apply to the Nexus task.                 | String                | daily
+enabled         | Whether the schedule is enabled.                         | Boolean               | true
+start\_date     | What date to start the task for the first time.          | String                | current date
+recurring\_time | What time of day to start the task.                      | String                | 00:00
+repository\_id  | The id of the repository to apply the task to.           | String                | all\_repo
+
+### Example
+
+```ruby
+nexus_task "Empty-Trash" do
+  type :empty_trash
+  recurring_time '01:00'
+  older_than_days 30
+end
+```
 
 Attributes
 ==========

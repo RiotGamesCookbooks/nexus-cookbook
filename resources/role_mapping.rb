@@ -1,9 +1,10 @@
 #
 # Cookbook Name:: nexus
-# Recipes:: cli
+# Resource:: role_mapping
 #
-# Author:: Jesse Howarth (<him@jessehowarth.com>)
+# Author:: Leo Simons (<lsimons@schubergphilis.com>)
 # Copyright 2013, Riot Games
+# Copyright 2014, Schuberg Philis
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +18,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-chef_gem "nexus_cli" do
-  version node[:nexus][:cli_gem][:version]
-end
+
+actions :create, :delete, :update
+default_action :create
+
+attribute :name,       :kind_of => String, :name_attribute => true
+attribute :roles,      :kind_of => Array
+attribute :privileges, :kind_of => Array
