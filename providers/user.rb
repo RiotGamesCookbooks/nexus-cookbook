@@ -74,19 +74,23 @@ private
   def create_user
     validate_create_user
     Chef::Nexus.nexus(node).create_user(get_params)
+    Chef::Log.info "Created nexus user #{new_resource.username}"
   end
 
   def update_user
     Chef::Nexus.nexus(node).update_user(get_params(true))
+    Chef::Log.info "Updated nexus user #{new_resource.username}"
   end
 
   def delete_user
     Chef::Nexus.nexus(node).delete_user(new_resource.username)
+    Chef::Log.info "Deleted nexus user #{new_resource.username}"
   end
 
   def change_password
     validate_change_password
     Chef::Nexus.nexus(node).change_password(get_password_params)
+    Chef::Log.info "Changed password for nexus user #{new_resource.username}"
   end
 
   def validate_create_user

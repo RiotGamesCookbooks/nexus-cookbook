@@ -34,6 +34,7 @@ action :install do
     license_data = Chef::Nexus.decode(data_bag_item[:file])
     Chef::Nexus.nexus(node).install_license_bytes(license_data)
     new_resource.updated_by_last_action(true)
+    Chef::Log.info "Installed nexus license"
   end
 end
 
