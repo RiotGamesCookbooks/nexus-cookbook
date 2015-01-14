@@ -174,9 +174,6 @@ class Chef
         Base64.decode64(value)
       end
 
-      private
-
-
         # Creates a new instance of a Nexus connection using only
         # the URL to the local server. This connection is anonymous.
         #
