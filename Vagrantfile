@@ -5,8 +5,8 @@ Vagrant.configure("2") do |config|
   # Requires the vagrant-berkshelf plugin
   config.berkshelf.enabled = true
 
-  config.vm.box = "Berkshelf-CentOS-6.3-x86_64-minimal"
-  config.vm.box_url = "https://dl.dropbox.com/u/31081437/Berkshelf-CentOS-6.3-x86_64-minimal.box"
+  config.vm.box = "opscode-centos-6.6"
+  config.vm.box_url = "http://opscode-vm-bento.s3.amazonaws.com/vagrant/virtualbox/opscode_centos-6.6_chef-provisionerless.box"
   config.vm.network :private_network, ip: "192.168.33.10"
   config.vm.network :forwarded_port, guest: 8081, host: 8081
   config.vm.network :forwarded_port, guest: 8443, host: 8443
