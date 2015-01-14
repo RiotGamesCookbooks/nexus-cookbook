@@ -27,3 +27,4 @@ attribute :policy, :kind_of               => String, :default => nil
 attribute :publisher, :kind_of            => [TrueClass, FalseClass], :default => nil
 attribute :subscriber, :kind_of           => [TrueClass, FalseClass], :default => nil
 attribute :preemptive_fetch, :kind_of     => [TrueClass, FalseClass], :default => false
+attribute :repo_provider, :kind_of        => String, :default => nil

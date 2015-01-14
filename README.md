@@ -117,6 +117,7 @@ Attribute        | Description                                                  
 name             | Name of the repository to create/delete/update                             | String                | name
 publisher             | The type of repository - either "hosted" or "proxy".                | String                |
 policy           | Either "HOSTED" or "SNAPSHOT" repository policy for artifacts       | String                |
+repo_provider   | 'rubygems-hosted', 'maven2', ...etc       | String                | nil will use 'maven2'
 
 
 ## nexus\_group\_repository
@@ -137,6 +138,7 @@ Attribute        | Description                                                  
 ---------        |-------------                                                        |-----                  |--------
 name             | Name of the repository to create/delete/add_to /remove_from                            | String                | name
 repository             | Repository to add/remove from group repo                | String                |
+repo_provider   | 'rubygems-group', 'maven2', ...etc       | String                | nil will use 'maven2'
 
 
 ## nexus\_proxy\_repository
@@ -159,6 +161,7 @@ policy           | Either "HOSTED" or "SNAPSHOT" repository policy for artifacts
 publisher             | The type of repository - either "hosted" or "proxy".                | String                |
 subscriber       | Whether this repository is a subscriber to artifacts.               | TrueClass, FalseClass |
 preemptive_fetch | Whether this (proxy) repository should preemptively fetch artifacts | TrueClass, FalseClass |
+repo_provider    | 'rubygems-proxy', 'maven2', ...etc       | String                | nil will use 'maven2'
 
 ## nexus\_settings
 
