@@ -2,6 +2,9 @@ Vagrant.configure("2") do |config|
 
   config.vm.hostname = "nexus-berkshelf"
 
+  # Requires the vagrant-omnibus plugin
+  config.omnibus.chef_version = :latest
+
   # Requires the vagrant-berkshelf plugin
   config.berkshelf.enabled = true
 
