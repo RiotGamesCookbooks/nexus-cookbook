@@ -54,4 +54,5 @@ private
     *path_elements, setting_to_update = new_resource.path.split(".")
     path_elements.inject(hashed_settings, :fetch)[setting_to_update] = new_resource.value
     Chef::Nexus.nexus(node).upload_global_settings(JSON.dump(hashed_settings))
+    Chef::Log.info "Updated nexus setting #{setting_to_update}"
   end

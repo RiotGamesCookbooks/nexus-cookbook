@@ -36,6 +36,7 @@ action :create do
   unless group_repository_exists?(@current_resource.name)
     Chef::Nexus.nexus(node).create_group_repository(new_resource.name, nil, new_resource.repo_provider)
     new_resource.updated_by_last_action(true)
+    Chef::Log.info "Created nexus group repository #{new_resource.name}"
   end
 end
 
@@ -43,6 +44,7 @@ action :delete do
   if group_repository_exists?(@current_resource.name)
     Chef::Nexus.nexus(node).delete_group_repository(@parsed_id)
     new_resource.updated_by_last_action(true)
+    Chef::Log.info "Deleted nexus group repository #{new_resource.name}"
   end
 end
 
@@ -50,6 +52,7 @@ action :add_to do
   unless repository_in_group?(@current_resource.name, @current_resource.repository)
     Chef::Nexus.nexus(node).add_to_group_repository(@parsed_id, @parsed_repository)
     new_resource.updated_by_last_action(true)
+    Chef::Log.info "Addded nexus repository #{@parsed_repository} to group repository #{new_resource.name}"
   end
 end
 
@@ -57,6 +60,7 @@ action :remove_from do
   if repository_in_group?(@current_resource.name, @current_resource.repository)
     Chef::Nexus.nexus(node).remove_from_group_repository(@parsed_id, @parsed_repository)
     new_resource.updated_by_last_action(true)
+    Chef::Log.info "Removed nexus repository #{@parsed_repository} from group repository #{new_resource.name}"
   end
 end
 

@@ -1,9 +1,10 @@
 #
 # Cookbook Name:: nexus
-# Resource:: settings
+# Resource:: role_mapping
 #
-# Author:: Kyle Allan (<kallan@riotgames.com>)
+# Author:: Leo Simons (<lsimons@schubergphilis.com>)
 # Copyright 2013, Riot Games
+# Copyright 2014, Schuberg Philis
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,8 +19,9 @@
 # limitations under the License.
 #
 
-actions :update
-default_action :update
+actions :create, :delete, :update
+default_action :create
 
-attribute :path, :kind_of  => String, :name_attribute => true
-attribute :value, :kind_of => [String, TrueClass, FalseClass, Hash, Integer], :required => true
+attribute :name,       :kind_of => String, :name_attribute => true
+attribute :roles,      :kind_of => Array
+attribute :privileges, :kind_of => Array

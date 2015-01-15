@@ -34,6 +34,7 @@ action :create do
     Chef::Nexus.nexus(node).create_repository(new_resource.name, false, nil, nil, new_resource.policy, new_resource.repo_provider)
     set_publisher if new_resource.publisher
     new_resource.updated_by_last_action(true)
+    Chef::Log.info "Created nexus hosted repository #{new_resource.name}"
   end
 end
 
@@ -41,6 +42,7 @@ action :delete do
   if repository_exists?(@current_resource.name)
     Chef::Nexus.nexus(node).delete_repository(@parsed_id)
     new_resource.updated_by_last_action(true)
+    Chef::Log.info "Deleted nexus hosted repository #{new_resource.name}"
   end
 end
 
@@ -52,6 +54,7 @@ action :update do
       unset_publisher
     end
     new_resource.updated_by_last_action(true)
+    Chef::Log.info "Updated nexus hosted repository #{new_resource.name}"
   end
 end
 
