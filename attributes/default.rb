@@ -19,20 +19,8 @@
 #
 #
 
+# Nexus requires Java 7
 default[:java][:jdk_version] = '7'
-# this duplicates logic from the java cookbook's attributes because
-# we can't work around the attribute file load ordering
-case node['platform_family']
-when "rhel", "fedora"
-  default['java']['java_home'] = "/usr/lib/jvm/java"
-  default['java']['openjdk_packages'] = ["java-1.#{node['java']['jdk_version']}.0-openjdk", "java-1.#{node['java']['jdk_version']}.0-openjdk-devel"]
-when "debian"
-  default['java']['java_home'] = "/usr/lib/jvm/default-java"
-  default['java']['openjdk_packages'] = ["openjdk-#{node['java']['jdk_version']}-jdk", "default-jre-headless"]
-else
-  default['java']['java_home'] = "/usr/lib/jvm/default-java"
-  default['java']['openjdk_packages'] = ["openjdk-#{node['java']['jdk_version']}-jdk"]
-end
 
 default[:nexus][:version]                                      = '2.11.1-01'
 default[:nexus][:base_dir]                                      = '/'
