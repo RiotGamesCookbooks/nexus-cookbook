@@ -31,7 +31,7 @@ end
 
 action :create do
   unless repository_exists?(@current_resource.name)
-    Chef::Nexus.nexus(node).create_repository(new_resource.name, true, new_resource.url, nil, new_resource.policy, nil)
+    Chef::Nexus.nexus(node).create_repository(new_resource.name, true, new_resource.url, nil, new_resource.policy, new_resource.provider)
     set_publisher if new_resource.publisher
     set_subscriber if new_resource.subscriber
     new_resource.updated_by_last_action(true)
