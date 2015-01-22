@@ -25,7 +25,7 @@ def load_current_resource
   run_context.include_recipe "nexus::cli"
   Chef::Nexus.ensure_nexus_available(node)
 
-  @parsed_id = Chef::Nexus.parse_identifier(new_resource.name)
+  @parsed_id = new_resource.name
 
   @current_resource
 end
