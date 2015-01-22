@@ -58,7 +58,7 @@ private
 
 def role_mapping_exists?(name)
   begin
-    Chef::Nexus.nexus(node).get_role_mapping_info(Chef::Nexus.parse_identifier(name))
+    Chef::Nexus.nexus(node).get_role_mapping_info(name)
     true
   rescue NexusCli::RoleMappingNotFoundException => e
     return false
