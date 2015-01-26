@@ -21,12 +21,13 @@ include_recipe "nexus::_common_system"
 include_recipe "java"
 
 artifact_deploy node[:nexus][:name] do
-  version           node[:nexus][:version]
-  artifact_location node[:nexus][:url]
-  artifact_checksum node[:nexus][:checksum]
-  deploy_to         node[:nexus][:home]
-  owner             node[:nexus][:user]
-  group             node[:nexus][:group]
+  skip_manifest_check node[:nexus][:skip_manifest_check]
+  version             node[:nexus][:version]
+  artifact_location   node[:nexus][:url]
+  artifact_checksum   node[:nexus][:checksum]
+  deploy_to           node[:nexus][:home]
+  owner               node[:nexus][:user]
+  group               node[:nexus][:group]
   symlinks({
     "log" => "#{node[:nexus][:bundle_name]}/logs",
     "tmp" => "#{node[:nexus][:bundle_name]}/tmp"
