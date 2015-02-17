@@ -156,12 +156,40 @@ update  | Updates a repository     |
 Attribute        | Description                                                         | Type                  | Default
 ---------        |-------------                                                        |-----                  |--------
 name             | Name of the repository to create/delete/update                             | String                | name
+description      | Describe the repository                                             | String                |
 url              | The url used for a proxy repository.                                | String                |
 policy           | Either "HOSTED" or "SNAPSHOT" repository policy for artifacts       | String                |
 publisher             | The type of repository - either "hosted" or "proxy".                | String                |
 subscriber       | Whether this repository is a subscriber to artifacts.               | TrueClass, FalseClass |
 preemptive_fetch | Whether this (proxy) repository should preemptively fetch artifacts | TrueClass, FalseClass |
 repo_provider    | 'rubygems-proxy', 'maven2', ...etc       | String                | nil will use 'maven2'
+
+#### Proxy Repo Authentication
+Below is how you should create your data bags for using authentication in proxy repo:
+
+    knife data bag create nexus _wildcard -c your/chef/config --secret-file your/encrypted_data_bag_key
+
+    {
+      "id": "_wildcard",
+      "credentials": {
+        "default_admin": {
+          "username": "admin",
+          "password": "admin123"
+        },
+        "updated_admin": {
+          "username": "admin",
+          "password": "new_password"
+        },
+        "reponame": {
+          "username": "remoteuser",
+          "password": "remotepassword"
+        }
+      },
+      "license": {
+        "file": "base64d license file"
+      }
+    }
+
 
 ## nexus\_settings
 
