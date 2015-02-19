@@ -3,13 +3,13 @@
 server {
   # Redirect HTTP to HTTPS
   listen 80;
-  server_name <%= @server_name %>;
+  server_name <%= @server_name %> <%= @server_aliases.join(" ") %>;
   return 301 https://$host$request_uri;
 }
 
 server {
   listen   <%= @listen_port %> ssl;
-  server_name  <%= @server_name %>;
+  server_name  <%= @server_name %> <%= @server_aliases.join(" ") %>;
 
   ssl_certificate <%= @ssl_certificate %>;
   ssl_certificate_key  <%= @ssl_key %>;

@@ -78,6 +78,7 @@ template "#{node[:nginx][:dir]}/sites-available/nexus_proxy.conf" do
     :ssl_key         => "#{node[:nginx][:dir]}/shared/certificates/nexus-proxy.key",
     :listen_port     => node[:nexus][:app_server_proxy][:ssl][:port],
     :server_name     => node[:nexus][:app_server_proxy][:server_name],
+    :server_aliases  => node[:nexus][:app_server_proxy][:server_aliases],
     :fqdn            => node[:fqdn],
     :server_options  => node[:nexus][:app_server_proxy][:server][:options],
     :proxy_options   => node[:nexus][:app_server_proxy][:proxy][:options],
