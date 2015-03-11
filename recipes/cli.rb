@@ -18,5 +18,5 @@
 # limitations under the License.
 #
 chef_gem "nexus_cli" do
-  version "4.1.0"
+  version node[:nexus][:cli_gem][:version]
 end

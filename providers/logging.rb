@@ -33,6 +33,7 @@ action :set_level do
 
     Chef::Nexus.nexus(node).set_logger_level(new_resource.level)
     new_resource.updated_by_last_action(true)
+    Chef::Log.info "Set nexus log level to #{new_resource.level}"
   end
 end
 
