@@ -213,6 +213,33 @@ Attribute  | Description                                                       |
 ---------  |-------------                                                      |-----                          |--------
 name       | Some useful information about the license. Similar to ruby_block. | String                        | name
 
+## nexus\_logging
+
+Resource provider for setting level for logger 
+
+### Actions
+Action   | Description                                       | Default
+-------  |-------------                                      |---------
+set_level| Set logger level          | Yes
+
+### Attributes
+Attribute  | Description                                                       | Type                          | Default
+---------  |-------------                                                      |-----                          |--------
+name       | Name of LOGGER that would be adjusted                             | String                        | name
+level      | Level to set for LOGGER [name]                                    | String                        | info
+
+#### Logging Example
+
+Below is how you should configure logger to get information who has downloaded which artifact:
+
+    nexus_logging "org.eclipse.jetty.server.Server" do
+      level "debug"
+    end
+    
+    nexus_logging "org.sonatype.security.internal.UserIdMdcHelper" do
+      level "trace"
+    end
+
 ## nexus\_proxy
 
 Resource provider for manipulating the Nexus' settings for Smart Proxy.
