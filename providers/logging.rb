@@ -38,7 +38,7 @@ end
 private
   
   def same_logging_level?
-    log_levels[new_resource.name] == new_resource.level
+    log_levels[new_resource.name] == new_resource.level.upcase
   end
 
   def log_levels
