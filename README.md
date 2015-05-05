@@ -79,7 +79,7 @@ The following data bag configures the SSL certificate and key. This is a require
       }
     }
 
-For a simpler setup with self-signed certificates, set the attribute node[:nexus][:app_server_proxy][:use_self_signed] to true.
+For a simpler setup with self-signed certificates, set the attribute **node[:nexus][:app_server_proxy][:use_self_signed]** to **true**.
 
 Resources/Providers
 ===================
