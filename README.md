@@ -30,7 +30,7 @@ Recipes
 Usage
 =====
 
-Simply add the `nexus::default` recipe to the node where you want Sonatype Nexus installed.
+Simply add the `nexus::default` recipe to the node where you want Sonatype Nexus installed. Next, configure the data bags as shown in the section below.
 
 Due to a recent change on Sonatypes website, the downloads got a bit weird. Each time you download a tar.gz from Sonatype's site, it has two version
 numbers. One that is an internal folder inside the tar (ex: 2.3.1-01) and one that they use on their website's downloads page (ex: 2.3, latest). I have
@@ -67,10 +67,7 @@ Below is how you should create your data bags for using this cookbook:
       }
     }
 
-When you want to configure the Nexus to be served via SSL, you will need to set the nexus.app\_server\_proxy.ssl.enabled attribtue and configure an
-encrypted data bag.
-
-Your data bag items should look like the following:
+The following data bag configures the SSL certificate and key. This is a required data bag even if self-signed certificates are being used.
 
     knife data bag create nexus_ssl_files _wildcard -c your/chef/config --secret-file your/encrypted_data_bag_key
 
@@ -81,6 +78,8 @@ Your data bag items should look like the following:
         "key": "base64-encoded-private-key"
       }
     }
+
+For a simpler setup with self-signed certificates, set the attribute **node[:nexus][:app_server_proxy][:use_self_signed]** to **true**.
 
 Resources/Providers
 ===================
@@ -247,12 +246,12 @@ Most attributes under nexus are basic attributes needed for correctly installing
 
 * nexus.version - sets the version inside the nexus package
 * nexus.base_dir - sets the base directory under which to place the nexus user's home directory.
-* nexus.user - sets the user to install nexus under
-* nexus.group - sets the group to install nexus under
+* nexus.user - sets the user to install nexus under. **Default value:** nexus
+* nexus.group - sets the group to install nexus under. **Default value:** nexus
 * nexus.external_version - the version used on the downloads page for nexus
 * nexus.url - sets the URL where the nexus package is located
 * nexus.checksum - The SHA256 checksum of the Nexus installation package
-* nexus.port - the port to run nexus on
+* nexus.port - the port to run nexus on. **Default value:** 8081
 * nexus.host - the hostname to use for nexus
 * nexus.context_path - the context path under which Nexus is running under. ie. "/nexus" #=> "http://localhost:8081/nexus"
 * nexus.name - the name of the Nexus
@@ -272,7 +271,7 @@ Attributes under app\_server\_proxy help when you want to install an proxy in fr
 * nexus.app\_server.jetty.loopback - true if you want to loop back on the default port (useful if you want to disable HTTP access).
 * nexus.app\_server\_proxy.ssl.setup - set this attribute when you want SSL configured. Valid values are :none, :nginx, or :jetty.
 * nexus.app\_server\_proxy.use_self_signed - defaults to false, set to true to use the pre-packaged, self signed certificate.
-* nexus.app\_server\_proxy.ssl.port - the port to use for SSL connections.
+* nexus.app\_server\_proxy.ssl.port - the port to use for SSL connections. **Default value:** 8443
 * nexus.app\_server\_proxy.ssl.key - defines where to look in the credentials data bag for the SSL certificate and key information.
 * nexus.app\_server\_proxy.nginx.server.options - used to generate options in the `server` section of the nginx conf file.
 * nexus.app\_server\_proxy.nginx.proxy.options - used to generate proxy options in the `location` section of the nginx conf file.
