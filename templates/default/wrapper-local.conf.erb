@@ -1,0 +1,6 @@
+# Dropped off by Chef, thanks!
+# Force to include the original wrapper configuration
+#include ../conf/wrapper.conf
+<% @wrapper_configuration.each do |param, value| -%>
+<%= param %>=<%= value %>
+<% end -%>

@@ -85,3 +85,5 @@ default[:nexus][:cli][:retries]                                = 3
 default[:nexus][:cli][:retry_delay]                            = 10
   
 default[:nexus][:use_chef_vault]                              = false
+
+default[:nexus][:jsw][:wrapper][:config] = {}

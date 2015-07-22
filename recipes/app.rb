@@ -74,6 +74,16 @@ artifact_deploy node[:nexus][:name] do
         :nexus_pid  => node[:nexus][:pid_dir]
       )
     end
+
+    template "#{conf_dir}/wrapper-local.conf" do
+      source "wrapper-local.conf.erb"
+      owner  node[:nexus][:user]
+      group  node[:nexus][:group]
+      mode   "0775"
+      variables(
+        :wrapper_configuration => node[:nexus][:jsw][:wrapper][:config]
+      )
+    end
     
     template "#{conf_dir}/nexus.properties" do
       source "nexus.properties.erb"
