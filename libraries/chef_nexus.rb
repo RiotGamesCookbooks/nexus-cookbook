@@ -120,6 +120,7 @@ class Chef
       # 
       # @return [Boolean] true if a connection could be made, false otherwise
       def nexus_available?(node)
+        require 'nexus_cli'
         retries = node[:nexus][:cli][:retries]
         begin
           remote = anonymous_nexus_remote(node)
