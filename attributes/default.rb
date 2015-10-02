@@ -78,6 +78,8 @@ default[:nexus][:app_server_proxy][:proxy][:options]  = []
 default[:nexus][:load_balancer][:upstream_name] = "nexii"
 default[:nexus][:load_balancer][:upstream_servers] = []
 
+default[:nexus][:cli][:gem_name]                               = 'nexus_cli'
+default[:nexus][:cli][:gem_version]                            = '4.1.0'
 default[:nexus][:cli][:ssl][:verify]                           = true
 default[:nexus][:cli][:repository]                             = "releases"
 default[:nexus][:cli][:default_admin_credentials_updated]      = false

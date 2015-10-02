@@ -17,6 +17,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-chef_gem "nexus_cli" do
-  version "4.1.0"
+chef_gem node[:nexus][:cli][:gem_name] do
+  version node[:nexus][:cli][:gem_version]
 end
