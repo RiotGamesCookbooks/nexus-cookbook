@@ -19,4 +19,5 @@
 #
 chef_gem "nexus_cli" do
   version "4.1.0"
+  compile_time false if Chef::Resource::ChefGem.method_defined?(:compile_time)
 end
