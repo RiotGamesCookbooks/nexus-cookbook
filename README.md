@@ -67,7 +67,7 @@ Below is how you should create your data bags for using this cookbook:
       }
     }
 
-When you want to configure the Nexus to be served via SSL, you will need to set the nexus.app\_server\_proxy.ssl.enabled attribtue and configure an
+When you want to configure the Nexus to be served via SSL, you will need to set the nexus.app\_server\_proxy.ssl.enabled attribute and configure an
 encrypted data bag.
 
 Your data bag items should look like the following:
