@@ -124,7 +124,7 @@ class Chef
         begin
           remote = anonymous_nexus_remote(node)
           return remote.status['state'] == 'STARTED'
-        rescue Errno::ECONNREFUSED, NexusCli::CouldNotConnectToNexusException, NexusCli::UnexpectedStatusCodeException => e
+        rescue Errno::ECONNREFUSED, Errno::ENETUNREACH, NexusCli::CouldNotConnectToNexusException, NexusCli::UnexpectedStatusCodeException => e
           if retries > 0
             retries -= 1
             Chef::Log.info "Could not connect to Nexus, #{retries} attempt(s) left"
