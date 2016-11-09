@@ -11,5 +11,5 @@ version          "3.3.1"
 end
 
 depends "java", ">= 1.15.4"
-depends "nginx", ">= 1.8.0"
+depends "nginx", "= 2.7.6"
 depends "artifact", ">= 1.11.0"
