@@ -19,7 +19,7 @@
 #
 
 def load_current_resource
-  @current_resource = Chef::Resource::NexusUser.new(new_resource.username)
+  @current_resource = Chef::Resource::resource_for_node(:nexus_user, node).new(new_resource.name)
   @current_resource.old_password new_resource.old_password
   
   run_context.include_recipe "nexus::cli"

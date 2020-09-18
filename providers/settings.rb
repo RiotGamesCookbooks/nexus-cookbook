@@ -19,7 +19,7 @@
 #
 
 def load_current_resource
-  @current_resource = Chef::Resource::NexusSettings.new(new_resource.path)
+  @current_resource = Chef::Resource::resource_for_node(:nexus_settings, node).new(new_resource.name)
   @current_resource.value new_resource.value
 
   run_context.include_recipe "nexus::cli"

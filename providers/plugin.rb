@@ -18,7 +18,7 @@
 # limitations under the License.
 #
 def load_current_resource
-  @current_resource = Chef::Resource::NexusPlugin.new(new_resource.name)
+  @current_resource = Chef::Resource::resource_for_node(:nexus_plugin, node).new(new_resource.name)
 end
 
 action :install do
